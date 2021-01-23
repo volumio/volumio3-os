@@ -53,14 +53,9 @@ export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
 export LC_ALL=C LANGUAGE=C LANG=C
 
 log "Running dpkg fixes for ${DISTRO_NAME}(${DISTRO_VER})"
-if [[ ${DISTRO_VER} = 10 ]]; then
-  # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=924401
-  log "Running base-passwd.preinst" "wrn"
-  /var/lib/dpkg/info/base-passwd.preinst install
-else
-  # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=890073
-  /var/lib/dpkg/info/dash.preinst install
-fi
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=924401
+log "Running base-passwd.preinst" "wrn"
+/var/lib/dpkg/info/base-passwd.preinst install
 
 log "Configuring packages, this may take some time.." "info"
 start_dpkg_configure=$(date +%s)

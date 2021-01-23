@@ -34,6 +34,7 @@ function HELP() {
 Help documentation for Volumio Image Builder
 Basic usage: ./build.sh -b arm -d pi -v 2.0
 Switches:
+  -s <suite>    Picks a Debian release to target (Defaults to Buster)
   -b <arch>     Build a base rootfs with Multistrap.
                 Options for the target architecture are 
   'arm' (Raspbian armhf 32bit), 'armv7' (Debian armhf 32bit), 'armv8' (Debian arm64 64bit) 
@@ -203,7 +204,6 @@ function patch_multistrap_conf() {
   case "$type" in
   arm)
     log "Patching multistrap config to point to Raspbian sources" "info"
-    BASECONF=recipes/base/VolumioBase.conf
     export RASPBIANCONF=recipes/base/arm-raspbian.conf
     debian_source=http://deb.debian.org/debian
     rapsbian_source=http://mirrordirector.raspbian.org/raspbian
@@ -248,8 +248,8 @@ function check_supported_device() {
 #Check the number of arguments. If none are passed, print help and exit.
 [[ "$#" -eq 0 ]] && HELP
 
-while getopts b:v:d:p:t:h: FLAG; do
-  case ${FLAG} in
+while getopts b:d:p:s:t:v:h: FLAG; do
+  case $FLAG in
   b)
     BUILD=${OPTARG}
     ;;
@@ -262,11 +262,14 @@ while getopts b:v:d:p:t:h: FLAG; do
   p)
     PATCH=${OPTARG}
     ;;
-  h) #show help
-    HELP
+  s)
+    SUITE=$OPTARG
     ;;
   t)
     VARIANT=${OPTARG}
+    ;;
+  h) #show help
+    HELP
     ;;
   \?) #unrecognized option - show help
     echo -e \\n"Option -${bold}${OPTARG}${normal} not allowed."
@@ -312,6 +315,14 @@ if [[ -n "${BUILD}" ]]; then
   log "Creating ${BUILD} rootfs" "info"
   #TODO Check naming conventions!
   BASE="Debian"
+  BASECONF=recipes/base/VolumioBase.conf
+
+  # Check if we need to update our Multistrap config
+  if ! grep -q ${SUITE} "${BASECONF}"; then
+    log "Updating Multistrap config suite" "wrn" "${SUITE}"
+    log "Please check in new config post testing" "wrn" ""${BASECONF%%.*}_${SUITE}.conf""
+    sed "s|\(^suite=\).*$|\1${SUITE}|g" "${BASECONF}" >>"${BASECONF%%.*}_${SUITE}.conf"
+  fi
 
   MULTISTRAPCONF=${BUILD}
   case "${BUILD}" in
