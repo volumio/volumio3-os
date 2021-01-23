@@ -34,7 +34,7 @@ function HELP() {
 Help documentation for Volumio Image Builder
 Basic usage: ./build.sh -b arm -d pi -v 2.0
 Switches:
-  -s <suite>    Picks a Debian release to target (Defaults to Buster)
+  -s <suite>    Picks a Debian release to target (Defaults to Bullseye)
   -b <arch>     Build a base rootfs with Multistrap.
                 Options for the target architecture are 
   'arm' (Raspbian armhf 32bit), 'armv7' (Debian armhf 32bit), 'armv8' (Debian arm64 64bit) 
@@ -296,7 +296,7 @@ start=$(date +%s)
 LOG_DIR="${OUTPUT_DIR}/debug_$(date +%Y-%m-%d_%H-%M-%S)"
 
 if [[ -z "${SUITE}" ]]; then
-  SUITE="buster"
+  SUITE="bullseye"
   log "Defaulting to release" "" "${SUITE^}"
 fi
 
