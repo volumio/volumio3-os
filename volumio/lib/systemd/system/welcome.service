@@ -1,0 +1,9 @@
+[Unit]
+Description=Show a welcome message on console
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/welcome

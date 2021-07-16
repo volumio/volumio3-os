@@ -85,6 +85,10 @@ cp -rp "${SRC}"/volumio/usr/* "${ROOTFS}/usr/"
 cp "${SRC}/volumio/bin/volumio_cpu_tweak" "${ROOTFS}/bin/volumio_cpu_tweak"
 chmod a+x "${ROOTFS}/bin/volumio_cpu_tweak"
 
+#Welcome
+cp "${SRC}/volumio/bin/welcome" "${ROOTFS}/bin/welcome"
+chmod a+x "${ROOTFS}/bin/welcome"
+
 #LAN HOTPLUG
 cp "${SRC}/volumio/etc/default/ifplugd" "${ROOTFS}/etc/default/ifplugd"
 

@@ -334,8 +334,11 @@ systemctl disable ssh.service
 log "Enable Volumio SSH enabler"
 ln -s /lib/systemd/system/volumiossh.service /etc/systemd/system/multi-user.target.wants/volumiossh.service
 
-log "Enable Volumio Log Rotation Service"
-ln -s /lib/systemd/system/volumiologrotate.service /etc/systemd/system/multi-user.target.wants/volumiologrotate.service
+# log "Enable Volumio Log Rotation Service"
+# ln -s /lib/systemd/system/volumiologrotate.service /etc/systemd/system/multi-user.target.wants/volumiologrotate.service
+
+log "Enable Volumio Welcome Service"
+ln -s /lib/systemd/system/welcome.service /etc/systemd/system/multi-user.target.wants/welcome.service
 
 log "Enable Volumio CPU Tweak Service"
 ln -s /lib/systemd/system/volumio_cpu_tweak.service /etc/systemd/system/multi-user.target.wants/volumio_cpu_tweak.service
