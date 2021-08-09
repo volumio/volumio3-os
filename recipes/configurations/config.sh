@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Central location for Build System configuration(s)
+# Location for configuration(s) for rootfs and image creation
 
 declare -A SecureApt=(
   [debian_10.gpg]="https://repo.volumio.org/Volumio2/archive-key-10.asc"
