@@ -269,6 +269,8 @@ if [[ -e "${VOLMNT}/kernel_current.tar" ]]; then
 fi
 
 log "Creating Kernel archive"
+# Exclude ldlinux.sys from kernel_current.tar (only present with x86). It is part of the x86 syslinux bootloader
+# Rewriting it would result in relocation and a broken x86 legacy boot!
 tar cf "${VOLMNT}/kernel_current.tar" --exclude='resize-volumio-datapart' --exclude='ldlinux.sys' \
   -C "${SQSHMNT}/boot/" .
 
