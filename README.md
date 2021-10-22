@@ -1,6 +1,6 @@
 ### Buildscripts for Volumio System
 
-Copyright Michelangelo Guarise - 2016
+Copyright Volumio SRL
 
 #### Requirements
 
@@ -37,9 +37,9 @@ zip
 
 - Ensure you have installed all dependencies listed above.
 - Clone the build repo, and launch the build script (requires root permissions).
-  
+
 ```
-git clone https://github.com/volumio/Build build
+git clone https://github.com/volumio/volumio3-os.git build
 cd ./build
 ./build.sh -b <architecture> -d <device> -v <version>
 ```
