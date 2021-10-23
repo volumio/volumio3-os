@@ -140,20 +140,20 @@ device_chroot_tweaks_pre() {
 	)
 	# Version we want
 	KERNEL_VERSION="5.4.83"
+        RPI_REPO="https://github.com/Hexxeh/rpi-firmware"
+        RPI_REPO_API=${RPI_REPO/github.com/api.github.com\/repos}
+        RPI_REPO_RAW=${RPI_REPO/github.com/raw.githubusercontent.com}
 
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
 	if [[ ${RPI_USE_LATEST_KERNEL:-no} == yes ]]; then
 		branch=master
 		log "Using bleeding edge Rpi kernel" "info" "$branch"
-		RpiRepo="https://github.com/Hexxeh/rpi-firmware"
-		RpiRepoApi=${RpiRepo/github.com/api.github.com\/repos}
-		RpiRepoRaw=${RpiRepo/github.com/raw.githubusercontent.com}
-		log "Fetching latest kernel details from ${RpiRepo}"
-		RpiGitSHA=$(curl --silent "${RpiRepoApi}/branches/${branch}")
+		log "Fetching latest kernel details from ${RPI_REPO}"
+		RpiGitSHA=$(curl --silent "${RPI_REPO_API}/branches/${branch}")
 		readarray -t RpiCommitDetails <<<"$(jq -r '.commit.sha, .commit.commit.message' <<<"${RpiGitSHA}")"
 		log "Rpi latest kernel -- ${RpiCommitDetails[*]}"
-		KVER=$(curl --silent "${RpiRepoRaw}/${RpiCommitDetails[0]}/uname_string" | awk '{print $3}')
+		KVER=$(curl --silent "${RPI_REPO_RAW}/${RpiCommitDetails[0]}/uname_string" | awk '{print $3}')
 		KERNEL_VERSION=${KVER/+/}
 		log "Using rpi-update SHA ${RpiCommitDetails[0]}" "${KERNEL_VERSION}"
 		PI_KERNELS[${KERNEL_VERSION}]+="${RpiCommitDetails[0]}|${branch}"
@@ -172,6 +172,8 @@ device_chroot_tweaks_pre() {
 	### Kernel installation
 	KERNEL_COMMIT=${PI_KERNELS[$KERNEL_VERSION]%%|*}
 	BRANCH=${PI_KERNELS[$KERNEL_VERSION]##*|}
+	KERNEL_REV=$(curl --silent "${RPI_REPO_RAW}/${KERNEL_COMMIT}/uname_string" | awk -F"#" '/#/{print $2}' | awk '{print $1}')
+
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${BRANCH}"
@@ -237,7 +239,40 @@ device_chroot_tweaks_pre() {
 		rm "$key.tar.gz"
 	done
 
-	log "Starting Raspi platform tweaks" "info"
+	log "Installing Wireless drivers for 8188eu, 8192eu, 8812au, mt7610, and mt7612. Many thanks MrEngman"
+
+        MRENGMAN_REPO="http://wifi-drivers.volumio.org/wifi-drivers"
+	mkdir wifi
+	cd wifi
+
+	for DRIVER in 8188eu 8188fu 8192eu 8812au 8821cu 8822bu
+	do
+  	  log "WIFI: $DRIVER for armv7l"
+  	  wget $MRENGMAN_REPO/$DRIVER-drivers/$DRIVER-$KERNEL_VERSION-v7l-$KERNEL_REV.tar.gz
+  	  tar xf $DRIVER-$KERNEL_VERSION-v7l-$KERNEL_REV.tar.gz
+  	  sed -i 's/^kernel=.*$/kernel='"$KERNEL_VERSION"'-v7l+/' install.sh
+  	  sh install.sh
+  	  rm -rf *
+
+  	  log "WIFI: $DRIVER for armv7"
+  	  wget $MRENGMAN_REPO/$DRIVER-drivers/$DRIVER-$KERNEL_VERSION-v7-$KERNEL_REV.tar.gz
+  	  tar xf $DRIVER-$KERNEL_VERSION-v7-$KERNEL_REV.tar.gz
+  	  sed -i 's/^kernel=.*$/kernel='"$KERNEL_VERSION"'-v7+/' install.sh
+  	  sh install.sh
+  	  rm -rf *
+
+  	  log "WIFI: $DRIVER for armv6"
+  	  wget $MRENGMAN_REPO/$DRIVER-drivers/$DRIVER-$KERNEL_VERSION-$KERNEL_REV.tar.gz
+  	  tar xf $DRIVER-$KERNEL_VERSION-$KERNEL_REV.tar.gz
+  	  sed -i 's/^kernel=.*$/kernel='"$KERNEL_VERSION"'+/' install.sh
+  	  sh install.sh
+  	  rm -rf *
+	done
+
+	cd ..
+	rm -rf wifi
+
+        log "Starting Raspi platform tweaks" "info"
 	plymouth-set-default-theme volumio
 
 	log "Adding gpio & spi group and permissions"
