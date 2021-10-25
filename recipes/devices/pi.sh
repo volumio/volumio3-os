@@ -242,38 +242,42 @@ device_chroot_tweaks_pre() {
 		rm "$key.tar.gz"
 	done
 
-	log "Installing Wireless drivers for 8188eu, 8192eu, 8812au, mt7610, and mt7612. Many thanks MrEngman"
+	# Fetch and install additional WiFi drivers
+	WifiRepo="http://wifi-drivers.volumio.org/wifi-drivers"
+	WifiDrivers=("8188eu" "8188fu" "8192eu" "8812au" "8821cu" "8822bu")
+	archs=("arm-v7l" "arm-v7" "arm")
+	log "Installing additional wireless drivers. Many thanks MrEngman!" "info" "${WifiDrivers[*]}"
+	WifiDir=/tmp/wifi
+	[[ ! -d "${WifiDir}" ]] && mkdir -p "${WifiDir}"
+	pushd "${WifiDir}" || log "Can't change to ${WifiDir}" "error"
+	for driver in "${WifiDrivers[@]}"; do
+		for arch in "${archs[@]}"; do
+			log "[${arch}] Fetching driver" "${driver}"
+			archiveName=${driver}-${KERNEL_VERSION}${arch:3}-${KERNEL_REV}.tar.gz
+			archiveUrl=${WifiRepo}/${driver}-drivers/${archiveName}
+			# The Volumio mirror will always return a 200 code,
+			# and even give you a file to download for a missing driver, so usual curl tricks won't work here..
+			curl -sLO "${archiveUrl}"
+			# So test the file before continuing, or gracefully move on
+			[[ ! -s ${archiveName} ]] && {
+				log "[${arch}] Failed fetching ${driver}" "err" "${archiveUrl}"
+				continue
+			}
+			tar xz --exclude='install.sh' -f "${archiveName}"
+			# Snip what we need from MrEngman
+			module_bin="${driver}.ko"
+			module_dir="/lib/modules/${KERNEL_VERSION}${arch:3}+/kernel/drivers/net/wireless"
 
-        MRENGMAN_REPO="http://wifi-drivers.volumio.org/wifi-drivers"
-	mkdir wifi
-	cd wifi
-
-	for DRIVER in 8188eu 8188fu 8192eu 8812au 8821cu 8822bu
-	do
-  	  log "WIFI: $DRIVER for armv7l"
-  	  wget $MRENGMAN_REPO/$DRIVER-drivers/$DRIVER-$KERNEL_VERSION-v7l-$KERNEL_REV.tar.gz
-  	  tar xf $DRIVER-$KERNEL_VERSION-v7l-$KERNEL_REV.tar.gz
-  	  sed -i 's/^kernel=.*$/kernel='"$KERNEL_VERSION"'-v7l+/' install.sh
-  	  sh install.sh
-  	  rm -rf *
-
-  	  log "WIFI: $DRIVER for armv7"
-  	  wget $MRENGMAN_REPO/$DRIVER-drivers/$DRIVER-$KERNEL_VERSION-v7-$KERNEL_REV.tar.gz
-  	  tar xf $DRIVER-$KERNEL_VERSION-v7-$KERNEL_REV.tar.gz
-  	  sed -i 's/^kernel=.*$/kernel='"$KERNEL_VERSION"'-v7+/' install.sh
-  	  sh install.sh
-  	  rm -rf *
-
-  	  log "WIFI: $DRIVER for armv6"
-  	  wget $MRENGMAN_REPO/$DRIVER-drivers/$DRIVER-$KERNEL_VERSION-$KERNEL_REV.tar.gz
-  	  tar xf $DRIVER-$KERNEL_VERSION-$KERNEL_REV.tar.gz
-  	  sed -i 's/^kernel=.*$/kernel='"$KERNEL_VERSION"'+/' install.sh
-  	  sh install.sh
-  	  rm -rf *
+			mv "${driver}.conf" /etc/modprobe.d/.
+			chown root:root "${module_bin}"
+			chmod 644 "${module_bin}"
+			install -p -m 644 "${module_bin}" "${module_dir}"
+			rm -f "${driver}".*
+			log "[${arch}] Installed" "ok" "${driver}"
+		done
 	done
-
-	cd ..
-	rm -rf wifi
+	popd || log "Can't change dir" "error"
+	rm -r "${WifiDir}"
 
 	log "Starting Raspi platform tweaks" "info"
 	plymouth-set-default-theme volumio
