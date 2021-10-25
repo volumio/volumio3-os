@@ -127,39 +127,43 @@ device_chroot_tweaks() {
 device_chroot_tweaks_pre() {
 	## Define parameters
 	declare -A PI_KERNELS=(
-		#[KVER]="SHA|Branch"
-		[4.19.86]="b9ecbe8d0e3177afed08c54fc938938100a0b73f|master"
-		[4.19.97]="993f47507f287f5da56495f718c2d0cd05ccbc19|master"
-		[4.19.118]="e1050e94821a70b2e4c72b318d6c6c968552e9a2|master"
-		[5.4.51]="8382ece2b30be0beb87cac7f3b36824f194d01e9|master"
-		[5.4.59]="caf7070cd6cece7e810e6f2661fc65899c58e297|master"
-		[5.4.79]="0642816ed05d31fb37fc8fbbba9e1774b475113f|master"
-		[5.4.81]="453e49bdd87325369b462b40e809d5f3187df21d|master"
-		[5.4.83]="b7c8ef64ea24435519f05c38a2238658908c038e|stable"
-		[5.10.3]="da59cb1161dc7c75727ec5c7636f632c52170961|master"
+		#[KERNEL_VERSION]="SHA|Branch|Rev"
+		[4.19.86]="b9ecbe8d0e3177afed08c54fc938938100a0b73f|master|1283"
+		[4.19.97]="993f47507f287f5da56495f718c2d0cd05ccbc19|master|1293"
+		[4.19.118]="e1050e94821a70b2e4c72b318d6c6c968552e9a2|master|1311"
+		[5.4.51]="8382ece2b30be0beb87cac7f3b36824f194d01e9|master|1325"
+		[5.4.59]="caf7070cd6cece7e810e6f2661fc65899c58e297|master|1336"
+		[5.4.79]="0642816ed05d31fb37fc8fbbba9e1774b475113f|master|1373"
+		[5.4.81]="453e49bdd87325369b462b40e809d5f3187df21d|master|1379" # Looks like uname_string wasn't updated here..
+		[5.4.83]="b7c8ef64ea24435519f05c38a2238658908c038e|stable|1379"
+		[5.10.3]="da59cb1161dc7c75727ec5c7636f632c52170961|master|1386"
 	)
 	# Version we want
 	KERNEL_VERSION="5.4.83"
-        RPI_REPO="https://github.com/Hexxeh/rpi-firmware"
-        RPI_REPO_API=${RPI_REPO/github.com/api.github.com\/repos}
-        RPI_REPO_RAW=${RPI_REPO/github.com/raw.githubusercontent.com}
 
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
 	if [[ ${RPI_USE_LATEST_KERNEL:-no} == yes ]]; then
 		branch=master
 		log "Using bleeding edge Rpi kernel" "info" "$branch"
-		log "Fetching latest kernel details from ${RPI_REPO}"
-		RpiGitSHA=$(curl --silent "${RPI_REPO_API}/branches/${branch}")
+		RpiRepo="https://github.com/Hexxeh/rpi-firmware"
+		RpiRepoApi=${RpiRepo/github.com/api.github.com\/repos}
+		RpiRepoRaw=${RpiRepo/github.com/raw.githubusercontent.com}
+		log "Fetching latest kernel details from ${RpiRepo}"
+		RpiGitSHA=$(curl --silent "${RpiRepoApi}/branches/${branch}")
 		readarray -t RpiCommitDetails <<<"$(jq -r '.commit.sha, .commit.commit.message' <<<"${RpiGitSHA}")"
 		log "Rpi latest kernel -- ${RpiCommitDetails[*]}"
-		KVER=$(curl --silent "${RPI_REPO_RAW}/${RpiCommitDetails[0]}/uname_string" | awk '{print $3}')
-		KERNEL_VERSION=${KVER/+/}
-		log "Using rpi-update SHA ${RpiCommitDetails[0]}" "${KERNEL_VERSION}"
-		PI_KERNELS[${KERNEL_VERSION}]+="${RpiCommitDetails[0]}|${branch}"
+		# Parse required info from `uname_string`
+		uname_string=$(curl --silent "${RpiRepoRaw}/${RpiCommitDetails[0]}/uname_string")
+		RpiKerVer=$(awk '{print $3}' <<<"${uname_string}")
+		KERNEL_VERSION=${RpiKerVer/+/}
+		RpiKerRev=$(awk '{print $1}' <<<"${uname_string##*#}")
+		PI_KERNELS[${KERNEL_VERSION}]+="${RpiCommitDetails[0]}|${branch}|${RpiKerRev}"
+		# Make life easier
+		log "Using rpi-update SHA:${RpiCommitDetails[0]} Rev:${RpiKerRev}" "${KERNEL_VERSION}"
+		log "[${KERNEL_VERSION}]=\"${RpiCommitDetails[0]}|${branch}|${RpiKerRev}\"" "debug"
 	fi
 
-	IFS=\. read -ra KERNEL_SEMVER <<<"${KERNEL_VERSION}"
 	# List of custom firmware -
 	# github archives that can be extracted directly
 	declare -A CustomFirmware=(
@@ -170,14 +174,13 @@ device_chroot_tweaks_pre() {
 	)
 
 	### Kernel installation
-	KERNEL_COMMIT=${PI_KERNELS[$KERNEL_VERSION]%%|*}
-	BRANCH=${PI_KERNELS[$KERNEL_VERSION]##*|}
-	KERNEL_REV=$(curl --silent "${RPI_REPO_RAW}/${KERNEL_COMMIT}/uname_string" | awk -F"#" '/#/{print $2}' | awk '{print $1}')
+	IFS=\. read -ra KERNEL_SEMVER <<<"${KERNEL_VERSION}"
+	IFS='|' read -r KERNEL_COMMIT KERNEL_BRANCH KERNEL_REV <<<"${PI_KERNELS[$KERNEL_VERSION]}"
 
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
-	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${BRANCH}"
-	echo y | SKIP_BACKUP=1 WANT_PI4=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=$BRANCH /usr/bin/rpi-update "$KERNEL_COMMIT"
+	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}"
+	echo y | SKIP_BACKUP=1 WANT_PI4=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
 
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
 		log "Removing v8+ (pi4) Kernels" "info"
@@ -272,7 +275,7 @@ device_chroot_tweaks_pre() {
 	cd ..
 	rm -rf wifi
 
-        log "Starting Raspi platform tweaks" "info"
+	log "Starting Raspi platform tweaks" "info"
 	plymouth-set-default-theme volumio
 
 	log "Adding gpio & spi group and permissions"
