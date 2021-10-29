@@ -290,6 +290,7 @@ $*
 System Volume Information
 $RECYCLE.BIN
 RECYCLER
+._*
 EOF
 
 # This is not going to work
