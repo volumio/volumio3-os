@@ -371,16 +371,6 @@ cat <<-EOF >/var/lib/alsa/asound.state
 EOF
 chmod 777 /var/lib/alsa/asound.state
 
-log "Setting USB DAC ordering"
-## Set USB card ordering
-#https://alsa.opensrc.org/Usb-audio
-cat <<-EOF >>/etc/modprobe.d/alsa-base.conf
-#Tuning USB devices for minimal latencies
-options snd-usb-audio nrpacks=1
-# USB DACs will have device number 5 in whole Volumio device range
-options snd-usb-audio index=5
-EOF
-
 #####################
 #Network Settings and Optimizations#-----------------------------------------
 #####################
