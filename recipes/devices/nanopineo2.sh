@@ -17,7 +17,7 @@ DEVICENAME="NanoPi Neo2"
 DEVICEFAMILY="nanopi"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
-DEVICEREPO="https://github.com/ashthespy/platform-${DEVICEFAMILY}"
+DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}"
 
 ### What features do we want to target
 # TODO: Not fully implement
