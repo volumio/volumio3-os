@@ -17,7 +17,7 @@ declare -A APTSOURCE=(
 )
 
 ## Path to the volumio repo
-VOLBINSREPO="https://repo.volumio.org/Volumio2/Buster/CustomPackages/"
+VOLBINSREPO="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/binaries/"
 
 ## Array of volumio binaries
 #TODO: Fix naming scheme and repo location
