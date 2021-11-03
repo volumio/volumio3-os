@@ -17,7 +17,7 @@ declare -A APTSOURCE=(
 )
 
 ## Path to the volumio repo
-VOLBINSREPO="https://repo.volumio.org/Volumio2/Buster/CustomPackages/"
+VOLBINSREPO="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/binaries/"
 
 ## Array of volumio binaries
 #TODO: Fix naming scheme and repo location
@@ -30,12 +30,12 @@ declare -A VOLBINS=(
 # name_version_${BUILD}.deb
 # Note the use of $BUILD (arm/armv7/armv8/x86/x64) and not $ARCH(armel/armhf/arm64/i386/amd64) thanks to raspberrypi compatibility naming quirks
 declare -A CUSTOM_PKGS=(
-  [volumio_remote_updater]="https://github.com/volumio/static-assets/raw/master/custom-packages/volumio-remote-updater/volumio-remote-updater_1.7"
-  [libnpupnp1]="https://repo.volumio.org/Volumio2/Buster/CustomPackages/upmpdcli/libnpupnp1_4.0.14-1"
-  [libupnpp6]="https://repo.volumio.org/Volumio2/Buster/CustomPackages/upmpdcli/libupnpp6_0.20.2-1"
-  [upmpdcli]="https://repo.volumio.org/Volumio2/Buster/CustomPackages/upmpdcli/upmpdcli_1.5.8-1"
-  [shairport-sync]="https://repo.volumio.org/Volumio2/Buster/CustomPackages/shairport-sync/shairport-sync_3.2.2-1"
-  [mpd]="https://repo.volumio.org/Volumio2/Buster/CustomPackages/mpd/mpd_0.21.18"
+  [volumio_remote_updater]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/volumio-remote-updater/volumio-remote-updater_1.7"
+  [libnpupnp1]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/upmpdcli/libnpupnp1_4.0.14-1"
+  [libupnpp6]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/upmpdcli/libupnpp6_0.20.2-1"
+  [upmpdcli]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/upmpdcli/upmpdcli_1.5.8-1"
+  [shairport-sync]="https://github.com/volumio/volumio3-os-static-assets/blob/master/custom-packages/shairport-sync/shairport-sync_3.2.2-1"
+  [mpd]="https://github.com/volumio/volumio3-os-static-assets/blob/master/custom-packages/mpd/mpd_0.21.18"
 )
 
 ## Backend and Frontend Repository details
