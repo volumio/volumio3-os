@@ -37,6 +37,16 @@ tmpfs           /tmp                 tmpfs   defaults,noatime,mode=0755         
 tmpfs           /dev/shm             tmpfs   defaults,nosuid,noexec,nodev              0 0
 EOF
 
+if [ $BUILD == "armv8" ]; then
+  log "Adding multiarch support for armv8 to support armhf packages"
+  dpkg --add-architecture armhf
+fi
+
+if [ $BUILD == "x64" ]; then
+  log "Adding multiarch support for x64 to support i386  packages"
+  dpkg --add-architecture i386
+fi
+
 ## Initial chroot config
 declare -fF device_chroot_tweaks &>/dev/null &&
   log "Entering device_chroot_tweaks" "cfg" &&
