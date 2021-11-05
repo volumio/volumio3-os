@@ -127,39 +127,44 @@ device_chroot_tweaks() {
 device_chroot_tweaks_pre() {
 	## Define parameters
 	declare -A PI_KERNELS=(
-		#[KVER]="SHA|Branch"
-		[4.19.86]="b9ecbe8d0e3177afed08c54fc938938100a0b73f|master"
-		[4.19.97]="993f47507f287f5da56495f718c2d0cd05ccbc19|master"
-		[4.19.118]="e1050e94821a70b2e4c72b318d6c6c968552e9a2|master"
-		[5.4.51]="8382ece2b30be0beb87cac7f3b36824f194d01e9|master"
-		[5.4.59]="caf7070cd6cece7e810e6f2661fc65899c58e297|master"
-		[5.4.79]="0642816ed05d31fb37fc8fbbba9e1774b475113f|master"
-		[5.4.81]="453e49bdd87325369b462b40e809d5f3187df21d|master"
-		[5.4.83]="b7c8ef64ea24435519f05c38a2238658908c038e|stable"
-		[5.10.3]="da59cb1161dc7c75727ec5c7636f632c52170961|master"
+		#[KERNEL_VERSION]="SHA|Branch|Rev"
+		[4.19.86]="b9ecbe8d0e3177afed08c54fc938938100a0b73f|master|1283"
+		[4.19.97]="993f47507f287f5da56495f718c2d0cd05ccbc19|master|1293"
+		[4.19.118]="e1050e94821a70b2e4c72b318d6c6c968552e9a2|master|1311"
+		[5.4.51]="8382ece2b30be0beb87cac7f3b36824f194d01e9|master|1325"
+		[5.4.59]="caf7070cd6cece7e810e6f2661fc65899c58e297|master|1336"
+		[5.4.79]="0642816ed05d31fb37fc8fbbba9e1774b475113f|master|1373"
+		[5.4.81]="453e49bdd87325369b462b40e809d5f3187df21d|master|1379" # Looks like uname_string wasn't updated here..
+		[5.4.83]="b7c8ef64ea24435519f05c38a2238658908c038e|stable|1379"
+		[5.10.3]="da59cb1161dc7c75727ec5c7636f632c52170961|master|1386"
+		[5.10.73]="1597995e94e7ba3cd8866d249e6df1cf9a790e49|master|1470"		 
 	)
 	# Version we want
-	KERNEL_VERSION="5.4.83"
-        RPI_REPO="https://github.com/Hexxeh/rpi-firmware"
-        RPI_REPO_API=${RPI_REPO/github.com/api.github.com\/repos}
-        RPI_REPO_RAW=${RPI_REPO/github.com/raw.githubusercontent.com}
+	KERNEL_VERSION="5.10.73"
 
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
 	if [[ ${RPI_USE_LATEST_KERNEL:-no} == yes ]]; then
 		branch=master
 		log "Using bleeding edge Rpi kernel" "info" "$branch"
-		log "Fetching latest kernel details from ${RPI_REPO}"
-		RpiGitSHA=$(curl --silent "${RPI_REPO_API}/branches/${branch}")
+		RpiRepo="https://github.com/raspberrypi/rpi-firmware"
+		RpiRepoApi=${RpiRepo/github.com/api.github.com\/repos}
+		RpiRepoRaw=${RpiRepo/github.com/raw.githubusercontent.com}
+		log "Fetching latest kernel details from ${RpiRepo}"
+		RpiGitSHA=$(curl --silent "${RpiRepoApi}/branches/${branch}")
 		readarray -t RpiCommitDetails <<<"$(jq -r '.commit.sha, .commit.commit.message' <<<"${RpiGitSHA}")"
 		log "Rpi latest kernel -- ${RpiCommitDetails[*]}"
-		KVER=$(curl --silent "${RPI_REPO_RAW}/${RpiCommitDetails[0]}/uname_string" | awk '{print $3}')
-		KERNEL_VERSION=${KVER/+/}
-		log "Using rpi-update SHA ${RpiCommitDetails[0]}" "${KERNEL_VERSION}"
-		PI_KERNELS[${KERNEL_VERSION}]+="${RpiCommitDetails[0]}|${branch}"
+		# Parse required info from `uname_string`
+		uname_string=$(curl --silent "${RpiRepoRaw}/${RpiCommitDetails[0]}/uname_string")
+		RpiKerVer=$(awk '{print $3}' <<<"${uname_string}")
+		KERNEL_VERSION=${RpiKerVer/+/}
+		RpiKerRev=$(awk '{print $1}' <<<"${uname_string##*#}")
+		PI_KERNELS[${KERNEL_VERSION}]+="${RpiCommitDetails[0]}|${branch}|${RpiKerRev}"
+		# Make life easier
+		log "Using rpi-update SHA:${RpiCommitDetails[0]} Rev:${RpiKerRev}" "${KERNEL_VERSION}"
+		log "[${KERNEL_VERSION}]=\"${RpiCommitDetails[0]}|${branch}|${RpiKerRev}\"" "debug"
 	fi
 
-	IFS=\. read -ra KERNEL_SEMVER <<<"${KERNEL_VERSION}"
 	# List of custom firmware -
 	# github archives that can be extracted directly
 	declare -A CustomFirmware=(
@@ -170,14 +175,13 @@ device_chroot_tweaks_pre() {
 	)
 
 	### Kernel installation
-	KERNEL_COMMIT=${PI_KERNELS[$KERNEL_VERSION]%%|*}
-	BRANCH=${PI_KERNELS[$KERNEL_VERSION]##*|}
-	KERNEL_REV=$(curl --silent "${RPI_REPO_RAW}/${KERNEL_COMMIT}/uname_string" | awk -F"#" '/#/{print $2}' | awk '{print $1}')
+	IFS=\. read -ra KERNEL_SEMVER <<<"${KERNEL_VERSION}"
+	IFS=\| read -r KERNEL_COMMIT KERNEL_BRANCH KERNEL_REV <<<"${PI_KERNELS[$KERNEL_VERSION]}"
 
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
-	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${BRANCH}"
-	echo y | SKIP_BACKUP=1 WANT_PI4=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=$BRANCH /usr/bin/rpi-update "$KERNEL_COMMIT"
+	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}"
+	echo y | SKIP_BACKUP=1 WANT_PI4=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
 
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
 		log "Removing v8+ (pi4) Kernels" "info"
@@ -220,7 +224,7 @@ device_chroot_tweaks_pre() {
 			rm -rf /volumio/customNode
 		fi
 		# Block upgrade of nodejs from raspi repos
-		log "Blocking nodejs updgrades for ${NODE_VERSION}"
+		log "Blocking nodejs upgrades for ${NODE_VERSION}"
 		cat <<-EOF >"${ROOTFSMNT}/etc/apt/preferences.d/nodejs"
 			Package: nodejs
 			Pin: release *
@@ -239,40 +243,40 @@ device_chroot_tweaks_pre() {
 		rm "$key.tar.gz"
 	done
 
-	log "Installing Wireless drivers for 8188eu, 8192eu, 8812au, mt7610, and mt7612. Many thanks MrEngman"
-
-        MRENGMAN_REPO="http://wifi-drivers.volumio.org/wifi-drivers"
-	mkdir wifi
-	cd wifi
-
-	for DRIVER in 8188eu 8188fu 8192eu 8812au 8821cu 8822bu
-	do
-  	  log "WIFI: $DRIVER for armv7l"
-  	  wget $MRENGMAN_REPO/$DRIVER-drivers/$DRIVER-$KERNEL_VERSION-v7l-$KERNEL_REV.tar.gz
-  	  tar xf $DRIVER-$KERNEL_VERSION-v7l-$KERNEL_REV.tar.gz
-  	  sed -i 's/^kernel=.*$/kernel='"$KERNEL_VERSION"'-v7l+/' install.sh
-  	  sh install.sh
-  	  rm -rf *
-
-  	  log "WIFI: $DRIVER for armv7"
-  	  wget $MRENGMAN_REPO/$DRIVER-drivers/$DRIVER-$KERNEL_VERSION-v7-$KERNEL_REV.tar.gz
-  	  tar xf $DRIVER-$KERNEL_VERSION-v7-$KERNEL_REV.tar.gz
-  	  sed -i 's/^kernel=.*$/kernel='"$KERNEL_VERSION"'-v7+/' install.sh
-  	  sh install.sh
-  	  rm -rf *
-
-  	  log "WIFI: $DRIVER for armv6"
-  	  wget $MRENGMAN_REPO/$DRIVER-drivers/$DRIVER-$KERNEL_VERSION-$KERNEL_REV.tar.gz
-  	  tar xf $DRIVER-$KERNEL_VERSION-$KERNEL_REV.tar.gz
-  	  sed -i 's/^kernel=.*$/kernel='"$KERNEL_VERSION"'+/' install.sh
-  	  sh install.sh
-  	  rm -rf *
+	# Fetch and install additional WiFi drivers
+	WifiRepo="http://wifi-drivers.volumio.org/wifi-drivers"
+	WifiDrivers=("8188eu" "8188fu" "8192eu" "8812au" "8821cu" "8822bu")
+	archs=("arm-v7l" "arm-v7" "arm")
+	log "Installing additional wireless drivers. Many thanks MrEngman!" "info" "${WifiDrivers[*]}"
+	WifiDir=/tmp/wifi
+	[[ ! -d "${WifiDir}" ]] && mkdir -p "${WifiDir}"
+	pushd "${WifiDir}" || log "Can't change to ${WifiDir}" "error"
+	for driver in "${WifiDrivers[@]}"; do
+		for arch in "${archs[@]}"; do
+			log "[${arch}] Fetching driver" "${driver}"
+			archiveName=${driver}-${KERNEL_VERSION}${arch:3}-${KERNEL_REV}.tar.gz
+			archiveUrl=${WifiRepo}/${driver}-drivers/${archiveName}
+			# The Volumio mirror will always return a 200 code,
+			# and even give you a file to download for a missing driver, so usual curl tricks won't work here..
+			curl -sLO "${archiveUrl}"
+			# So test the file before continuing, or gracefully move on
+			[[ ! -s ${archiveName} ]] && {
+				log "[${arch}] Failed fetching ${driver}" "err" "${archiveUrl}"
+				continue
+			}
+			# Kinda messy, but the tarball doesn't always extract fully - so try and protect against that as well
+			(
+				tar xz -f "${archiveName}" &&
+					sed -i 's|sudo ||' install.sh &&
+					./install.sh &&
+					log "[${arch}] Installed" "okay" "${driver}"
+			) || log "[${arch}] Installation failed" "err" "${driver} -- $(stat --printf="%s" "${archiveName}")"
+		done
 	done
+	popd || log "Can't change dir" "error"
+	rm -r "${WifiDir}"
 
-	cd ..
-	rm -rf wifi
-
-        log "Starting Raspi platform tweaks" "info"
+	log "Starting Raspi platform tweaks" "info"
 	plymouth-set-default-theme volumio
 
 	log "Adding gpio & spi group and permissions"
