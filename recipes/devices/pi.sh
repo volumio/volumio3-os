@@ -147,7 +147,7 @@ device_chroot_tweaks_pre() {
 	if [[ ${RPI_USE_LATEST_KERNEL:-no} == yes ]]; then
 		branch=master
 		log "Using bleeding edge Rpi kernel" "info" "$branch"
-		RpiRepo="https://github.com/Hexxeh/rpi-firmware"
+		RpiRepo="https://github.com/raspberrypi/rpi-firmware"
 		RpiRepoApi=${RpiRepo/github.com/api.github.com\/repos}
 		RpiRepoRaw=${RpiRepo/github.com/raw.githubusercontent.com}
 		log "Fetching latest kernel details from ${RpiRepo}"
