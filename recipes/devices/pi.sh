@@ -176,7 +176,7 @@ device_chroot_tweaks_pre() {
 
 	### Kernel installation
 	IFS=\. read -ra KERNEL_SEMVER <<<"${KERNEL_VERSION}"
-	IFS='|' read -r KERNEL_COMMIT KERNEL_BRANCH KERNEL_REV <<<"${PI_KERNELS[$KERNEL_VERSION]}"
+	IFS=\| read -r KERNEL_COMMIT KERNEL_BRANCH KERNEL_REV <<<"${PI_KERNELS[$KERNEL_VERSION]}"
 
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
@@ -224,7 +224,7 @@ device_chroot_tweaks_pre() {
 			rm -rf /volumio/customNode
 		fi
 		# Block upgrade of nodejs from raspi repos
-		log "Blocking nodejs updgrades for ${NODE_VERSION}"
+		log "Blocking nodejs upgrades for ${NODE_VERSION}"
 		cat <<-EOF >"${ROOTFSMNT}/etc/apt/preferences.d/nodejs"
 			Package: nodejs
 			Pin: release *
@@ -264,17 +264,13 @@ device_chroot_tweaks_pre() {
 				log "[${arch}] Failed fetching ${driver}" "err" "${archiveUrl}"
 				continue
 			}
-			tar xz --exclude='install.sh' -f "${archiveName}"
-			# Snip what we need from MrEngman
-			module_bin="${driver}.ko"
-			module_dir="/lib/modules/${KERNEL_VERSION}${arch:3}+/kernel/drivers/net/wireless"
-
-			mv "${driver}.conf" /etc/modprobe.d/.
-			chown root:root "${module_bin}"
-			chmod 644 "${module_bin}"
-			install -p -m 644 "${module_bin}" "${module_dir}"
-			rm -f "${driver}".*
-			log "[${arch}] Installed" "ok" "${driver}"
+			# Kinda messy, but the tarball doesn't always extract fully - so try and protect against that as well
+			(
+				tar xz -f "${archiveName}" &&
+					sed -i 's|sudo ||' install.sh &&
+					./install.sh &&
+					log "[${arch}] Installed" "okay" "${driver}"
+			) || log "[${arch}] Installation failed" "err" "${driver} -- $(stat --printf="%s" "${archiveName}")"
 		done
 	done
 	popd || log "Can't change dir" "error"
