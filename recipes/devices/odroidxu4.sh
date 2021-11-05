@@ -43,7 +43,7 @@ write_device_files() {
   log "Running write_device_files" "ext"
 
   cp ${PLTDIR}/${DEVICEBASE}/boot/boot.ini /mnt/volumio/rootfs/boot
-  cp ${PLTDIR}/${DEVICEBASE}/boot/exynos5422-odroidxu4.dtb /mnt/volumio/rootfs/boot
+  cp ${PLTDIR}/${DEVICEBASE}/boot/dtb/exynos5422-odroidxu4.dtb /mnt/volumio/rootfs/boot
   cp ${PLTDIR}/${DEVICEBASE}/boot/zImage /mnt/volumio/rootfs/boot
 
   log "Copying modules and firmware and inittab"
