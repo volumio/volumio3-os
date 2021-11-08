@@ -477,3 +477,8 @@ log "Setting CPU governor to performance" "info"
 echo 'GOVERNOR="performance"' >/etc/default/cpufrequtils
 
 log "Finished Volumio chroot configuration for ${DISTRO_NAME}" "okay"
+
+#------------------------------------------------------------
+
+echo "Allowing UDEV To make rest calls to make usb detection work"
+echo "IPAddressAllow=127.0.0.1" >> /lib/systemd/system/udev.service
