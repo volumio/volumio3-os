@@ -332,6 +332,7 @@ device_chroot_tweaks_pre() {
 		dtparam=i2c_arm=on
 		disable_splash=1
 		hdmi_force_hotplug=1
+		force_eeprom_read=0
 
 		include userconfig.txt
 	EOF
