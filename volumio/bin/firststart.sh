@@ -14,7 +14,7 @@ mkdir -p /var/log/samba/cores && chmod -R 0700 "$_"
 
 if [[ ${VOLUMIO_HARDWARE} == "pi" ]]; then
   echo "Creating /boot/userconfig.txt"
-  echo "# Add your custom config.txt options to this file, which will be preserved during updates" >>/boot/userconfig.txt
+  echo "# Add your custom config.txt options to this file, which will be preserved during updates" > /boot/userconfig.txt
 fi
 
 echo "Removing default SSH host keys"
