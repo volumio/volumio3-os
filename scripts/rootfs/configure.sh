@@ -37,14 +37,6 @@ cp -r "${SRC}/volumio/etc/udev" "${ROOTFS}/etc/"
 # cp -r "${SRC}/volumio/etc/polkit-1/localauthority/50-local.d/50-mount-as-pi.pkla" \
 #   "${ROOTFS}/etc/polkit-1/localauthority/50-local.d/50-mount-as-pi.pkla"
 
-#Inittab file
-cp "${SRC}/volumio/etc/inittab" "${ROOTFS}/etc/inittab"
-
-#MOTD
-# Seems to get overwritten later
-# rm -f "${ROOTFSMNT}/etc/motd" "${ROOTFSMNT}"/etc/update-motd.d/*
-# cp "${SRC}"/volumio/etc/update-motd.d/* "${ROOTFS}/etc/update-motd.d/"
-
 #SSH
 cp "${SRC}/volumio/etc/ssh/sshd_config" "${ROOTFS}/etc/ssh/sshd_config"
 
