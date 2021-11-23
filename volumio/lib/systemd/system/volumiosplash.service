@@ -6,8 +6,6 @@ DefaultDependencies=no
 
 [Service]
 ExecStart=/bin/volumiosplash.sh
-StandardOutput=syslog
-StandardError=syslog
 SyslogIdentifier=volumio-splash
 User=root
 Group=root

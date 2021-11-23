@@ -6,8 +6,6 @@ Wants=dynamicswap.service
 [Service]
 ExecStart=/usr/bin/node /volumio/index.js
 Restart=always
-StandardOutput=syslog
-StandardError=syslog
 SyslogIdentifier=volumio
 User=volumio
 Group=volumio
