@@ -72,7 +72,7 @@ device_chroot_tweaks_pre() {
 	  kernel /zImage
 	  fdt /dtb/rk3288-miniarm.dtb
 	  initrd /uInitrd
-	  append  earlyprintk splash console=tty1 console=ttyS3,115200n8 rw init=/sbin/init imgpart=UUID=${UUID_IMG} imgfile=/volumio_current.sqsh bootpart=UUID=${UUID_BOOT} datapart=UUID=${UUID_DATA} bootconfig=/extlinux/extlinux.conf logo.nologo vt.global_cursor_default=0 loglevel=8
+	  append  earlyprintk splash quiet plymouth.ignore-serial-consoles console=tty1 console=ttyS3,115200n8 rw init=/sbin/init imgpart=UUID=${UUID_IMG} imgfile=/volumio_current.sqsh bootpart=UUID=${UUID_BOOT} datapart=UUID=${UUID_DATA} bootconfig=/extlinux/extlinux.conf logo.nologo vt.global_cursor_default=0 loglevel=8
 	EOF
   cat <<-EOF >/usr/local/bin/tinker-init.sh
 	#!/bin/sh
