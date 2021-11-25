@@ -125,6 +125,9 @@ device_chroot_tweaks() {
 # Will be run in chroot - Pre initramfs
 # TODO Try and streamline this!
 device_chroot_tweaks_pre() {
+        log "Changing initramfs module config to 'modules=list' to limit volumio.initrd size" "cfg"
+        sed -i "s/MODULES=most/MODULES=list/g" /etc/initramfs-tools/initramfs.conf
+
 	## Define parameters
 	declare -A PI_KERNELS=(
 		#[KERNEL_VERSION]="SHA|Branch|Rev"
