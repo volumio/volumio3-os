@@ -106,6 +106,7 @@ device_chroot_tweaks_pre() {
   
   cat <<-EOF >/etc/rc.local
   #!/bin/sh -e
+  /usr/local/bin/tinker-init.sh
   /usr/local/bin/detect-primo.sh
 	EOF
 
