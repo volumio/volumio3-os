@@ -76,15 +76,14 @@ write_device_files() {
   cp "${pkg_root}"/firmware-cfg80211/* "${ROOTFSMNT}"/lib/firmware
 
   #log "Copying Alsa Use Case Manager files"
-  #No need to copy our own, with Buster we seem to have a default
-  #UCM2 will be tsted with Debian "Bullseye"
-  #cp -R "${pkg_root}"/UCM2/* "${ROOTFSMNT}"/usr/share/alsa/ucm/
-  #cp -R "${pkg_root}"/UCM/* "${ROOTFSMNT}"/usr/share/alsa/ucm/
+  #With Buster we seem to have a default install, but it is not complete. Add the missing codecs.
+  #(UCM2, which is complete, does not work with Buster's Alsa version but will with Bullseye)
+  cp -R "${pkg_root}"/UCM/* "${ROOTFSMNT}"/usr/share/alsa/ucm/
 
   mkdir -p "${ROOTFSMNT}"/usr/local/bin/
   declare -A CustomScripts=(
     [bytcr_init.sh]="bytcr-init/bytcr-init.sh"
-    [jackdetect-rt5640.sh]="bytcr-init/jackdetect-rt5640.sh"
+    [jackdetect.sh]="bytcr-init/jackdetect.sh"
     [volumio_hda_intel_tweak.sh]="hda-intel-tweaks/volumio_hda_intel_tweak.sh"
     [x86Installer.sh]="x86Installer/x86Installer.sh"
   )
