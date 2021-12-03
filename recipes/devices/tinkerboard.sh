@@ -74,17 +74,16 @@ device_chroot_tweaks_pre() {
 	  initrd /uInitrd
 	  append  earlyprintk splash quiet plymouth.ignore-serial-consoles console=tty1 console=ttyS3,115200n8 rw init=/sbin/init imgpart=UUID=${UUID_IMG} imgfile=/volumio_current.sqsh bootpart=UUID=${UUID_BOOT} datapart=UUID=${UUID_DATA} bootconfig=/extlinux/extlinux.conf logo.nologo vt.global_cursor_default=0 loglevel=8
 	EOF
-  cat <<-EOF >/usr/local/bin/tinker-init.sh
-	#!/bin/sh
-	echo 2 > /proc/irq/45/smp_affinity
-	EOF
+  
+  log "Tinkerboard Init"
+  echo "#!/bin/sh
+  echo 2 > /proc/irq/45/smp_affinity" > /usr/local/bin/tinker-init.sh
   chmod +x /usr/local/bin/tinker-init.sh
 
-  log "Detect primo script"
-  cat <<-EOF >/usr/local/bin/detect-primo.sh
-  primodac=\`sudo /usr/sbin/i2cdetect -y 1 0x48 0x48 | grep -E 'UU|48' | awk '{print \$2}'\`
+  log "Primo DAC"
+  echo "primodac=\`sudo /usr/sbin/i2cdetect -y 1 0x48 0x48 | grep -E 'UU|48' | awk '{print \$2}'\`
   if [ ! -z \"\$primodac\" ]; then
-  configured=\`cat /boot/hw_intf.conf | grep es90x8q2m-dac | awk -F '=' '{print \$2}'\`
+    configured=\`cat /boot/hw_intf.conf | grep es90x8q2m-dac | awk -F '=' '{print \$2}'\`
     if [ -z \"\$configured\" ]; then
       echo \"For information only, you may safely delete this file\" > /boot/dacdetect.log
       echo \"\`date\`: Volumio Primo DAC detected on i2c address 0x48...\" >> /boot/dacdetect.log
@@ -100,15 +99,15 @@ device_chroot_tweaks_pre() {
       echo \"intf:dtoverlay=es90x8q2m-dac\" >> /boot/hw_intf.conf
       /sbin/reboot
     fi
-  fi
-	EOF
+  fi" > /usr/local/bin/detect-primo.sh
   chmod +x /usr/local/bin/detect-primo.sh
-  
-  cat <<-EOF >/etc/rc.local
-  #!/bin/sh -e
+
+  echo "#!/bin/sh -e
   /usr/local/bin/tinker-init.sh
   /usr/local/bin/detect-primo.sh
-	EOF
+  exit 0" > /etc/rc.local
+
+  chmod +x /usr/local/bin/tinker-init.sh
 
   log "USB Card Ordering"
   cat <<-EOF >/etc/modprobe.d/alsa-base.conf
