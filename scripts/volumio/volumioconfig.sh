@@ -480,5 +480,8 @@ log "Finished Volumio chroot configuration for ${DISTRO_NAME}" "okay"
 
 #------------------------------------------------------------
 
-echo "Allowing UDEV To make rest calls to make usb detection work"
+log "Allowing UDEV To make rest calls to make usb detection work"
 echo "IPAddressAllow=127.0.0.1" >> /lib/systemd/system/udev.service
+
+log "Allowing UDEV to bring up HCI devices"
+sed -i 's/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6 AF_BLUETOOTH/' /lib/systemd/system/udev.service
