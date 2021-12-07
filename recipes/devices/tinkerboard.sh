@@ -121,6 +121,10 @@ device_chroot_tweaks_pre() {
   tar xf rtl_bt_tinkerboard.tar.gz -C /
   rm rtl_bt_tinkerboard.tar.gz
   systemctl enable tinkerbt.service
+ 
+  log "Fix for bluetooth enable"
+  echo 'echo "Enabling Bluetooth"
+  /bin/hciconfig hci0 up' >> /bin/init_tinkerboard_bt
 
   log "Installing updated Realtek firmwares"
   wget https://github.com/volumio/volumio3-os-static-assets/raw/master/firmwares/firmware-realtek_20210818-1_all.deb
