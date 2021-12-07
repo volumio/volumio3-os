@@ -123,9 +123,9 @@ device_chroot_tweaks_pre() {
   systemctl enable tinkerbt.service
 
   log "Installing updated Realtek firmwares"
-  wget http://repo.volumio.org/Volumio2/Firmwares/firmware-realtek_20190114-2_all.deb
-  dpkg -i firmware-realtek_20190114-2_all.deb
-  rm firmware-realtek_20190114-2_all.deb
+  wget https://github.com/volumio/volumio3-os-static-assets/raw/master/firmwares/firmware-realtek_20210818-1_all.deb
+  dpkg -i firmware-realtek_20210818-1_all.deb
+  rm firmware-realtek_20210818-1_all.deb
 
   log "Configuring boot splash"
   plymouth-set-default-theme volumio
