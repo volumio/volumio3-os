@@ -125,4 +125,10 @@ device_image_tweaks_post() {
     mkimage -v -A "${UINITRD_ARCH}" -O linux -T ramdisk -C none -a 0 -e 0 -n uInitrd -d "${ROOTFSMNT}"/boot/volumio.initrd "${ROOTFSMNT}"/boot/uInitrd
     rm "${ROOTFSMNT}"/boot/volumio.initrd
   fi
+  log "Creating boot.scr from bootVolumio.cmd" "info"
+  if [[ -f "${ROOTFSMNT}"/boot/boot.cmd ]]; then
+    log "Creating boot.scr"
+    mkimage -A arm -T script -C none -d "${ROOTFSMNT}"/boot/bootVolumio.cmd "${ROOTFSMNT}"/boot/boot.scr
+  fi
+
 }
