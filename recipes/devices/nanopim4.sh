@@ -17,7 +17,7 @@ DEVICENAME="NanoPi M4"
 DEVICEFAMILY="rk3399"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
-DEVICEREPO="https://github.com/gkkpch/platform-${DEVICEFAMILY}"
+DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}"
 
 ### What features do we want to target
 # TODO: Not fully implement
@@ -55,17 +55,17 @@ write_device_files() {
   mkdir tmp_boot-lib-dtb
   mkdir tmp_firmware
   mkdir tmp_u-boot
-  
+
   log "Unpacking boot, lib and dtb from Armbian  .deb file..." "info"
   dpkg-deb -R ${PLTDIR}/${DEVICE}/armbian/linux-image*.deb tmp_boot-lib-dtb
   cp -dR tmp_boot-lib-dtb/boot/vmlinuz-* "${ROOTFSMNT}/boot/Image"
   cp -dR tmp_boot-lib-dtb/boot/config* "${ROOTFSMNT}/boot/"
   cp -pdR tmp_boot-lib-dtb/lib/modules "${ROOTFSMNT}/lib"
-  cp -pdR tmp_boot-lib-dtb/usr/lib/linux-image*/rockchip "${ROOTFSMNT}/boot/dtb"  
+  cp -pdR tmp_boot-lib-dtb/usr/lib/linux-image*/rockchip "${ROOTFSMNT}/boot/dtb"
 
   log "Unpacking firmware from Armbian .deb file..." "info"
   dpkg-deb -R ${PLTDIR}/${DEVICE}/armbian/armbian-firmware*.deb tmp_firmware
-  cp -pdR "tmp_firmware/lib/firmware" "${ROOTFSMNT}/lib"  
+  cp -pdR "tmp_firmware/lib/firmware" "${ROOTFSMNT}/lib"
 
   log "Unpacking u-boot from Armbian .deb file..." "info"
   dpkg-deb -R ${PLTDIR}/${DEVICE}/armbian/linux-u-boot* tmp_u-boot
