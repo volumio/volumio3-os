@@ -264,7 +264,7 @@ if [ ! -e "/mnt/imgpart/kernel_current.tar" ] || [ -e "/mnt/imgpart/curret_kerne
   print_msg "Creating archive for current kernel..."
   touch /mnt/imgpart/curret_kernel_creation
   mkdir /mnt/factory
-  mount -t vfat /dev/${BOOTDEV}p1 /mnt/factory
+  mount -t vfat ${BOOTPART} /mnt/factory
   tar cf /mnt/imgpart/kernel_current.tar -C /mnt/factory .
   umount /mnt/factory
   rm -r /mnt/factory
