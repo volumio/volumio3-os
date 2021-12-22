@@ -94,7 +94,7 @@ device_image_tweaks_post() {
     mkimage -v -A "${UINITRD_ARCH}" -O linux -T ramdisk -C none -a 0 -e 0 -n uInitrd -d "${ROOTFSMNT}"/boot/volumio.initrd "${ROOTFSMNT}"/boot/uInitrd
     rm "${ROOTFSMNT}"/boot/volumio.initrd
   fi
-  log "Creating boot.scr" "info"
-  mkimage -A arm -T script -C none -d "${ROOTFSMNT}"/boot/boot.cmd "${ROOTFSMNT}"/boot/boot.scr
+  log "Creating boot.scr, compiling the volumio3 version of the .cmd" "info"
+  mkimage -A arm -T script -C none -d "${ROOTFSMNT}"/boot/boot.cmd.volumio-os3 "${ROOTFSMNT}"/boot/boot.scr
 
 }
