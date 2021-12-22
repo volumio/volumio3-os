@@ -3,7 +3,7 @@
 
 ## Setup for FriendlyElec Nanopi Neo3  (Community Portings)
 DEVICE_SUPPORT_TYPE="C,O" # First letter (Community Porting|Supported Officially|OEM)
-DEVICE_STATUS="P"         # First letter (Planned|Test|Maintenance)
+DEVICE_STATUS="T"         # First letter (Planned|Test|Maintenance)
 
 # Base system
 BASE="Debian"
