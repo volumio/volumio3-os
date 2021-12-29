@@ -181,7 +181,8 @@ create_volumio_partitions()
 
 	echo "[info] Creating partition filesystems"
 	mkfs.vfat -n $LBLBOOT ${TARGETBOOT}
-	mkfs.ext4 -F -L $LBLIMAGE ${TARGETIMAGE}
-	mkfs.ext4 -F -L $LBLDATA ${TARGETDATA}
+    #mke2fsfull is used since busybox mke2fs does not include ext4 support
+    /sbin/mke2fsfull -t ext4 -F -L $LBLIMAGE ${TARGETIMAGE} 
+    /sbin/mke2fsfull -t ext4 -F -L $LBLDATA ${TARGETDATA} 
 	sync
 }
