@@ -495,7 +495,7 @@ build_volumio_initramfs() {
 
   num_ker_max=3
 
-  log "Found ${#versions[@]} kernel version(s)" "${versions[@]}"
+  log "Found ${#versions[@]} kernel version(s)" "${versions[@]}" "info"
   for ver in "${!versions[@]}"; do
     log "Building intramsfs for Kernel[${ver}]: ${versions[ver]}" "info"
     build_initramfs "${versions[ver]}"
@@ -519,17 +519,19 @@ build_volumio_initramfs() {
   # Add in VolumioOS customisation
   log "Addig Volumio specific binaries" "info"
   # Add VolumioOS binaries
-  volbins=('/usr/local/sbin/volumio-init-updater')
-  volbins+=('/sbin/parted' '/sbin/findfs' '/bin/lsblk' '/sbin/mke2fs'
-    '/sbin/e2fsck' '/sbin/resize2fs' '/sbin/mke2fsfull')
+  volbins=('/sbin/parted' '/sbin/findfs' '/bin/lsblk' '/sbin/mke2fs'
+    '/sbin/e2fsck' '/sbin/resize2fs' '/sbin/mke2fsfull' '/sbin/mkfs.vfat')
   if [[ ${DPKG_ARCH} = 'i386' ]] || [[ ${DPKG_ARCH} = 'amd64' ]]; then
-    log "Adding x86/x64 specific binaries (sgdisk/lsblk/dmidecode..etc)"
+    log "Adding x86/x64 specific binaries (sgdisk/lsblk/dmidecode..etc)" "info"
     volbins+=('/sbin/fdisk' '/sbin/sgdisk' '/usr/sbin/dmidecode')
   fi
-
+  # mkinitramfs for installer's do not have a volumio-init-updater
+  if [[ -f "/usr/local/sbin/volumio-init-updater" ]]; then
+    volbins+=('/usr/local/sbin/volumio-init-updater')
+  fi
   for bin in "${volbins[@]}"; do
     if [[ -f ${bin} ]]; then
-      log "Adding $bin to /sbin"
+      log "Adding $bin to /sbin" "info"
       copy_exec "$bin" /sbin
     else
       log "$bin not found!" "wrn"
@@ -543,6 +545,11 @@ build_initrd() {
   log "Creating volumio.initrd Image from ${DESTDIR}" "info"
   # Remove auto-generated scripts
   rm -rf "${DESTDIR}/scripts"
+  # Add additional init scripts (in case there are any)
+  if [ -d /root/scripts ]; then
+    mkdir "${DESTDIR}/scripts"
+    cp /root/scripts/* "${DESTDIR}/scripts/"
+  fi
   cp /root/init "${DESTDIR}"
   cd "${DESTDIR}"
   OPTS=("-o")
