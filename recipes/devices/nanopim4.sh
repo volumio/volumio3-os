@@ -61,7 +61,7 @@ write_device_files() {
   cp -dR tmp_boot-lib-dtb/boot/vmlinuz-* "${ROOTFSMNT}/boot/Image"
   cp -dR tmp_boot-lib-dtb/boot/config* "${ROOTFSMNT}/boot/"
   cp -pdR tmp_boot-lib-dtb/lib/modules "${ROOTFSMNT}/lib"
-  cp -pdR tmp_boot-lib-dtb/usr/lib/linux-image*/rockchip "${ROOTFSMNT}/boot/dtb"
+  cp -pdR tmp_boot-lib-dtb/usr/lib/linux-image*/rockchip/* "${ROOTFSMNT}/boot/dtb/rockchip"
 
   log "Unpacking firmware from Armbian .deb file..." "info"
   dpkg-deb -R ${PLTDIR}/${DEVICE}/armbian/armbian-firmware*.deb tmp_firmware
@@ -71,17 +71,15 @@ write_device_files() {
   dpkg-deb -R ${PLTDIR}/${DEVICE}/armbian/linux-u-boot* tmp_u-boot
   cp tmp_u-boot/usr/lib/linux-u-boot*/* ${PLTDIR}/${DEVICE}/u-boot
 
-#TODO cards.json
-
-
 }
 
 write_device_bootloader() {
   log "Running write_device_bootloader" "ext"
 
-  dd if="${PLTDIR}/${DEVICE}/u-boot/idbloader.bin" of="${LOOP_DEV}" bs=1024 seek=64
-  dd if="${PLTDIR}/${DEVICE}/u-boot/uboot.img" of="${LOOP_DEV}" bs=1024 seek=16384
-  dd if="${PLTDIR}/${DEVICE}/u-boot/trust.bin" of="${LOOP_DEV}" bs=1024 seek=24576
+  dd if="${PLTDIR}/${DEVICE}/u-boot/idbloader.bin" of="${LOOP_DEV}" seek=64 conv=notrunc
+  dd if="${PLTDIR}/${DEVICE}/u-boot/uboot.img" of="${LOOP_DEV}" seek=16384 conv=notrunc
+  dd if="${PLTDIR}/${DEVICE}/u-boot/trust.bin" of="${LOOP_DEV}" seek=24576 conv=notrunc
+  
 }
 
 # Will be called by the image builder for any customisation
@@ -132,3 +130,4 @@ device_image_tweaks_post() {
   fi
 
 }
+
