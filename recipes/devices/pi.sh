@@ -140,10 +140,11 @@ device_chroot_tweaks_pre() {
 		[5.4.81]="453e49bdd87325369b462b40e809d5f3187df21d|master|1379" # Looks like uname_string wasn't updated here..
 		[5.4.83]="b7c8ef64ea24435519f05c38a2238658908c038e|stable|1379"
 		[5.10.3]="da59cb1161dc7c75727ec5c7636f632c52170961|master|1386"
-		[5.10.73]="1597995e94e7ba3cd8866d249e6df1cf9a790e49|master|1470"		 
+		[5.10.73]="1597995e94e7ba3cd8866d249e6df1cf9a790e49|master|1470"		
+                [5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512" 
 	)
 	# Version we want
-	KERNEL_VERSION="5.4.83"
+	KERNEL_VERSION="5.10.90"
 
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
