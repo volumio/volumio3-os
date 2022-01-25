@@ -303,3 +303,9 @@ log "Clearning up Volumio.sqsh"
 
 log "Hashing image" "info"
 md5sum "$IMG_FILE" >"${IMG_FILE}.md5"
+
+log "Populating image info file" "info"
+
+echo "extract_size=$(stat -c%s $IMG_FILE)
+extract_sha256=$(sha256sum $IMG_FILE | awk '{print $1}')
+release_date=$BUILDDATE" > "${OUTPUT_DIR}"/image_info
