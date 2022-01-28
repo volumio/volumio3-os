@@ -197,10 +197,22 @@ device_chroot_tweaks_pre() {
         ### Important: remove this when kernel > 5.10.80
         ### We use this as kernel 5.10.89 does not work with some USB DACs preventing latest kernel to be used 
         log "Downloading Firmware to support PI4 v 1.5"
+        wget -O /boot/fixup.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup.dat
+        wget -O /boot/fixup4.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup4.dat
+        wget -O /boot/fixup4cd.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup4cd.dat
+        wget -O /boot/fixup4db.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup4db.dat
+        wget -O /boot/fixup4x.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup4x.dat
+        wget -O /boot/fixup_cd.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup_cd.dat
+        wget -O /boot/fixup_db.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup_db.dat
+        wget -O /boot/fixup_x.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup_x.dat
+        wget -O /boot/start.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start.elf
         wget -O /boot/start4.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start4.elf
         wget -O /boot/start4cd.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start4cd.elf
         wget -O /boot/start4db.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start4db.elf
         wget -O /boot/start4x.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start4x.elf
+        wget -O /boot/start_cd.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start_cd.elf
+        wget -O /boot/start_db.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start_db.elf
+        wget -O /boot/start_x.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start_x.elf
 
 
 	log "Finished Kernel installation" "okay"
