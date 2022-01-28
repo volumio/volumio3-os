@@ -193,6 +193,16 @@ device_chroot_tweaks_pre() {
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
 	fi
 
+        ### Temporary fix for Rasbperry PI 1.5 
+        ### Important: remove this when kernel > 5.10.80
+        ### We use this as kernel 5.10.89 does not work with some USB DACs preventing latest kernel to be used 
+        log "Downloading Firmware to support PI4 v 1.5"
+        wget -O /boot/start4.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start4.elf
+        wget -O /boot/start4cd.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start4cd.elf
+        wget -O /boot/start4db.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start4db.elf
+        wget -O /boot/start4x.elf https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/start4x.elf
+
+
 	log "Finished Kernel installation" "okay"
 
 	### Other Rpi specific stuff
