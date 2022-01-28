@@ -144,7 +144,7 @@ device_chroot_tweaks_pre() {
                 [5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512" 
 	)
 	# Version we want
-	KERNEL_VERSION="5.10.90"
+	KERNEL_VERSION="5.4.83"
 
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
