@@ -140,8 +140,8 @@ device_chroot_tweaks_pre() {
 		[5.4.81]="453e49bdd87325369b462b40e809d5f3187df21d|master|1379" # Looks like uname_string wasn't updated here..
 		[5.4.83]="b7c8ef64ea24435519f05c38a2238658908c038e|stable|1379"
 		[5.10.3]="da59cb1161dc7c75727ec5c7636f632c52170961|master|1386"
-		[5.10.73]="1597995e94e7ba3cd8866d249e6df1cf9a790e49|master|1470"		
-                [5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512" 
+		[5.10.73]="1597995e94e7ba3cd8866d249e6df1cf9a790e49|master|1470"
+                [5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
 	)
 	# Version we want
 	KERNEL_VERSION="5.4.83"
@@ -193,10 +193,28 @@ device_chroot_tweaks_pre() {
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
 	fi
 
-        ### Temporary fix for Rasbperry PI 1.5 
+        ### Temporary fix for Rasbperry PI 1.5
         ### Important: remove this when kernel > 5.10.80
-        ### We use this as kernel 5.10.89 does not work with some USB DACs preventing latest kernel to be used 
+        ### We use this as kernel 5.10.89 does not work with some USB DACs preventing latest kernel to be used
         log "Downloading Firmware to support PI4 v 1.5"
+				wget -O /boot/bcm2708-rpi-b-plus.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2708-rpi-b-plus.dtb
+        wget -O /boot/bcm2708-rpi-b-rev1.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2708-rpi-b-rev1.dtb
+        wget -O /boot/bcm2708-rpi-b.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2708-rpi-b.dtb
+        wget -O /boot/bcm2708-rpi-cm.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2708-rpi-cm.dtb
+        wget -O /boot/bcm2708-rpi-zero-w.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2708-rpi-zero-w.dtb
+        wget -O /boot/bcm2708-rpi-zero.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2708-rpi-zero.dtb
+        wget -O /boot/bcm2709-rpi-2-b.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2709-rpi-2-b.dtb
+        wget -O /boot/bcm2710-rpi-2-b.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-2-b.dtb
+        wget -O /boot/bcm2710-rpi-3-b-plus.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-3-b-plus.dtb
+        wget -O /boot/bcm2710-rpi-3-b.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-3-b.dtb
+        wget -O /boot/bcm2710-rpi-cm3.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-cm3.dtb
+        wget -O /boot/bcm2710-rpi-zero-2-w.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-zero-2-w.dtb
+        wget -O /boot/bcm2710-rpi-zero-2.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-zero-2.dtb
+        wget -O /boot/bcm2711-rpi-4-b.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2711-rpi-4-b.dtb
+        wget -O /boot/bcm2711-rpi-400.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2711-rpi-400.dtb
+        wget -O /boot/bcm2711-rpi-cm4.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2711-rpi-cm4.dtb
+        wget -O /boot/bcm2711-rpi-cm4s.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2711-rpi-cm4s.dtb
+        wget -O /boot/bootcode.bin https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bootcode.bin
         wget -O /boot/fixup.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup.dat
         wget -O /boot/fixup4.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup4.dat
         wget -O /boot/fixup4cd.dat https://github.com/raspberrypi/firmware/raw/165bd7bc5622ee1c721aa5da9af68935075abedd/boot/fixup4cd.dat
