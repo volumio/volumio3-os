@@ -53,4 +53,13 @@ NODE_VERSION=14.15.4
 # expected format node_modules_{arm/x86}-v${NODE_VERSION}.tar.gz
 NODE_MODULES_REPO="http://repo.volumio.org/Volumio2/"
 
-export SecureApt APTSOURCE VOLBINSREPO VOLBINS VOL_BE_REPO VOL_BE_REPO_BRANCH VOL_BE_REPO_SHA NODE_VERSION NODE_MODULES_REPO CUSTOM_PKGS
+## 
+# Array of custom ALSA plugins
+# The expected naming scheme is
+# ${BUILD}-libasound_module_pcm_<name>.so
+# Note the use of $BUILD (arm/x86/x64) and not $ARCH(armel/armhf/arm64/i386/amd64) thanks to raspberrypi compatibility naming quirks
+declare -A ALSA_PLUGINS=(
+  [volumiohook]="https://github.com/volumio/volumio-alsa-hook/releases/download/volumiohook-1.0.1/"
+)
+
+export SecureApt APTSOURCE VOLBINSREPO VOLBINS VOL_BE_REPO VOL_BE_REPO_BRANCH VOL_BE_REPO_SHA NODE_VERSION NODE_MODULES_REPO CUSTOM_PKGS ALSA_PLUGINS

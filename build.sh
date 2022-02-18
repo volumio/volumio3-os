@@ -552,6 +552,15 @@ if [[ -n "${DEVICE}" ]]; then
   fi
   # shellcheck disable=SC2012
   [[ -d "${ROOTFS}"/volumio/customPkgs ]] && log "Added custom packages:" "" "$(ls -b "${ROOTFS}"/volumio/customPkgs | tr '\n' ' ')"
+  
+  # Install Volumio ALSA plugins
+  ALSA_DIR_PARENT=$(eval dirname "${ROOTFS}/usr/lib/*/alsa-lib/")
+  for key in "${!ALSA_PLUGINS[@]}"; do  
+    url=${ALSA_PLUGINS[$key]}${BUILD}-libasound_module_pcm_$key.so
+    # log "Fetching ${key} from ${url}"
+    wget -nv "${url}" -O "${ALSA_DIR_PARENT}/alsa-lib/libasound_module_pcm_$key.so" || log "${key} ALSA plugin not found for ${BUILD}!" "err"
+  done
+
   # Prepare Images
   start_img=$(date +%s)
   BUILDDATE=$(date -I)
