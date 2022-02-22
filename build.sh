@@ -554,7 +554,7 @@ if [[ -n "${DEVICE}" ]]; then
   [[ -d "${ROOTFS}"/volumio/customPkgs ]] && log "Added custom packages:" "" "$(ls -b "${ROOTFS}"/volumio/customPkgs | tr '\n' ' ')"
   
   # Install Volumio ALSA plugins
-  ALSA_DIR_PARENT=$(eval dirname "${ROOTFS}/usr/lib/*/alsa-lib/")
+  ALSA_DIR_PARENT=$(dirname "${ROOTFS}/"usr/lib/*/alsa-lib/)
   for key in "${!ALSA_PLUGINS[@]}"; do  
     url=${ALSA_PLUGINS[$key]}${BUILD}-libasound_module_pcm_$key.so
     # log "Fetching ${key} from ${url}"
