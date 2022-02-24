@@ -35,7 +35,7 @@ INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437" "fuse")
 # Packages that will be installed
-# PACKAGES=("u-boot-tools")
+PACKAGES=("bluez-firmware" "bluetooth" "bluez" "bluez-tools")
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
@@ -47,6 +47,9 @@ write_device_files() {
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/u-boot" "${ROOTFSMNT}"
+  
+  cp -pdR "${PLTDIR}/${DEVICE}/misc/brcm_patchram_plus_rk3399" "${ROOTFSMNT}/usr/local/bin/"
+  cp -pdR "${PLTDIR}/${DEVICE}/misc/rk3399-bluetooth.service" "${ROOTFSMNT}/lib/systemd/system/"
 
   log "Creating temp targets for .deb unpacking"
   [ -e "tmp_boot-lib-dtb" ] && rm -r tmp_boot-lib-dtb
