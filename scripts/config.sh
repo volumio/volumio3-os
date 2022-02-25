@@ -62,6 +62,7 @@ NODE_MODULES_REPO="http://repo.volumio.org/Volumio2/"
 # Note the use of $BUILD (arm/x86/x64) and not $ARCH(armel/armhf/arm64/i386/amd64) thanks to raspberrypi compatibility naming quirks
 declare -A ALSA_PLUGINS=(
   [volumiohook]="https://github.com/volumio/volumio-alsa-hook/releases/download/volumiohook-1.0.1/"
+  [volumiofifo]="https://github.com/volumio/volumio-alsa-fifo/releases/download/volumiofifo-1.0.1/"
 )
 
 export SecureApt APTSOURCE VOLBINSREPO VOLBINS VOL_BE_REPO VOL_BE_REPO_BRANCH VOL_BE_REPO_SHA NODE_VERSION NODE_MODULES_REPO CUSTOM_PKGS ALSA_PLUGINS
