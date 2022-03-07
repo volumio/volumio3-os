@@ -545,7 +545,7 @@ if [[ -n "${DEVICE}" ]]; then
       url=${CUSTOM_PKGS[$key]}
       [[ "$url" != *".deb"$ ]] && url="${url}_${BUILD}.deb"
       # log "Fetching ${key} from ${url}"
-      wget -nv "${url}" -P "${ROOTFS}/volumio/customPkgs/" || log "${key} not found for ${BUILD}!" "err"
+      curl -sSOf "${url}" -P "${ROOTFS}/volumio/customPkgs/" || log "${key} not found for ${BUILD}!" "err"
     done
   else
     log "No customPkgs added!" "wrn"
