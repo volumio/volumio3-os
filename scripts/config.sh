@@ -38,7 +38,7 @@ declare -A CUSTOM_PKGS=(
   [mpd]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/mpd/mpd_0.21.18"
   [alsacap]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/alsacap/alsacap_1.0-1"
   [libcurl]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/curl/00libcurl4_7.74.0-1.2~bpo10%2B1"
-  [curl]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/curl/curl_7.74.0-1.2~bpo10%2B1REMOVETHIS"
+  [curl]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/curl/curl_7.74.0-1.2~bpo10%2B1"
 )
 
 ## Backend and Frontend Repository details
