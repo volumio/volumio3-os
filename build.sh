@@ -562,7 +562,10 @@ if [[ -n "${DEVICE}" ]]; then
   for key in "${!ALSA_PLUGINS[@]}"; do  
     url=${ALSA_PLUGINS[$key]}${BUILD}-libasound_module_pcm_$key.so
     # log "Fetching ${key} from ${url}"
-    wget -nv "${url}" -O "${ALSA_DIR_PARENT}/alsa-lib/libasound_module_pcm_$key.so" || log "${key} ALSA plugin not found for ${BUILD}!" "err"
+    wget -nv "${url}" -O "${ALSA_DIR_PARENT}/alsa-lib/libasound_module_pcm_$key.so" || {
+      log "${key} ALSA plugin not found for ${BUILD}!" "err"
+      exit_error ${LINENO} && exit 1
+    }
   done
 
   # Prepare Images
