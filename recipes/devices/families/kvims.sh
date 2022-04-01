@@ -22,7 +22,7 @@ DEVICEREPO="https://github.com/volumio/platform-khadas.git"
 VOLVARIANT=no # Custom Volumio (Motivo/Primo etc)
 MYVOLUMIO=no
 VOLINITUPDATER=yes
-KIOSKMODE=no
+KIOSKMODE=yes
 
 ## Partition info
 BOOT_START=16
