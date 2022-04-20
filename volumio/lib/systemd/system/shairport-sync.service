@@ -10,5 +10,6 @@ After=network.target network-online.target
 ExecStart=/usr/bin/shairport-sync --configfile=/tmp/shairport-sync.conf
 User=shairport-sync
 Group=shairport-sync
+Restart=on-failure
 
 [Install]
