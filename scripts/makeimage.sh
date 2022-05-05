@@ -185,10 +185,12 @@ fi
 
 echo "$PATCH" >${ROOTFSMNT}/patch
 if [[ -f "${ROOTFSMNT}/${PATCH}/patch.sh" ]] && [[ -f "${SDK_PATH}"/config.js ]]; then
+  UIVARIANT=$(cat "UIVARIANT")
+  UIVARIANT=$(if [ -f "UIVARIANT" ]; then cat "UIVARIANT"; else echo "none";fi);
   log "Starting ${SDK_PATH}/config.js" "ext" "${PATCH}"
-  ROOTFSMNT="${ROOTFSMNT}" node "${SDK_PATH}"/config.js "${PATCH}"
+  ROOTFSMNT="${ROOTFSMNT}" node "${SDK_PATH}"/config.js "${PATCH}" "${UIVARIANT}"
   status=$?
-  [[ ${status} -ne 0 ]] && log "config.js failed with ${status}" "err" "${PATCH}" && exit 10
+  [[ ${status} -ne 0 ]] && log "config.js failed with ${status}" "err" "${PATCH}" "${UIVARIANT}" && exit 10
   log "Completed config.js" "ext" "${PATCH}"
 fi
 
