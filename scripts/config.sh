@@ -2,7 +2,7 @@
 # Central location for Build System configuration(s)
 
 declare -A SecureApt=(
-  [debian_10.gpg]="https://ftp-master.debian.org/keys/archive-key-10.asc"
+  [debian_10.gpg]="https://repo.volumio.org/Volumio2/archive-key-10.asc"
   [nodesource.gpg]="https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
   [lesbonscomptes.gpg]="https://www.lesbonscomptes.com/pages/jf-at-dockes.org.pub"
   #TODO Not needed for arm64 and x86
