@@ -18,6 +18,7 @@ var ifconfigHotspot = "ifconfig " + wlan + " 192.168.211.1 up";
 var ifconfigWlan = "ifconfig " + wlan + " up";
 var ifdeconfig = "sudo ip addr flush dev " + wlan + " && sudo ifconfig " + wlan + " down";
 var execSync = require('child_process').execSync;
+var exec = require('child_process').exec;
 var ifconfig = require('/volumio/app/plugins/system_controller/network/lib/ifconfig.js');
 var wirelessEstablishedOnceFlagFile = '/data/flagfiles/wirelessEstablishedOnce';
 var wirelessWPADriver = getWirelessWPADriverString();
@@ -257,7 +258,10 @@ if (process.argv.length < 2) {
             stopHotspot(function () {
                 stopAP(function() {
                     console.log("Stopped aP");
-                    startFlow();
+                    // Here we set the regdomain if not set
+                    detectAndApplyRegdomain(function() {
+                        startFlow();
+                    });
                 })});
             break;
         case "stop":
@@ -356,4 +360,64 @@ function getWirelessWPADriverString() {
     } else {
         return fullDriver
     }
+}
+
+function detectAndApplyRegdomain(callback) {
+    var appropriateRegDom = '00';
+    try {
+        var currentRegDomain = execSync("/usr/bin/sudo /sbin/ifconfig wlan0 up && /usr/bin/sudo /sbin/iw reg get | grep country | cut -f1 -d':'", { uid: 1000, gid: 1000, encoding: 'utf8'}).replace(/country /g, '').replace('\n','');
+        var countrCodesInScan = execSync("/usr/bin/sudo /sbin/ifconfig wlan0 up && /usr/bin/sudo /sbin/iw wlan0 scan | grep Country: | cut -f 2", { uid: 1000, gid: 1000, encoding: 'utf8'}).replace(/Country: /g, '').split('\n');
+        var appropriateRegDomain = determineMostAppropriateRegdomain(countrCodesInScan);
+        logger('CURRENT REG DOMAIN: ' + currentRegDomain)
+        logger('APPROPRIATE REG DOMAIN: ' + appropriateRegDomain)
+        if (isValidRegDomain(appropriateRegDomain) && appropriateRegDomain !== currentRegDomain) {
+            applyNewRegDomain(appropriateRegDomain);
+        }
+    } catch(e) {
+        console.log('Failed to determine most appropriate reg domain: ' + e);
+    }
+    callback()
+}
+
+function applyNewRegDomain(newRegDom) {
+    console.log('SETTING APPROPRIATE REG DOMAIN: ' + newRegDom);
+
+    try {
+        execSync("/usr/bin/sudo /sbin/ifconfig wlan0 up && /usr/bin/sudo /sbin/iw reg set " + newRegDom, { uid: 1000, gid: 1000, encoding: 'utf8'});
+        //execSync("/usr/bin/sudo /bin/echo 'REGDOMAIN=" + newRegDom + "' > /etc/default/crda", { uid: 1000, gid: 1000, encoding: 'utf8'});
+        fs.writeFileSync("/etc/default/crda", "REGDOMAIN=" + newRegDom);
+        console.log('SUCCESSFULLY SET NEW REGDOMAIN: ' + newRegDom)
+    } catch(e) {
+        console.log('Failed to set new reg domain: ' + e);
+    }
+
+}
+
+function isValidRegDomain(regDomain) {
+    if (regDomain && regDomain.length === 2) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function determineMostAppropriateRegdomain(arr) {
+        let compare = "";
+        let mostFreq = "";
+        if (!arr.length) {
+            arr = ['00'];
+        }
+        arr.reduce((acc, val) => {
+            if(val in acc){
+                acc[val]++;
+            }else{
+                acc[val] = 1;
+            }
+            if(acc[val] > compare){
+                compare = acc[val];
+                mostFreq = val;
+            }
+            return acc;
+        }, {})
+       return mostFreq;
 }
