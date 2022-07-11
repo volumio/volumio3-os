@@ -138,6 +138,16 @@ device_chroot_tweaks_post() {
     ln -s "/lib/systemd/system/fan.service" "/etc/systemd/system/multi-user.target.wants/fan.service"
   fi
 
+  log "Tweaking default WiFi firmware global configuration"
+  echo 'kso_enable=0
+ccode=ALL
+regrev=38
+nv_by_chip=5 \
+43430 0 nvram_ap6212.txt \
+43430 1 nvram_ap6212a.txt \
+17221 6 nvram_ap6255.txt  \
+17236 2 nvram_ap6356.txt \
+17241 9 nvram_ap6359sa.txt' > "${ROOTFSMNT}/lib/firmware/brcm/config.txt"
 }
 
 # Will be called by the image builder post the chroot, before finalisation
