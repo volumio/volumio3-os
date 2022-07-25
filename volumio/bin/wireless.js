@@ -363,11 +363,14 @@ function getWirelessWPADriverString() {
 }
 
 function detectAndApplyRegdomain(callback) {
+    if (isWirelessDisabled()) {
+        return callback();
+    }
     var appropriateRegDom = '00';
     try {
         var currentRegDomain = execSync("/usr/bin/sudo /sbin/ifconfig wlan0 up && /usr/bin/sudo /sbin/iw reg get | grep country | cut -f1 -d':'", { uid: 1000, gid: 1000, encoding: 'utf8'}).replace(/country /g, '').replace('\n','');
-        var countrCodesInScan = execSync("/usr/bin/sudo /sbin/ifconfig wlan0 up && /usr/bin/sudo /sbin/iw wlan0 scan | grep Country: | cut -f 2", { uid: 1000, gid: 1000, encoding: 'utf8'}).replace(/Country: /g, '').split('\n');
-        var appropriateRegDomain = determineMostAppropriateRegdomain(countrCodesInScan);
+        var countryCodesInScan = execSync("/usr/bin/sudo /sbin/ifconfig wlan0 up && /usr/bin/sudo /sbin/iw wlan0 scan | grep Country: | cut -f 2", { uid: 1000, gid: 1000, encoding: 'utf8'}).replace(/Country: /g, '').split('\n');
+        var appropriateRegDomain = determineMostAppropriateRegdomain(countryCodesInScan);
         logger('CURRENT REG DOMAIN: ' + currentRegDomain)
         logger('APPROPRIATE REG DOMAIN: ' + appropriateRegDomain)
         if (isValidRegDomain(appropriateRegDomain) && appropriateRegDomain !== currentRegDomain) {
@@ -376,7 +379,7 @@ function detectAndApplyRegdomain(callback) {
     } catch(e) {
         console.log('Failed to determine most appropriate reg domain: ' + e);
     }
-    callback()
+    callback();
 }
 
 function applyNewRegDomain(newRegDom) {
