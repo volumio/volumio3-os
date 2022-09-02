@@ -142,6 +142,7 @@ device_chroot_tweaks_post() {
   echo 'kso_enable=0
 ccode=ALL
 regrev=38
+PM=0
 nv_by_chip=5 \
 43430 0 nvram_ap6212.txt \
 43430 1 nvram_ap6212a.txt \
