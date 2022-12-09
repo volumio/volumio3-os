@@ -194,7 +194,7 @@ device_chroot_tweaks_pre() {
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
 	fi
 
-        if [ "$ KERNEL_VERSION" = "5.4.83" ]; then
+        if [[ "${KERNEL_VERSION}" = "5.4.83" ]]; then
           ### Temporary fix for Rasbperry PI 1.5
           ### We use this as kernel 5.10.89 does not work with some USB DACs preventing latest kernel to be used
           log "Downloading Firmware to support PI4 v 1.5"
