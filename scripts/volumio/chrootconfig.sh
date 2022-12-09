@@ -118,9 +118,10 @@ else
     pushd "${PATCH}"
     for script in "${patch_scrips[@]}"; do
       log "Running ${script}" "ext" "${PATCH}"
-      bash "${script}"
-      status=$?
-      [[ ${status} -ne 0 ]] && log "${script} failed with ${status}" "err" "${PATCH}"
+      bash "${script}" || { 
+        status=$? 
+        log "${script} failed: Err ${status}" "err" "${PATCH}" && exit 10 
+        }
     done
     popd
   else
