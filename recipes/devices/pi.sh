@@ -125,8 +125,8 @@ device_chroot_tweaks() {
 # Will be run in chroot - Pre initramfs
 # TODO Try and streamline this!
 device_chroot_tweaks_pre() {
-        log "Changing initramfs module config to 'modules=list' to limit volumio.initrd size" "cfg"
-        sed -i "s/MODULES=most/MODULES=list/g" /etc/initramfs-tools/initramfs.conf
+	log "Changing initramfs module config to 'modules=list' to limit volumio.initrd size" "cfg"
+	sed -i "s/MODULES=most/MODULES=list/g" /etc/initramfs-tools/initramfs.conf
 
 	## Define parameters
 	declare -A PI_KERNELS=(
@@ -141,8 +141,8 @@ device_chroot_tweaks_pre() {
 		[5.4.83]="b7c8ef64ea24435519f05c38a2238658908c038e|stable|1379"
 		[5.10.3]="da59cb1161dc7c75727ec5c7636f632c52170961|master|1386"
 		[5.10.73]="1597995e94e7ba3cd8866d249e6df1cf9a790e49|master|1470"
-    [5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
-    [5.10.92]="ea9e10e531a301b3df568dccb3c931d52a469106|stable|1514"
+		[5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
+		[5.10.92]="ea9e10e531a301b3df568dccb3c931d52a469106|stable|1514"
 	)
 	# Version we want
 	KERNEL_VERSION="5.10.92"
@@ -193,33 +193,6 @@ device_chroot_tweaks_pre() {
 		rm /boot/kernel8.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
 	fi
-
-        if [[ "${KERNEL_VERSION}" = "5.4.83" ]]; then
-          ### Temporary fix for Rasbperry PI 1.5
-          ### We use this as kernel 5.10.89 does not work with some USB DACs preventing latest kernel to be used
-          log "Downloading Firmware to support PI4 v 1.5"
-					### DTBs not included in 5.4.83
-					wget -O /boot/bcm2710-rpi-zero-2-w.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-zero-2-w.dtb
-					wget -O /boot/bcm2710-rpi-zero-2.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-zero-2.dtb
-					wget -O /boot/bcm2711-rpi-cm4s.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2711-rpi-cm4s.dtb
-					### ELFs to support new PI versions
-					wget -O /boot/fixup.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup.dat
-					wget -O /boot/fixup4.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup4.dat
-					wget -O /boot/fixup4cd.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup4cd.dat
-					wget -O /boot/fixup4db.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup4db.dat
-					wget -O /boot/fixup4x.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup4x.dat
-					wget -O /boot/fixup_cd.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup_cd.dat
-					wget -O /boot/fixup_db.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup_db.dat
-					wget -O /boot/fixup_x.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup_x.dat
-					wget -O /boot/start.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start.elf
-					wget -O /boot/start4.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start4.elf
-					wget -O /boot/start4cd.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start4cd.elf
-					wget -O /boot/start4db.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start4db.elf
-					wget -O /boot/start4x.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start4x.elf
-					wget -O /boot/start_cd.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start_cd.elf
-					wget -O /boot/start_db.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start_db.elf
-					wget -O /boot/start_x.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start_x.elf
-        fi
 
 	log "Finished Kernel installation" "okay"
 
