@@ -52,10 +52,7 @@ MODULES=("overlay" "squashfs"
   "sata_qstor" "sata_sil24" "sata_sil" "sata_sis" "sata_svw" "sata_sx4" "ata_uli" "sata_via" "sata_vsc"
 )
 # Packages that will be installed
-PACKAGES=(
-  # Wireless firmware
-  "firmware-b43-installer"
-)
+PACKAGES=()
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
@@ -74,6 +71,10 @@ write_device_files() {
   log "Copying firmware additions"
   tar xf "${pkg_root}"/firmware-brcm-sdio-nvram/broadcom-nvram.tar.xz -C "${ROOTFSMNT}"
   cp "${pkg_root}"/firmware-cfg80211/* "${ROOTFSMNT}"/lib/firmware
+
+  log "Copy firmware needed by the b43 kernel driver..."
+  log "... for some Broadcom 43xx wireless network cards." 
+  tar xfJ "${pkg_root}"/firmware-b43/firmware-b43.tar.xz -C "${ROOTFSMNT}"/lib
 
   #log "Copying Alsa Use Case Manager files"
   #With Buster we seem to have a default install, but it is not complete. Add the missing codecs.
@@ -279,6 +280,7 @@ EOF
   log "Notebook-specific: ignore 'cover closed' event"
   sed -i "s/#HandleLidSwitch=suspend/HandleLidSwitch=ignore/g" /etc/systemd/logind.conf
   sed -i "s/#HandleLidSwitchExternalPower=suspend/HandleLidSwitchExternalPower=ignore/g" /etc/systemd/logind.conf
+
 
 }
 
