@@ -6,19 +6,17 @@ DEVICE_STATUS="P"       # First letter (Planned|Test|Maintenance)
 
 # Base system
 BASE="Debian"
-#ARCH="arm64"
-#BUILD="armv8"
 ARCH="armhf"
 BUILD="armv7"
 UINITRD_ARCH="arm64"
 
 ### Device information
-DEVICENAME="ROCK Pi S"
+DEVICENAME="RockPi S"
 # This is useful for multiple devices sharing the same/similar kernel
-DEVICEFAMILY="rockpis"
+DEVICEFAMILY="rockpi"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
-DEVICEREPO="https://github.com/ashthespy/platform-${DEVICEFAMILY}.git"
+DEVICEREPO="https://github.com/darmur/platform-${DEVICEFAMILY}.git"
 
 ### What features do we want to target
 # TODO: Not fully implement
@@ -28,14 +26,15 @@ VOLINITUPDATER=yes
 
 ## Partition info
 BOOT_START=20
-BOOT_END=84
+BOOT_END=148
 BOOT_TYPE=msdos          # msdos or gpt
+BOOT_USE_UUID=yes        # Add UUID to fstab
 INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
 
 # Modules that will be added to intramsfs
-MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437")
+MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437"  "fuse")
 # Packages that will be installed
-# PACKAGES=("u-boot-tools")
+PACKAGES=("bluez-firmware" "bluetooth" "bluez" "bluez-tools")
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
@@ -69,15 +68,24 @@ device_chroot_tweaks() {
 # Will be run in chroot - Pre initramfs
 device_chroot_tweaks_pre() {
   log "Performing device_chroot_tweaks_pre" "ext"
+  log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
+  cat <<-EOF >/etc/sysctl.conf
+abi.cp15_barrier=2
+EOF
+
+  log "Creating boot parameters from template"
+  sed -i "s/rootdev=UUID=/rootdev=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
+  sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
+  sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
+  sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/armbianEnv.txt
 
   log "Adding gpio group and udev rules"
   groupadd -f --system gpio
   usermod -aG gpio volumio
-  #TODO: Refactor to cat
-  touch /etc/udev/rules.d/99-gpio.rules
-  echo "SUBSYSTEM==\"gpio\", ACTION==\"add\", RUN=\"/bin/sh -c '
-          chown -R root:gpio /sys/class/gpio && chmod -R 770 /sys/class/gpio;\
-          chown -R root:gpio /sys$DEVPATH && chmod -R 770 /sys$DEVPATH    '\"" >/etc/udev/rules.d/99-gpio.rules
+  # Works with newer kernels as well
+  cat <<-EOF >/etc/udev/rules.d/99-gpio.rules
+	SUBSYSTEM=="gpio*", PROGRAM="/bin/sh -c 'find -L /sys/class/gpio/ -maxdepth 2 -exec chown root:gpio {} \; -exec chmod 770 {} \; || true'"
+	EOF
 }
 
 # Will be run in chroot - Post initramfs
