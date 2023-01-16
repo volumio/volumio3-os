@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
-## Setup for Radxa Rock Pi S
+## Setup for Radxa Rock Pi E
 DEVICE_SUPPORT_TYPE="C" # First letter (Community Porting|Supported Officially|OEM)
 DEVICE_STATUS="P"       # First letter (Planned|Test|Maintenance)
 
@@ -11,7 +11,7 @@ BUILD="armv7"
 UINITRD_ARCH="arm64"
 
 ### Device information
-DEVICENAME="RockPi S"
+DEVICENAME="RockPi E"
 # This is useful for multiple devices sharing the same/similar kernel
 DEVICEFAMILY="rockpi"
 # tarball from DEVICEFAMILY repo to use
