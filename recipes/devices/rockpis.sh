@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
+
 ## Setup for Radxa Rock Pi S
 DEVICE_SUPPORT_TYPE="C" # First letter (Community Porting|Supported Officially|OEM)
 DEVICE_STATUS="P"       # First letter (Planned|Test|Maintenance)
@@ -16,7 +17,7 @@ DEVICENAME="RockPi S"
 DEVICEFAMILY="rockpi"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
-DEVICEREPO="https://github.com/darmur/platform-${DEVICEFAMILY}.git"
+DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
 
 ### What features do we want to target
 # TODO: Not fully implement
