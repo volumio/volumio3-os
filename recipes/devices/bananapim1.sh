@@ -13,15 +13,11 @@ UINITRD_ARCH="arm" # Instruct mkimage to use the correct architecture on arm{64}
 
 ### Device information
 DEVICENAME="BananaPi M1" # Pretty name
-
-### Device information
 # This is useful for multiple devices sharing the same/similar kernel
 DEVICEFAMILY="bananapi-legacy"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
-
-#DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}"
-DEVICEREPO="https://github.com/darmur/platform-${DEVICEFAMILY}"
+DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}"
 
 ### What features do we want to target
 # TODO: Not fully implement

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
 
-## Setup for Radxa Rock Pi E
-DEVICE_SUPPORT_TYPE="C" # First letter (Community Porting|Supported Officially|OEM)
+## Setup for RockBox T9 (RK3328)
+DEVICE_SUPPORT_TYPE="O" # First letter (Community Porting|Supported Officially|OEM)
 DEVICE_STATUS="P"       # First letter (Planned|Test|Maintenance)
 
 # Base system
@@ -12,9 +12,9 @@ BUILD="armv7"
 UINITRD_ARCH="arm64"
 
 ### Device information
-DEVICENAME="RockPi E"
+DEVICENAME="RockBox T9"
 # This is useful for multiple devices sharing the same/similar kernel
-DEVICEFAMILY="rockpi"
+DEVICEFAMILY="rkbox"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
 DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
@@ -24,6 +24,7 @@ DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
 VOLVARIANT=no # Custom Volumio (Motivo/Primo etc)
 MYVOLUMIO=no
 VOLINITUPDATER=yes
+KIOSKMODE=yes
 
 ## Partition info
 BOOT_START=20
@@ -35,7 +36,7 @@ INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437"  "fuse")
 # Packages that will be installed
-PACKAGES=("bluez-firmware" "bluetooth" "bluez" "bluez-tools")
+PACKAGES=("lirc" "fbset" "mc" "abootimg" "bluez-firmware" "bluetooth" "bluez" "bluez-tools" "linux-base" "triggerhappy")
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
@@ -50,9 +51,8 @@ write_device_files() {
 write_device_bootloader() {
   log "Running write_device_bootloader" "ext"
 
-  dd if="${PLTDIR}/${DEVICE}/u-boot/idbloader.bin" of="${LOOP_DEV}" seek=64 conv=notrunc status=none
-  dd if="${PLTDIR}/${DEVICE}/u-boot/uboot.img" of="${LOOP_DEV}" seek=16384 conv=notrunc status=none
-  dd if="${PLTDIR}/${DEVICE}/u-boot/trust.bin" of="${LOOP_DEV}" seek=24576 conv=notrunc status=none
+  dd if="${PLTDIR}/${DEVICE}/u-boot/idbloader.img" of="${LOOP_DEV}" seek=64 conv=notrunc status=none
+  dd if="${PLTDIR}/${DEVICE}/u-boot/u-boot.itb" of="${LOOP_DEV}" seek=16384 conv=notrunc status=none
 }
 
 # Will be called by the image builder for any customisation
