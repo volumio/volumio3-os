@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
 
-## Setup for RockBox T9 (RK3328)
+## Setup for RockBox HK1 (RK3318 - HK6334Q)
 DEVICE_SUPPORT_TYPE="O" # First letter (Community Porting|Supported Officially|OEM)
 DEVICE_STATUS="P"       # First letter (Planned|Test|Maintenance)
 
@@ -12,7 +12,7 @@ BUILD="armv7"
 UINITRD_ARCH="arm64"
 
 ### Device information
-DEVICENAME="RockBox T9"
+DEVICENAME="RockBox HK1"
 # This is useful for multiple devices sharing the same/similar kernel
 DEVICEFAMILY="rkbox"
 # tarball from DEVICEFAMILY repo to use
