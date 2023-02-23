@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
 
-## Setup for RockBox X88Pro-B (RK3318)
+## Setup for RockBox H96Max (RK3318 - SP2734C)
 DEVICE_SUPPORT_TYPE="O" # First letter (Community Porting|Supported Officially|OEM)
 DEVICE_STATUS="P"       # First letter (Planned|Test|Maintenance)
 
@@ -12,7 +12,7 @@ BUILD="armv7"
 UINITRD_ARCH="arm64"
 
 ### Device information
-DEVICENAME="RockBox X88Pro"
+DEVICENAME="RockBox H96Max"
 # This is useful for multiple devices sharing the same/similar kernel
 DEVICEFAMILY="rkbox"
 # tarball from DEVICEFAMILY repo to use
