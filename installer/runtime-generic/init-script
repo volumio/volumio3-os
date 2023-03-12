@@ -26,7 +26,7 @@ mknod /dev/tty c 5 0
 
 mdev -s
 
-echo "[info] Including config script functions"
+echo "[info] Including config script functions" >> /dev/kmsg
 . /scripts/initconfig.sh
 . /scripts/gen-functions
 . /scripts/board-functions
@@ -40,7 +40,7 @@ load_modules
 check_uuids
 
 if [ ! -z "${BOOTDELAY}" ]; then
-  echo "[info] Boot delay will be ${BOOTDELAY} seconds"
+  echo "[info] Boot delay will be ${BOOTDELAY} seconds" >> /dev/kmsg
   sleep ${BOOTDELAY}
 fi
 
@@ -62,14 +62,14 @@ create_volumio_partitions
 write_device_bootloader ${TARGETDEV}
 mount_target_boot
 
-echo "[info] Copying current image partition files"
+echo "[info] Copying current image partition files" >> /dev/kmsg
 cp $BOOT/data/image/* $BOOT/temp/image
 
-echo "[info] Copying volumio boot partition files (image, dtb, boot files etc.)"
+echo "[info] Copying volumio boot partition files (image, dtb, boot files etc.)" >> /dev/kmsg
 tar xf $BOOT/data/image/kernel_current.tar -C $BOOT/temp/boot
 
 if [ ! -z ${FACTORYCOPY} ]; then
-   echo "[info] Continue with creating factory copies"
+   echo "[info] Continue with creating factory copies" >> /dev/kmsg
    cp $BOOT/data/image/kernel_current.tar $BOOT/temp/image/kernel_factory.tar
    cp $BOOT/data/image/volumio_current.sqsh $BOOT/temp/image/volumio_factory.sqsh
 fi
@@ -78,19 +78,18 @@ sync
 
 
 if [ ! "x${UUIDFMT}" == "x" ]; then
-   echo "[info] Correcting UUID in boot configs"
+   echo "[info] Correcting UUID in boot configs" >> /dev/kmsg
    swap_uuids
 fi
 
-echo "[info] Syncing..."
+echo "[info] Syncing..." >> /dev/kmsg
 sync
-echo "[info] Remove temp folders"
+echo "[info] Remove temp folders" >> /dev/kmsg
 umount $BOOT/temp/boot
 umount $BOOT/temp/image
 umount $BOOT
 rm -r $BOOT
 sync
-
 
 #==============================================================
 led_show_finish_signal
@@ -98,7 +97,7 @@ led_show_finish_signal
 umount /proc
 umount /sys
 
-echo "[info] Installer program finished, please manually power off the unit and remove the SD card."
+echo "[info] Installer program finished, please manually power off the unit and remove the SD card." >> /dev/kmsg
 sh
 while true
 do
