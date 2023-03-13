@@ -189,7 +189,7 @@ if [[ -f "${ROOTFSMNT}/${PATCH}/patch.sh" ]] && [[ -f "${SDK_PATH}"/config.js ]]
   log "Starting ${SDK_PATH}/config.js" "ext" "${PATCH}"
   ROOTFSMNT="${ROOTFSMNT}" node "${SDK_PATH}"/config.js "${PATCH}" "${UIVARIANT}" || {
     status=$?
-    log "config.js failed: Err ${status}" "err" "${PATCH} | ${UIVARIANT}"  && exit 10
+    log "config.js failed: Err ${status}" "err" "${PATCH} | ${UIVARIANT}"  && exit_error
   }  
   log "Completed config.js" "ext" "${PATCH}"
 fi
