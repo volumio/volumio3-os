@@ -104,11 +104,10 @@ function check_os_release() {
   fi
   # We keep backward compatibly for some cases for devices with ambiguous names
   # mainly raspberry -> pi
-  log "Adding ${VARIANT}, ${VERSION} and ${VOL_DEVICE_ID:-${DEVICE}} to os-release" "info"
+  log "Adding ${VERSION} and ${VOL_DEVICE_ID:-${DEVICE}} to os-release" "info"
   cat <<-EOF >>"${os_release}"
 	VOLUMIO_VERSION="${VERSION}"
 	VOLUMIO_HARDWARE="${VOL_DEVICE_ID-${DEVICE}}"
-	VOLUMIO_VARIANT="${VARIANT}"
 	EOF
 }
 
