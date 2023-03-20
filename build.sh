@@ -95,19 +95,13 @@ trap 'exit_error ${LINENO}' INT ERR
 
 function check_os_release() {
   os_release="${ROOTFS}/etc/os-release"
-  # This shouldn't be required anymore - we pack the rootfs tarball at base level
-  if grep "VOLUMIO_VERSION" "${os_release}"; then
-    # os-release already has a VERSION number
-    # remove prior version and hardware
-    log "Removing previous VOLUMIO_VERSION and VOLUMIO_HARDWARE from os-release"
-    sed -i '/^\(VOLUMIO_VERSION\|VOLUMIO_HARDWARE\)/d' "${os_release}"
-  fi
   # We keep backward compatibly for some cases for devices with ambiguous names
   # mainly raspberry -> pi
-  log "Adding ${VERSION} and ${VOL_DEVICE_ID:-${DEVICE}} to os-release" "info"
+  log "Adding ${VARIANT}, ${VERSION} and ${VOL_DEVICE_ID:-${DEVICE}} to os-release" "info"
   cat <<-EOF >>"${os_release}"
 	VOLUMIO_VERSION="${VERSION}"
 	VOLUMIO_HARDWARE="${VOL_DEVICE_ID-${DEVICE}}"
+	VOLUMIO_VARIANT="${VARIANT}"
 	EOF
 }
 
@@ -402,7 +396,6 @@ if [ -n "${BUILD}" ]; then
   #Write some Version information
   log "Writing system information"
   cat <<-EOF >>"${ROOTFS}"/etc/os-release
-	VOLUMIO_VARIANT="${VARIANT}"
 	VOLUMIO_TEST="FALSE"
 	VOLUMIO_BUILD_DATE="${CUR_DATE}"
 	EOF
@@ -556,10 +549,10 @@ if [[ -n "${DEVICE}" ]]; then
   fi
   # shellcheck disable=SC2012
   [[ -d "${ROOTFS}"/volumio/customPkgs ]] && log "Added custom packages:" "" "$(ls -b "${ROOTFS}"/volumio/customPkgs | tr '\n' ' ')"
-  
+
   # Install Volumio ALSA plugins
   ALSA_DIR_PARENT=$(dirname "${ROOTFS}/"usr/lib/*/alsa-lib/)
-  for key in "${!ALSA_PLUGINS[@]}"; do  
+  for key in "${!ALSA_PLUGINS[@]}"; do
     url=${ALSA_PLUGINS[$key]}${BUILD}-libasound_module_pcm_$key.so
     # log "Fetching ${key} from ${url}"
     wget -nv "${url}" -O "${ALSA_DIR_PARENT}/alsa-lib/libasound_module_pcm_$key.so" || {
