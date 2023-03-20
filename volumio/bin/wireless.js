@@ -242,7 +242,7 @@ function stop(callback) {
 
 if ( ! fs.existsSync("/sys/class/net/" + wlan + "/operstate") ) {
     console.log("WIRELESS: No wireless interface, exiting");
-    process.exit(1);
+    process.exit(0);
 }
 
 
