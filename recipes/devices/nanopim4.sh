@@ -47,7 +47,7 @@ write_device_files() {
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/u-boot" "${ROOTFSMNT}"
-  
+
   cp -pdR "${PLTDIR}/${DEVICE}/misc/brcm_patchram_plus_rk3399" "${ROOTFSMNT}/usr/local/bin/"
   cp -pdR "${PLTDIR}/${DEVICE}/misc/rk3399-bluetooth.service" "${ROOTFSMNT}/lib/systemd/system/"
 
@@ -82,7 +82,7 @@ write_device_bootloader() {
   dd if="${PLTDIR}/${DEVICE}/u-boot/idbloader.bin" of="${LOOP_DEV}" seek=64 conv=notrunc
   dd if="${PLTDIR}/${DEVICE}/u-boot/uboot.img" of="${LOOP_DEV}" seek=16384 conv=notrunc
   dd if="${PLTDIR}/${DEVICE}/u-boot/trust.bin" of="${LOOP_DEV}" seek=24576 conv=notrunc
-  
+
 }
 
 # Will be called by the image builder for any customisation
@@ -94,7 +94,7 @@ device_image_tweaks() {
 device_chroot_tweaks_pre() {
   #log "Performing device_chroot_tweaks_pre" "ext"
   log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
-  cat <<-EOF >/etc/sysctl.conf
+  cat <<-EOF >>/etc/sysctl.conf
 abi.cp15_barrier=2
 EOF
 
@@ -133,4 +133,3 @@ device_image_tweaks_post() {
   fi
 
 }
-

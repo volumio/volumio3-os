@@ -76,7 +76,7 @@ device_chroot_tweaks_pre() {
   sed -i "s/%%BOOT-EMMC%%/bootdev=mmcblk0 bootpart=\/dev\/mmcblk0p1 imgpart=\/dev\/mmcblk0p2 datapart=\/dev\/mmcblk0p3/g" /boot/uEnv.txt
 
   log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
-  cat <<-EOF >/etc/sysctl.conf
+  cat <<-EOF >>/etc/sysctl.conf
 abi.cp15_barrier=2
 EOF
 

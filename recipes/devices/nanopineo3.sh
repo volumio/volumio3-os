@@ -85,7 +85,7 @@ EOF
   sed -i "s/MODULES=most/MODULES=list/g" /etc/initramfs-tools/initramfs.conf
 
   log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
-  cat <<-EOF >/etc/sysctl.conf
+  cat <<-EOF >>/etc/sysctl.conf
 abi.cp15_barrier=2
 EOF
 

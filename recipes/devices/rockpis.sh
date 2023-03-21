@@ -70,7 +70,7 @@ device_chroot_tweaks() {
 device_chroot_tweaks_pre() {
   log "Performing device_chroot_tweaks_pre" "ext"
   log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
-  cat <<-EOF >/etc/sysctl.conf
+  cat <<-EOF >>/etc/sysctl.conf
 abi.cp15_barrier=2
 EOF
 
