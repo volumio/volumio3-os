@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
 
-## Setup for Radxa Rock Pi 4B
+## Setup for Radxa Rock 3A
 DEVICE_SUPPORT_TYPE="S" # First letter (Community Porting|Supported Officially|OEM)
 DEVICE_STATUS="P"       # First letter (Planned|Test|Maintenance)
 
@@ -12,9 +12,9 @@ BUILD="armv7"
 UINITRD_ARCH="arm64"
 
 ### Device information
-DEVICENAME="RockPi 4B"
+DEVICENAME="Rock 3A"
 # This is useful for multiple devices sharing the same/similar kernel
-DEVICEFAMILY="rock4"
+DEVICEFAMILY="rock3"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
 DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
@@ -51,9 +51,8 @@ write_device_files() {
 write_device_bootloader() {
   log "Running write_device_bootloader" "ext"
 
-  dd if="${PLTDIR}/${DEVICE}/u-boot/idbloader.bin" of="${LOOP_DEV}" seek=64 conv=notrunc status=none
-  dd if="${PLTDIR}/${DEVICE}/u-boot/uboot.img" of="${LOOP_DEV}" seek=16384 conv=notrunc status=none
-  dd if="${PLTDIR}/${DEVICE}/u-boot/trust.bin" of="${LOOP_DEV}" seek=24576 conv=notrunc status=none
+  dd if="${PLTDIR}/${DEVICE}/u-boot/idbloader.img" of="${LOOP_DEV}" seek=64 conv=notrunc status=none
+  dd if="${PLTDIR}/${DEVICE}/u-boot/u-boot.itb" of="${LOOP_DEV}" seek=16384 conv=notrunc status=none
 }
 
 # Will be called by the image builder for any customisation
