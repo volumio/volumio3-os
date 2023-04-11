@@ -73,7 +73,7 @@ write_device_files() {
   cp "${pkg_root}"/firmware-cfg80211/* "${ROOTFSMNT}"/lib/firmware
 
   log "Copy firmware needed by the b43 kernel driver..."
-  log "... for some Broadcom 43xx wireless network cards." 
+  log "... for some Broadcom 43xx wireless network cards."
   tar xfJ "${pkg_root}"/firmware-b43/firmware-b43.tar.xz -C "${ROOTFSMNT}"/lib
 
   #log "Copying Alsa Use Case Manager files"
@@ -132,6 +132,18 @@ write_device_bootloader() {
 # Will be called by the image builder for any customisation
 device_image_tweaks() {
   log "Running device_image_tweaks" "ext"
+
+  log "Some wireless network drivers (e.g. for Marvell chipsets) create device 'mlan0'"
+  log "Rename these to 'wlan0' using a systemd link"
+  cat <<-EOF > "${ROOTFSMNT}/etc/systemd/network/10-rename-mlan0.link"
+[Match]
+Type=wlan
+Driver=mwifiex_sdio
+OriginalName=mlan0
+
+[Link]
+Name=wlan0
+EOF
 
   log "Add service to set sane defaults for baytrail/cherrytrail and HDA soundcards"
   cat <<-EOF >"${ROOTFSMNT}/usr/local/bin/soundcard-init.sh"
