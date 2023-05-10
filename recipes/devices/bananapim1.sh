@@ -24,25 +24,31 @@ DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}"
 VOLVARIANT=no # Custom Volumio (Motivo/Primo etc)
 MYVOLUMIO=no
 VOLINITUPDATER=yes
+KIOSKMODE=yes
 
 ## Partition info
-BOOT_START=1
-BOOT_END=64
+BOOT_START=20
+BOOT_END=148
 BOOT_TYPE=msdos          # msdos or gpt
 INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
 
 # Modules that will be added to intramsfs
-MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437")
+MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437" "fuse")
 # Packages that will be installed
-# PACKAGES=("u-boot-tools")
+PACKAGES=("bluez-firmware" "bluetooth" "bluez" "bluez-tools")
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
   log "Running write_device_files" "ext"
+
   cp -dR "${PLTDIR}/${DEVICE}/boot" "${ROOTFSMNT}"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
+
+  log "Add asound.conf for onboard DAC settings" "ext"
+  mkdir -p "${ROOTFSMNT}/var/lib/alsa"
+  cp "${PLTDIR}/${DEVICE}/var/lib/alsa/asound.state" "${ROOTFSMNT}/var/lib/alsa/asound.state"
 }
 
 write_device_bootloader() {
