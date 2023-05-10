@@ -34,7 +34,7 @@ BOOT_USE_UUID=yes        # Add UUID to fstab
 INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
 
 # Modules that will be added to intramsfs
-MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437"  "fuse")
+MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437" "fuse")
 # Packages that will be installed
 PACKAGES=("bluez-firmware" "bluetooth" "bluez" "bluez-tools")
 
@@ -46,6 +46,10 @@ write_device_files() {
   cp -dR "${PLTDIR}/${DEVICE}/boot" "${ROOTFSMNT}"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
+
+  log "Add asound.conf for onboard DAC settings" "ext"
+  mkdir -p "${ROOTFSMNT}/var/lib/alsa"
+  cp "${PLTDIR}/${DEVICE}/var/lib/alsa/asound.state" "${ROOTFSMNT}/var/lib/alsa/asound.state"
 }
 
 write_device_bootloader() {
