@@ -1,0 +1,29 @@
+
+#mandatory function
+write_device_bootloader()
+{
+   echo "[info] Flashing u-boot" >> /dev/kmsg
+   dd if=$BOOT/u-boot/u-boot.bin.sd.bin.signed of=$1 bs=442 count=1 conv=fsync,notrunc
+   dd if=$BOOT/u-boot/u-boot.bin.sd.bin.signed of=$1 bs=512 skip=1 seek=1 conv=fsync
+}
+
+led_show_init_signal()
+{
+   echo none  > /sys/class/leds/pwmled/trigger
+   sleep 0.5
+   echo default-on > /sys/class/leds/pwmled/trigger
+   sleep 0.5
+   echo none  > /sys/class/leds/pwmled/trigger
+   sleep 0.5
+}
+
+led_show_start_signal()
+{
+   echo heartbeat > /sys/class/leds/pwmled/trigger
+}
+
+led_show_finish_signal()
+{
+   echo default-on  > /sys/class/leds/pwmled/trigger
+}
+

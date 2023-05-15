@@ -29,6 +29,7 @@ BOOTPART="/dev/${BOOTDEV}${DPS}1"
 BOOTDELAY=5
 REBOOTMODE=normal
 
+CMDLINE="$(cat /proc/cmdline)"
 for p in ${CMDLINE};
 do
   key=${p%%=*}
@@ -58,8 +59,6 @@ fi
 }
 
 # Parse the kernel command line
-
-CMDLINE="$(cat /proc/cmdline)"
 
 parse_disk() {
   if [ "$(echo $1|cut -c -5)" = "UUID=" ]; then
@@ -108,7 +107,34 @@ do_reboot() {
       ;;
   esac
 }
+get_old_kernel() {
+    echo "[VIM3L] Kernel update requested, overwriting old logfile" > /boot/kernelupdate.log
+    OLDKERNEL=$(ls /boot | grep "^config-" | cut -c1-8)
+    echo "[VIM3L] Existing kernel: ${OLDKERNEL}" >> /boot/kernelupdate.log
+}
 
+check_new_kernel() {
+    echo "[VIM3L] Checking OTA kernel version" >> /boot/kernelupdate.log
+    NEWKERNEL=$(ls /boot | grep "^config-" | cut -c1-8)
+
+    echo "[VIM3L] OTA kernel: ${NEWKERNEL}" >> /boot/kernelupdate.log
+    BOOTDEV=$(lsblk -ndo pkname ${BOOTPART})
+    if [ "${OLDKERNEL}" != "${NEWKERNEL}" ]; then
+      echo "[VIM3L] Kernel change, replacing u-boot" >> /boot/kernelupdate.log
+
+      echo "[VIM3L] Write u-boot to ${BOOTDEV}" >> /boot/kernelupdate.log
+      dd if=/boot/uboot/u-boot.bin.sd.bin of=/dev/${BOOTDEV} bs=444 count=1 conv=fsync,notrunc 2>> /boot/kernelupdate.log
+      dd if=/boot/uboot/u-boot.bin.sd.bin of=/dev/${BOOTDEV} bs=512 skip=1 seek=1 conv=fsync,notrunc 2>> /boot/kernelupdate.log
+
+     echo "[VIM3L] Kernel change, cleaning up" >> /boot/kernelupdate.log
+      rm -r /boot/uboot
+      rm -r /boot/uboot-mainline
+      rm /boot/boot.ini
+      rm /boot/dtb/*.dtb
+    else
+      echo "[VIM3L] Minor kernel update, no additional action needed" >> /boot/kernelupdate.log
+    fi
+}
 DO_GEN=no
 
 for p in ${CMDLINE};
@@ -234,6 +260,7 @@ print_msg IMGFILE=${IMGFILE}
 print_msg DATAPART=${DATAPART}
 print_msg BOOTPART=${BOOTPART}
 print_msg BOOTCONFIG=${BOOTCONFIG}
+print_msg BOOTDELAY=${BOOTDELAY}
 
 # Retry mdev -s 3 times before throwing the towel
 for i in 1 2 3 4 5 6
@@ -371,7 +398,12 @@ fi
 
 # if the kernel has been updated, and no error has occurred before completition
 if [ -e "/boot/kernel_update" ]; then
+  if [ "${HWDEVICE}" == "VIM3L" ]; then
+	get_old_kernel
+  fi
   print_msg "unpacking kernel"
+# remove all previous kernel config files
+  rm /boot/config-*
   tar xf /mnt/imgpart/kernel_current.tar -C /boot
   BACKUP=""
   if [ -e "/mnt/imgpart/config.txt.bak" ]; then
@@ -405,6 +437,10 @@ if [ -e "/boot/kernel_update" ]; then
   fi
 
   rm /boot/kernel_update
+  if [ "${HWDEVICE}" == "VIM3L" ]; then
+    check_new_kernel
+  fi
+
   sync
   umount /boot
   rm -rf /boot

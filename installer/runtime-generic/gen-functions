@@ -1,13 +1,13 @@
 #!/bin/sh
 
-# There are all mandatory, generic functions and form the center core of the autoflasher. 
+# There are all mandatory, generic functions and form the center core of the autoflasher.
 # (Board-specific functions belong in "board-functions".
 # Generic functions should normally not change as this will impact other autoflashers.
 # In case a modification of generic script is needed, the modified copy of the function
 # should be added "board-functions" instead.-
 # TODO: test it
 
- 
+
 parse_disk()
 {
 	if [ "$(echo $1|cut -c -5)" = "UUID=" ]; then
@@ -44,31 +44,31 @@ parse_cmdline()
 				;;
 	  	esac
 	done
-	
-	echo "[info] Starting AutoFlasher for ${HWDEVICE}"
-	echo "[info] BOOTDEV=${BOOTDEV}"
-	echo "[info] BOOTPART=${BOOTPART}"
-	echo "[info] BOOTCONFIG=${BOOTCONFIG}"
-	echo "[info] BOOTDELAY=${BOOTDELAY}"
-	echo "[info] HWDEVICE=${HWDEVICE}"
-	echo "[info] TARGETDEV=${TARGETDEV}"
-	echo "[info] TARGETBOOT=${TARGETBOOT}"
-	echo "[info] TARGETIMAGE=${TARGETIMAGE}"
-	echo "[info] TARGETDATA=${TARGETDATA}"
-	echo "[info] USEKMSG=${USEKMSG}"
+
+	echo "[info] Starting AutoFlasher for ${HWDEVICE}" >> /dev/kmsg
+	echo "[info] BOOTDEV=${BOOTDEV}" >> /dev/kmsg
+	echo "[info] BOOTPART=${BOOTPART}" >> /dev/kmsg
+	echo "[info] BOOTCONFIG=${BOOTCONFIG}" >> /dev/kmsg
+	echo "[info] BOOTDELAY=${BOOTDELAY}" >> /dev/kmsg
+	echo "[info] HWDEVICE=${HWDEVICE}" >> /dev/kmsg
+	echo "[info] TARGETDEV=${TARGETDEV}" >> /dev/kmsg
+	echo "[info] TARGETBOOT=${TARGETBOOT}" >> /dev/kmsg
+	echo "[info] TARGETIMAGE=${TARGETIMAGE}" >> /dev/kmsg
+	echo "[info] TARGETDATA=${TARGETDATA}" >> /dev/kmsg
+	echo "[info] USEKMSG=${USEKMSG}" >> /dev/kmsg
 }
 
-# Load custom modules 
+# Load custom modules
 load_modules()
 {
-	echo "[info] Loading modules"
+	echo "[info] Loading modules" >> /dev/kmsg
 	if [ -e /conf/modules ]; then
 		while read -r m; do
 			# Skip empty lines
 			if [ -z "$m" ];  then
 				continue
 			fi
-			# Skip comments 
+			# Skip comments
 			com=$(printf "%.1s" "${m}")
 			if [ "$com" = "#" ]; then
 				continue
@@ -84,7 +84,7 @@ check_uuids()
 {
 	if [ ! -z ${UUIDFMT} ]; then
 		if [ $BOOTCONFIG == empty ]; then
-			echo "[error] when using UUIDs for disk parsing, you MUST also add the bootconfig parameter (eg. bootconfig=/extlinux/extlinux.conf)"
+			echo "[error] when using UUIDs for disk parsing, you MUST also add the bootconfig parameter (eg. bootconfig=/extlinux/extlinux.conf)" >> /dev/kmsg
 			exec sh
 			exit 0
 		fi
@@ -99,15 +99,17 @@ swap_uuids()
 	export UUID_IMAGE=$(blkid -s UUID -o value ${TARGETIMAGE})
 	export UUID_DATA=$(blkid -s UUID -o value ${TARGETDATA})
 	cp $BOOT/temp/boot/$BOOTCONFIG $BOOT/temp/boot/$BOOTCONFIG.old
+cat $BOOT/temp/boot/$BOOTCONFIG >> /dev/kmsg
 	sed -i "s/imgpart=UUID=[a-fA-F0-9]\{8\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{12\}/imgpart=UUID=${UUID_IMAGE}/g" $BOOT/temp/boot/${BOOTCONFIG}
 	sed -i "s/datapart=UUID=[a-fA-F0-9]\{8\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{12\}/datapart=UUID=${UUID_DATA}/g" $BOOT/temp/boot/${BOOTCONFIG}
 	sed -i "s/bootpart=UUID=[a-fA-F0-9]\{4\}-[a-fA-F0-9]\{4\}/bootpart=UUID=${UUID_BOOT}/g" $BOOT/temp/boot/${BOOTCONFIG}
-    sync
+  sync
+cat $BOOT/temp/boot/$BOOTCONFIG >> /dev/kmsg
 }
 
 mount_target_boot()
 {
-	echo "[info] Mounting boot and image partition"
+	echo "[info] Mounting boot and image partition" >> /dev/kmsg
 	mkdir -p $BOOT/temp/boot
 	mkdir -p $BOOT/temp/image
 	mount -t vfat ${TARGETBOOT} $BOOT/temp/boot
@@ -121,7 +123,7 @@ search_boot_device()
 	do
 		BOOTPARTDEV=`parse_disk ${BOOTPART}`
 		if [ ! -b "${BOOTPARTDEV}" ]; then
-		  echo "[info] Boot partition not ready, retrying mdev in 0.5 seconds"
+		  echo "[info] Boot partition not ready, retrying mdev in 0.5 seconds" >> /dev/kmsg
 		  sleep 0.5
 		  mdev -s
 		else
@@ -157,12 +159,12 @@ for i in 1 2 3 4 5 6
 
 clear_target_device()
 {
-	echo "[info] Removing existing partitions from target device"
+	echo "[info] Removing existing partitions from target device" >> /dev/kmsg
     partlist=$(parted -s ${TARGETDEV} print | awk 'f;/^Number/{f=1}' | awk '{print $1}' | grep -v '^$')
     for partno in $partlist
-    do 
-        echo "[....] removing partition ${partno}"
-        parted -s ${TARGETDEV} rm $partno 
+    do
+        echo "[....] removing partition ${partno}" >> /dev/kmsg
+        parted -s ${TARGETDEV} rm $partno
     done
     sync
 }
@@ -179,10 +181,10 @@ create_volumio_partitions()
 	mdev -s
 	sleep 0.5
 
-	echo "[info] Creating partition filesystems"
+	echo "[info] Creating partition filesystems" >> /dev/kmsg
 	mkfs.vfat -n $LBLBOOT ${TARGETBOOT}
     #mke2fsfull is used since busybox mke2fs does not include ext4 support
-    /sbin/mke2fsfull -t ext4 -F -L $LBLIMAGE ${TARGETIMAGE} 
-    /sbin/mke2fsfull -t ext4 -F -L $LBLDATA ${TARGETDATA} 
+    /sbin/mke2fsfull -t ext4 -F -L $LBLIMAGE ${TARGETIMAGE}
+    /sbin/mke2fsfull -t ext4 -F -L $LBLDATA ${TARGETDATA}
 	sync
 }
