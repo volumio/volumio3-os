@@ -17,7 +17,7 @@ DEVICENAME="Radxa Zero"
 DEVICEFAMILY="radxazero"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
-DEVICEREPO="https://github.com/gkkpch/platform-${DEVICEFAMILY}.git"
+DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
 
 ### What features do we want to target
 # TODO: Not fully implement
