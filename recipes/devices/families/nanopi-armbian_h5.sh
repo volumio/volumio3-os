@@ -16,7 +16,7 @@ UINITRD_ARCH="arm64" # Instruct mkimage to use the correct architecture on arm{6
 DEVICEFAMILY="armbian"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
-DEVICEREPO="https://github.com/nikkov/platform-${DEVICEFAMILY}"
+DEVICEREPO="https://github.com/volumio/platform-nanopi-${DEVICEFAMILY}"
 
 ### What features do we want to target
 # TODO: Not fully implement
