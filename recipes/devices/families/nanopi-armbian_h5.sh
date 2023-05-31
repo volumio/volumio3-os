@@ -73,7 +73,7 @@ device_chroot_tweaks_pre() {
 	SUBSYSTEM=="gpio*", PROGRAM="/bin/sh -c 'find -L /sys/class/gpio/ -maxdepth 2 -exec chown root:gpio {} \; -exec chmod 770 {} \; || true'"
 	EOF
   log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
-  cat <<-EOF >/etc/sysctl.conf
+  cat <<-EOF >>/etc/sysctl.conf
 abi.cp15_barrier=2
 EOF
 }
