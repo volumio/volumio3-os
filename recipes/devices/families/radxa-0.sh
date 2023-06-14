@@ -45,7 +45,8 @@ write_device_files() {
   cp -dR "${PLTDIR}/${DEVICE}/boot" "${ROOTFSMNT}"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
-  cp -pdR "${PLTDIR}/${DEVICE}/var/lib/alsa/asound.state" "${ROOTFSMNT}/var/lib/alsa"
+  cp -pdR "${PLTDIR}/${DEVICE}/var/" "${ROOTFSMNT}"
+  cp -pdR "${PLTDIR}/${DEVICE}/volumio" "${ROOTFSMNT}"
   
   log "Mark the boot partition with radxa-zero version "${VERSION}""
   echo "${VERSION}" > "${ROOTFSMNT}"/boot/radxa-zero.version
