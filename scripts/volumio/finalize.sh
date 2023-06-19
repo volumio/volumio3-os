@@ -18,6 +18,7 @@ cd translations
 [[ -e "${ROOTFSMNT}/volumio/http/www/app/i18n" ]] && cp -rp *.json "${ROOTFSMNT}/volumio/http/www/app/i18n/"
 [[ -e "${ROOTFSMNT}/volumio/http/www3/app/i18n" ]] && cp -rp *.json "${ROOTFSMNT}/volumio/http/www3/app/i18n/"
 [[ -e "${ROOTFSMNT}/volumio/http/www4/app/i18n" ]] && cp -rp *.json "${ROOTFSMNT}/volumio/http/www4/app/i18n/"
+[[ -e "${ROOTFSMNT}/volumio/http/wizard/app/i18n" ]] && cp -rp *.json "${ROOTFSMNT}/volumio/http/wizard/app/i18n/"
 echo "Volumio Translations updated"
 cd ..
 rm -rf translations
