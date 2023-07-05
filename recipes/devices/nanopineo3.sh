@@ -78,7 +78,7 @@ label kernel-5.4
     kernel /Image
     fdt /rk3328-nanopi-neo3-rev02.dtb
     initrd /uInitrd
-    append  earlycon=uart8250,mmio32,0xff130000 console=ttyS2,1500000 console=tty1 imgpart=/dev/mmcblk0p2 imgfile=/volumio_current.sqsh hwdevice=nanopineo3 bootdev=mmcblk0
+    append  earlycon=uart8250,mmio32,0xff130000 console=ttyS2,1500000 console=tty1 imgpart=/dev/mmcblk0p2 imgfile=/volumio_current.sqsh hwdevice=nanopineo3 bootdev=mmcblk0 net.ifnames=0
 EOF
 
   log "Changing to 'modules=list' to limit uInitrd size"
