@@ -26,10 +26,14 @@ device_image_tweaks() {
   cp "${PLTDIR}/${DEVICEBASE}/opt/ip.fix" "${ROOTFSMNT}/bin/ip"
 
   log "With VIM3 or MP1 (VIM3L): fix issue with AP6359SA and AP6398S using the same chipid and rev"
-  mv "${ROOTFSMNT}/lib/firmware/brcm/fw_bcm4359c0_ag_apsta_ap6398s.bin" "${ROOTFSMNT}/lib/firmware/brcm/fw_bcm4359c0_ag_apsta.bin"
-  mv "${ROOTFSMNT}/lib/firmware/brcm/fw_bcm4359c0_ag_ap6398s.bin" "${ROOTFSMNT}/lib/firmware/brcm/fw_bcm4359c0_ag.bin"
-  mv "${ROOTFSMNT}/lib/firmware/brcm/nvram_ap6398s.txt" "${ROOTFSMNT}/lib/firmware/brcm/nvram_ap6359sa.txt"
-  mv "${ROOTFSMNT}/lib/firmware/brcm/BCM4359C0_ap6398s.hcd" "${ROOTFSMNT}/lib/firmware/brcm/BCM4359C0.hcd"
+  cp "${ROOTFSMNT}/lib/firmware/brcm/fw_bcm4359c0_ag_apsta_ap6398s.bin" "${ROOTFSMNT}/lib/firmware/brcm/fw_bcm4359c0_ag_apsta.bin"
+  cp "${ROOTFSMNT}/lib/firmware/brcm/fw_bcm4359c0_ag_ap6398s.bin" "${ROOTFSMNT}/lib/firmware/brcm/fw_bcm4359c0_ag.bin"
+  cp "${ROOTFSMNT}/lib/firmware/brcm/nvram_ap6398s.txt" "${ROOTFSMNT}/lib/firmware/brcm/nvram_ap6359sa.txt"
+  cp "${ROOTFSMNT}/lib/firmware/brcm/BCM4359C0_ap6398s.hcd" "${ROOTFSMNT}/lib/firmware/brcm/BCM4359C0.hcd"
+  
+  log "Add missing config file for AP6359SA and AP6398S"
+  cp "${ROOTFSMNT}/lib/firmware/brcm/config.txt" "${ROOTFSMNT}/lib/firmware/brcm/config_bcm4359c0_ag.txt"
+  sed -i "s/ccode=CN/ccode=ALL/g" "${ROOTFSMNT}/lib/firmware/brcm/config_bcm4359c0_ag.txt"
 
   log "With VIM2/ VIM3/ MP1(VIM3L): adding fan services"
   cp "${PLTDIR}/${DEVICEBASE}/lib/systemd/system/fan.service" "${ROOTFSMNT}/lib/systemd/system"
