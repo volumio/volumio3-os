@@ -73,7 +73,7 @@ if [[ -d "/volumio/customPkgs" ]] && [[ $(ls /volumio/customPkgs/*.deb 2>/dev/nu
   log "Installing Volumio customPkgs" "info"
   for deb in /volumio/customPkgs/*.deb; do
     log "Installing ${deb}"
-    dpkg -i "${deb}"
+    dpkg -i --force-confold "${deb}"
   done
 fi
 
@@ -118,9 +118,9 @@ else
     pushd "${PATCH}"
     for script in "${patch_scrips[@]}"; do
       log "Running ${script}" "ext" "${PATCH}"
-      bash "${script}" || { 
-        status=$? 
-        log "${script} failed: Err ${status}" "err" "${PATCH}" && exit 10 
+      bash "${script}" || {
+        status=$?
+        log "${script} failed: Err ${status}" "err" "${PATCH}" && exit 10
         }
     done
     popd
