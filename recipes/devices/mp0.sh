@@ -61,6 +61,18 @@ device_image_tweaks() {
 # Will be run in chroot - Pre initramfs
 device_chroot_tweaks_pre() {
   log "Performing device_chroot_tweaks_pre" "ext"
+
+  log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
+  cat <<-EOF >>/etc/sysctl.conf
+abi.cp15_barrier=2
+EOF
+
+  log "Creating boot parameters from template"
+  sed -i "s/rootdev=UUID=/rootdev=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
+  sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
+  sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
+  sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/armbianEnv.txt
+
   log "Adding gpio group and udev rules"
   groupadd -f --system gpio
   usermod -aG gpio volumio
