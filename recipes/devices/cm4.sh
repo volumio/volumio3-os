@@ -280,7 +280,6 @@ device_chroot_tweaks_pre() {
 		force_eeprom_read=0
 		gpio=5=op,dl
 		dtoverlay=dwc2,dr_mode=host
-		dtoverlay=iqaudio-digi-wm8804-audio
 		dtparam=ant2
 		enable_uart=1
 		dtparam=uart0=on
@@ -295,6 +294,7 @@ device_chroot_tweaks_pre() {
 		display_lcd_rotate=1
 		display_hdmi_rotate=1
 		arm_freq=1000
+		dtoverlay=iqaudio-digi-wm8804-audio
 	EOF
 
 	log "Writing cmdline.txt file"
