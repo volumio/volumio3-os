@@ -399,7 +399,7 @@ fi
 # if the kernel has been updated, and no error has occurred before completition
 if [ -e "/boot/kernel_update" ]; then
   if [ "${HWDEVICE}" == "VIM3L" ]; then
-	get_old_kernel
+	#get_old_kernel
   fi
   print_msg "unpacking kernel"
 # remove all previous kernel config files
@@ -438,7 +438,7 @@ if [ -e "/boot/kernel_update" ]; then
 
   rm /boot/kernel_update
   if [ "${HWDEVICE}" == "VIM3L" ]; then
-    check_new_kernel
+    #check_new_kernel
   fi
 
   sync
