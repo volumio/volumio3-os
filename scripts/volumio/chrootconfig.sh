@@ -73,7 +73,7 @@ if [[ -d "/volumio/customPkgs" ]] && [[ $(ls /volumio/customPkgs/*.deb 2>/dev/nu
   log "Installing Volumio customPkgs" "info"
   for deb in /volumio/customPkgs/*.deb; do
     log "Installing ${deb}"
-    dpkg -i "${deb}"
+    dpkg -i --force-confold "${deb}"
   done
 fi
 
@@ -89,8 +89,6 @@ apt-get clean
 
 # Fix services for tmpfs logs
 log "Ensuring /var/log has right folders and permissions"
-sed -i '/^ExecStart=.*/i ExecStartPre=touch /var/log/mpd.log' /lib/systemd/system/mpd.service
-sed -i '/^ExecStart=.*/i ExecStartPre=chown volumio /var/log/mpd.log' /lib/systemd/system/mpd.service
 sed -i '/^ExecStart=.*/i ExecStartPre=mkdir -m 700 -p /var/log/samba/cores' /lib/systemd/system/nmbd.service
 # sed -i '/^ExecStart=.*/i ExecStartPre=chmod 700 /var/log/samba/cores' /lib/systemd/system/nmbd.service
 
@@ -118,9 +116,9 @@ else
     pushd "${PATCH}"
     for script in "${patch_scrips[@]}"; do
       log "Running ${script}" "ext" "${PATCH}"
-      bash "${script}" || { 
-        status=$? 
-        log "${script} failed: Err ${status}" "err" "${PATCH}" && exit 10 
+      bash "${script}" || {
+        status=$?
+        log "${script} failed: Err ${status}" "err" "${PATCH}" && exit 10
         }
     done
     popd

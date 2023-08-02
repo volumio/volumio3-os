@@ -42,9 +42,13 @@ write_device_files() {
   log "Running write_device_files" "ext"
 
   cp -dR "${PLTDIR}/${DEVICEBASE}/boot" "${ROOTFSMNT}"
+
   cp -pdR "${PLTDIR}/${DEVICEBASE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICEBASE}/lib/firmware" "${ROOTFSMNT}/lib"
 
+  # Volumio 3 needs predictable device naming switched off
+  # Use a volumio3-specific version which adds "net.ifnames=0" to the kernel parameters
+  cp "${PLTDIR}/${DEVICEBASE}/boot/boot.cmd.volumio-os3" "${ROOTFSMNT}/boot/boot.cmd"
 }
 
 write_device_bootloader() {

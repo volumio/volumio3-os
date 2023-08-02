@@ -11,6 +11,18 @@ function check_size() {
   fi
 }
 
+echo "Updating Volumio Translations"
+git clone https://github.com/volumio/translations.git
+cd translations
+[[ -e "${ROOTFSMNT}/volumio/app/i18n" ]] && cp -rp *.json "${ROOTFSMNT}/volumio/app/i18n/"
+[[ -e "${ROOTFSMNT}/volumio/http/www/app/i18n" ]] && cp -rp *.json "${ROOTFSMNT}/volumio/http/www/app/i18n/"
+[[ -e "${ROOTFSMNT}/volumio/http/www3/app/i18n" ]] && cp -rp *.json "${ROOTFSMNT}/volumio/http/www3/app/i18n/"
+[[ -e "${ROOTFSMNT}/volumio/http/www4/app/i18n" ]] && cp -rp *.json "${ROOTFSMNT}/volumio/http/www4/app/i18n/"
+[[ -e "${ROOTFSMNT}/volumio/http/wizard/app/i18n" ]] && cp -rp *.json "${ROOTFSMNT}/volumio/http/wizard/app/i18n/"
+echo "Volumio Translations updated"
+cd ..
+rm -rf translations
+
 [ -z "${ROOTFSMNT}" ] && ROOTFSMNT=/mnt/volumio/rootfs
 log "Computing Volumio folder Hash Checksum" "info"
 

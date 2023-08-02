@@ -210,7 +210,7 @@ function patch_multistrap_conf() {
     BASECONF=recipes/base/VolumioBase.conf
     export RASPBIANCONF=recipes/base/arm-raspbian.conf
     debian_source=http://deb.debian.org/debian
-    rapsbian_source=http://archive.raspbian.org/raspbian
+    rapsbian_source=http://mirrordirector.raspbian.org/raspbian
 
     cat <<-EOF >"${SRC}/${RASPBIANCONF}"
 		# Auto generated multistrap configuration for Raspberry Pi

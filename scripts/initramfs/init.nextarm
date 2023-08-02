@@ -390,7 +390,7 @@ if [ -e "/boot/update_process" ]; then
   print_msg "Previous update attempt failed, restoring fallbacks"
   cp /mnt/imgpart/kernel_fallback.tar /mnt/imgpart/kernel_current.tar
   cp /mnt/imgpart/volumio_fallback.tar /mnt/imgpart/volumio_current.tar
-  if [-e "/boot/kernel_update" ]; then
+  if [ -e "/boot/kernel_update" ]; then
     rm /boot/kernel_update
   fi
   rm /boot/update_process
@@ -398,9 +398,10 @@ fi
 
 # if the kernel has been updated, and no error has occurred before completition
 if [ -e "/boot/kernel_update" ]; then
-  if [ "${HWDEVICE}" == "VIM3L" ]; then
-	get_old_kernel
-  fi
+  # Commented but to be restored when moving to kernel 5.X
+  #if [ "${HWDEVICE}" == "VIM3L" ]; then
+  #	get_old_kernel
+  #fi
   print_msg "unpacking kernel"
 # remove all previous kernel config files
   rm /boot/config-*
@@ -437,9 +438,10 @@ if [ -e "/boot/kernel_update" ]; then
   fi
 
   rm /boot/kernel_update
-  if [ "${HWDEVICE}" == "VIM3L" ]; then
-    check_new_kernel
-  fi
+  # To be restored when moving to kernel 5.X
+  #if [ "${HWDEVICE}" == "VIM3L" ]; then
+  #  check_new_kernel
+  #fi
 
   sync
   umount /boot
