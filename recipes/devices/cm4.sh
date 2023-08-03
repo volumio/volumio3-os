@@ -293,7 +293,7 @@ device_chroot_tweaks_pre() {
 		max_framebuffers=2
 		display_lcd_rotate=1
 		display_hdmi_rotate=1
-		arm_freq=1000
+		arm_freq=1200
 		dtoverlay=iqaudio-digi-wm8804-audio
 	EOF
 
