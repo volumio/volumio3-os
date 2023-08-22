@@ -25,6 +25,7 @@ VOLVARIANT=no # Custom Volumio (Motivo/Primo etc)
 MYVOLUMIO=no
 VOLINITUPDATER=yes
 KIOSKMODE=yes
+KIOSKBROWSER=vivaldi
 
 ## Partition info
 BOOT_START=0
@@ -163,13 +164,13 @@ device_chroot_tweaks_pre() {
 		rm /boot/kernel.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}+"
 	fi
-	
+
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v7+" ]; then
 		log "Removing ${KERNEL_VERSION}-v7+ Kernel and modules" "info"
 		rm /boot/kernel7.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v7+"
 	fi
-	
+
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
 		log "Removing ${KERNEL_VERSION}-v8+ Kernel and modules" "info"
 		rm /boot/kernel8.img
@@ -302,7 +303,7 @@ device_chroot_tweaks_pre() {
 
 	log "Writing cmdline.txt file"
 	KERNEL_LOGLEVEL="loglevel=0" # Default to KERN_EMERG
-	
+
 	# Build up the base parameters
 	kernel_params=(
 		# Boot screen stuff
