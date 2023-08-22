@@ -288,12 +288,11 @@ device_chroot_tweaks_pre() {
 		display_auto_detect=1
 		dtoverlay=motivo-panel
 		start_x=1
-		gpu_mem=128
+		gpu_mem=512
 		dtoverlay=vc4-kms-v3d,cma-512,audio=off,noaudio=on
 		max_framebuffers=2
 		display_lcd_rotate=1
 		display_hdmi_rotate=1
-		arm_freq=1200
 		dtoverlay=iqaudio-digi-wm8804-audio
 	EOF
 
