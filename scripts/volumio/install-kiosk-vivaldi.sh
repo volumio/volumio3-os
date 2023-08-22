@@ -14,7 +14,8 @@ CMP_PACKAGES=(
   "keyboard-configuration"
   # Display stuff
   "openbox" "unclutter" "xorg" "xinit" "libexif12" "unclutter" "libu2f-udev" "libvulkan1"
-  
+  # Browser dependencies 
+  "fonts-liberation" "libatk-bridge2.0-0" "libatk1.0-0" "libatspi2.0-0" "libgtk-3-0" "libnspr4" "libnss3" "xdg-utils"
   # Fonts
   "fonts-arphic-ukai" "fonts-arphic-gbsn00lp" "fonts-unfonts-core"
 )
