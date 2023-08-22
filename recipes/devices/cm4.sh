@@ -142,7 +142,7 @@ device_chroot_tweaks_pre() {
 		[6.1.46]="c1ed09b26ca8bacfbce15e87001d69923a364413|master|1673"
 	)
 	# Version we want
-	KERNEL_VERSION="6.1.46"
+	KERNEL_VERSION="5.10.92"
 
 	# List of custom firmware -
 	# github archives that can be extracted directly
@@ -298,6 +298,7 @@ device_chroot_tweaks_pre() {
 		max_framebuffers=1
 		display_lcd_rotate=1
 		display_hdmi_rotate=1
+		arm_freq=1200
 		dtoverlay=iqaudio-digi-wm8804-audio
 	EOF
 
