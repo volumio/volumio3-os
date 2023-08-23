@@ -90,7 +90,7 @@ log "Enabling kiosk"
 if [[ ${VOLUMIO_HARDWARE} != motivo ]]; then
 
   log "Enabling UI for HDMI output selection"
-  echo '[{"value": false,"id":"section_hdmi_settings","attribute_name": "hidden"}]' >/volumio/app/plugins/system_controller/system/override.json
+  echo '[{"value": true,"id":"section_hdmi_settings","attribute_name": "hidden"}]' >/volumio/app/plugins/system_controller/system/override.json
 
   log "Setting HDMI UI enabled by default"
   config_path="/volumio/app/plugins/system_controller/system/config.json"
