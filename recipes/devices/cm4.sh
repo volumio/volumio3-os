@@ -147,7 +147,7 @@ device_chroot_tweaks_pre() {
 		[6.1.46]="c1ed09b26ca8bacfbce15e87001d69923a364413|master|1673"
 	)
 	# Version we want
-	KERNEL_VERSION="6.1.19"
+	KERNEL_VERSION="6.1.21"
 
 	# List of custom firmware -
 	# github archives that can be extracted directly
@@ -298,8 +298,8 @@ device_chroot_tweaks_pre() {
 		display_auto_detect=1
 		dtoverlay=motivo-panel
 		start_x=1
-		gpu_mem=512
-		dtoverlay=vc4-kms-v3d,cma-512,audio=off,noaudio=on
+		gpu_mem=256
+		dtoverlay=vc4-kms-v3d,cma-384,audio=off,noaudio=on
 		max_framebuffers=1
 		display_lcd_rotate=1
 		display_hdmi_rotate=1
