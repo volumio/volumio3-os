@@ -59,7 +59,7 @@ sed -i 's/"exit_type":"Crashed"/"exit_type":"None"/' /data/volumiokiosk/Default/
 openbox-session & 
 sleep 4 
 
-/usr/bin/vivaldi --kiosk --no-sandbox --disable-background-networking --disable-remote-extensions --disable-pinch --ignore-gpu-blacklist --use-gl=egl --disable-gpu-compositing --enable-gpu-rasterization --enable-zero-copy --disable-smooth-scrolling --enable-scroll-prediction --max-tiles-for-interest-area=512 --num-raster-threads=4 --enable-low-res-tiling --user-agent="volumiokiosk-memorysave-touch" --touch-events --user-data-dir='/data/volumiokiosk' --force-device-scale-factor=1.2 --app=http://localhost:3000 " > /opt/volumiokiosk.sh 
+/usr/bin/vivaldi --kiosk --no-sandbox --disable-background-networking --disable-remote-extensions --disable-pinch --ignore-gpu-blacklist --use-gl=egl --disable-gpu-compositing --enable-gpu-rasterization --enable-zero-copy --disable-smooth-scrolling --enable-scroll-prediction --max-tiles-for-interest-area=512 --num-raster-threads=4 --enable-low-res-tiling --user-agent="volumiokiosk-memorysave-touch" --touch-events --user-data-dir='/data/volumiokiosk' --force-device-scale-factor=1.2 --load-extension=--load-extension="/data/volumiokioskextensions/VirtualKeyboard/" --no-first-run --app=http://localhost:3000 " > /opt/volumiokiosk.sh 
 
 /bin/chmod +x /opt/volumiokiosk.sh
 
@@ -79,6 +79,11 @@ TimeoutSec=300
 WantedBy=multi-user.target
 " > /lib/systemd/system/volumio-kiosk.service
 /bin/ln -s /lib/systemd/system/volumio-kiosk.service /etc/systemd/system/multi-user.target.wants/volumio-kiosk.service
+
+
+log "Installing Virtual Keyboard"
+mkdir /data/volumiokioskextensions
+git clone https://github.com/volumio/chrome-virtual-keyboard.git /data/volumiokioskextensions/VirtualKeyboard
 
 log "  Allowing volumio to start an xsession"
 #/bin/sed -i "s/allowed_users=console/allowed_users=anybody/" /etc/X11/Xwrapper.config
