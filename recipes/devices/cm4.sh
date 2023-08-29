@@ -136,6 +136,7 @@ device_chroot_tweaks_pre() {
 		#[KERNEL_VERSION]="SHA|Branch|Rev"
 		[5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
 		[5.10.92]="ea9e10e531a301b3df568dccb3c931d52a469106|stable|1514"
+		[5.10.95]="27714acc7d19cfae3dcf8c7631eeb29df0135974|master|1521"
 		[5.15.84]="a99e144e939bf93bbd03e8066601a8d3eae640f7|stable|1613"
 		[6.1.19]="fa51258e0239eaf68d9dff9c156cec3a622fbacc|stable|1637"
 		[6.1.21]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1642"
@@ -145,9 +146,10 @@ device_chroot_tweaks_pre() {
 		[6.1.44]="30c05a7bcc43c27f230876779a87899b57278a0b|master|1670"
 		[6.1.45]="a88533edd6d3c0ea93ddd5bb5c89f47ec8fb6e98|master|1671"
 		[6.1.46]="c1ed09b26ca8bacfbce15e87001d69923a364413|master|1673"
+		[6.1.47]="abe4079532454173630b07123369fc4ba219502b|stable|1674"
 	)
 	# Version we want
-	KERNEL_VERSION="6.1.21"
+	KERNEL_VERSION="5.10.95"
 
 	# List of custom firmware -
 	# github archives that can be extracted directly
