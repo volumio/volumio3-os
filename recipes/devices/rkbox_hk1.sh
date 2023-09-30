@@ -25,6 +25,7 @@ VOLVARIANT=no # Custom Volumio (Motivo/Primo etc)
 MYVOLUMIO=no
 VOLINITUPDATER=yes
 KIOSKMODE=yes
+KIOSKBROWSER=vivaldi
 
 ## Partition info
 BOOT_START=20

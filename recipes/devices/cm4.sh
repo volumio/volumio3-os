@@ -25,6 +25,7 @@ VOLVARIANT=no # Custom Volumio (Motivo/Primo etc)
 MYVOLUMIO=no
 VOLINITUPDATER=yes
 KIOSKMODE=yes
+KIOSKBROWSER=vivaldi
 
 ## Partition info
 BOOT_START=0
@@ -135,6 +136,17 @@ device_chroot_tweaks_pre() {
 		#[KERNEL_VERSION]="SHA|Branch|Rev"
 		[5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
 		[5.10.92]="ea9e10e531a301b3df568dccb3c931d52a469106|stable|1514"
+		[5.10.95]="27714acc7d19cfae3dcf8c7631eeb29df0135974|master|1521"
+		[5.15.84]="a99e144e939bf93bbd03e8066601a8d3eae640f7|stable|1613"
+		[6.1.19]="fa51258e0239eaf68d9dff9c156cec3a622fbacc|stable|1637"
+		[6.1.21]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1642"
+		[6.1.39]="d873621b557928d397f3aa9707ce57d3ff313752|master|1664"
+		[6.1.42]="fc879d483956bb67ff5f4fc1a83b3df0f10222a2|master|1668"
+		[6.1.43]="5eaa5839de98012c21fb75cd0a075ecfcb573bff|master|1669"
+		[6.1.44]="30c05a7bcc43c27f230876779a87899b57278a0b|master|1670"
+		[6.1.45]="a88533edd6d3c0ea93ddd5bb5c89f47ec8fb6e98|master|1671"
+		[6.1.46]="c1ed09b26ca8bacfbce15e87001d69923a364413|master|1673"
+		[6.1.47]="abe4079532454173630b07123369fc4ba219502b|stable|1674"
 	)
 	# Version we want
 	KERNEL_VERSION="5.10.92"
@@ -142,7 +154,7 @@ device_chroot_tweaks_pre() {
 	# List of custom firmware -
 	# github archives that can be extracted directly
 	declare -A CustomFirmware=(
-		[MotivoDisplay]="https://github.com/Darmur/motivo-display/raw/main/modules-rpi-motivo.tar.gz"
+		[MotivoDisplay]="https://github.com/volumio/volumio3-os-static-assets/raw/master/drivers/motivo/modules-rpi-${KERNEL_VERSION}-ili9881c.tar.gz"
 	)
 
 	### Kernel installation
@@ -159,13 +171,13 @@ device_chroot_tweaks_pre() {
 		rm /boot/kernel.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}+"
 	fi
-	
+
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v7+" ]; then
 		log "Removing ${KERNEL_VERSION}-v7+ Kernel and modules" "info"
 		rm /boot/kernel7.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v7+"
 	fi
-	
+
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
 		log "Removing ${KERNEL_VERSION}-v8+ Kernel and modules" "info"
 		rm /boot/kernel8.img
@@ -288,18 +300,18 @@ device_chroot_tweaks_pre() {
 		display_auto_detect=1
 		dtoverlay=motivo-panel
 		start_x=1
-		gpu_mem=128
-		dtoverlay=vc4-kms-v3d,cma-512,audio=off,noaudio=on
-		max_framebuffers=2
+		gpu_mem=256
+		dtoverlay=vc4-kms-v3d,cma-384,audio=off,noaudio=on
+		max_framebuffers=1
 		display_lcd_rotate=1
 		display_hdmi_rotate=1
-		arm_freq=1000
+		#arm_freq=1200
 		dtoverlay=iqaudio-digi-wm8804-audio
 	EOF
 
 	log "Writing cmdline.txt file"
 	KERNEL_LOGLEVEL="loglevel=0" # Default to KERN_EMERG
-	
+
 	# Build up the base parameters
 	kernel_params=(
 		# Boot screen stuff

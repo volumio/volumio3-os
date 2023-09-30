@@ -179,8 +179,13 @@ cp "${SRC}"/scripts/initramfs/mkinitramfs-custom.sh ${ROOTFSMNT}/usr/local/sbin
 cp "${SRC}"/scripts/volumio/chrootconfig.sh ${ROOTFSMNT}
 
 if [[ "${KIOSKMODE}" == yes ]]; then
-  log "Copying kiosk scripts to rootfs"
-  cp "${SRC}/scripts/volumio/install-kiosk.sh" ${ROOTFSMNT}/install-kiosk.sh
+  if [[ "${KIOSKBROWSER}" == vivaldi ]]; then
+    log "Copying Vivaldi kiosk scripts to rootfs"
+    cp "${SRC}/scripts/volumio/install-kiosk-vivaldi.sh" ${ROOTFSMNT}/install-kiosk.sh
+  else
+    log "Copying Chromium kiosk scripts to rootfs"
+    cp "${SRC}/scripts/volumio/install-kiosk.sh" ${ROOTFSMNT}/install-kiosk.sh
+  fi
 fi
 
 echo "$PATCH" >${ROOTFSMNT}/patch
@@ -190,7 +195,7 @@ if [[ -f "${ROOTFSMNT}/${PATCH}/patch.sh" ]] && [[ -f "${SDK_PATH}"/config.js ]]
   ROOTFSMNT="${ROOTFSMNT}" node "${SDK_PATH}"/config.js "${PATCH}" "${UIVARIANT}" || {
     status=$?
     log "config.js failed: Err ${status}" "err" "${PATCH} | ${UIVARIANT}"  && exit 10
-  }  
+  }
   log "Completed config.js" "ext" "${PATCH}"
 fi
 
@@ -209,6 +214,7 @@ BUILD="${BUILD}"
 UINITRD_ARCH="${UINITRD_ARCH}"
 DEBUG_IMAGE="${DEBUG_IMAGE:-no}"
 KIOSKMODE="${KIOSKMODE:-no}"
+KIOSKBROWSER="${KIOSKBROWSER:-chromium}"
 KIOSKINSTALL="${KIOSKMODE:-install-kiosk.sh}"
 VOLVARIANT="${VOLVARIANT:-volumio}"
 BOOT_FS_SPEC=${BOOT_FS_SPEC}
