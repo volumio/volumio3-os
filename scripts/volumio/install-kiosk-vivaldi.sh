@@ -51,27 +51,25 @@ mkdir -p /data/volumiokiosk
 export DISPLAY=:0 
 
 xset s off -dpms 
-rm -rf /data/volumiokiosk/Singleton* 
 
-sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' /data/volumiokiosk/Default/Preferences 
-sed -i 's/"exit_type":"Crashed"/"exit_type":"None"/' /data/volumiokiosk/Default/Preferences 
+if [ -L /data/volumiokiosk/SingletonCookie ]; then
+  rm -rf /data/volumiokiosk/Singleton* 
+fi
 
-startBrowserKiosk () {
-  openbox-session & 
-  sleep 4 
-
-  /usr/bin/vivaldi --kiosk --no-sandbox --disable-background-networking --disable-remote-extensions --disable-pinch --ignore-gpu-blacklist --use-gl=egl --disable-gpu-compositing --enable-gpu-rasterization --enable-zero-copy --disable-smooth-scrolling --enable-scroll-prediction --max-tiles-for-interest-area=512 --num-raster-threads=4 --enable-low-res-tiling --user-agent="volumiokiosk-memorysave-touch" --touch-events --user-data-dir='/data/volumiokiosk' --force-device-scale-factor=1.2 --load-extension='/data/volumiokioskextensions/VirtualKeyboard/' --no-first-run --app=http://localhost:3000 
+[[ -e /data/volumiokiosk/Default/Preferences ]] && {
+  sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' /data/volumiokiosk/Default/Preferences 
+  sed -i 's/"exit_type":"Crashed"/"exit_type":"None"/' /data/volumiokiosk/Default/Preferences 
 }
 
-while true; do
-    HTTP_STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000 )
-    if [ $HTTP_STATUS = 200 ]; then
-        startBrowserKiosk
-        break
-    else
-        sleep 2
-    fi
-done" > /opt/volumiokiosk.sh 
+
+# Wait for Volumio webUI to be available
+while true; do timeout 2 bash -c '</dev/tcp/127.0.0.1/3000' >/dev/null 2>&1 && break; done
+
+openbox-session & 
+sleep 4 
+
+/usr/bin/vivaldi --kiosk --no-sandbox --disable-background-networking --disable-remote-extensions --disable-pinch --ignore-gpu-blacklist --use-gl=egl --disable-gpu-compositing --enable-gpu-rasterization --enable-zero-copy --disable-smooth-scrolling --enable-scroll-prediction --max-tiles-for-interest-area=512 --num-raster-threads=4 --enable-low-res-tiling --user-agent="volumiokiosk-memorysave-touch" --touch-events --user-data-dir='/data/volumiokiosk' --force-device-scale-factor=1.2 --load-extension='/data/volumiokioskextensions/VirtualKeyboard/' --no-first-run --app=http://localhost:3000 
+" > /opt/volumiokiosk.sh 
 
 /bin/chmod +x /opt/volumiokiosk.sh
 
