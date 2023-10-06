@@ -45,7 +45,7 @@ mkdir /data/volumiokiosk
 
 log " Creating Vivaldi kiosk start script" 
 
-echo "#!/bin/bash 
+echo '#!/bin/bash 
 
 mkdir -p /data/volumiokiosk 
 export DISPLAY=:0 
@@ -63,14 +63,13 @@ fi
 
 
 # Wait for Volumio webUI to be available
-while [[ $(curl -Is http://localhost:3000 | head -n 1 | cut -d ' ' -f 2) != 200 ]]; do sleep 2; done &
+while [[ $(curl -Is http://localhost:3000 | head -n 1 | cut -d " " -f 2) != 200 ]]; do sleep 2; done &
 
 openbox-session & 
-#no need for sleep
-#sleep 4 
+sleep 4 
 
 /usr/bin/vivaldi --kiosk --no-sandbox --disable-background-networking --disable-remote-extensions --disable-pinch --ignore-gpu-blacklist --use-gl=egl --disable-gpu-compositing --enable-gpu-rasterization --enable-zero-copy --disable-smooth-scrolling --enable-scroll-prediction --max-tiles-for-interest-area=512 --num-raster-threads=4 --enable-low-res-tiling --user-agent="volumiokiosk-memorysave-touch" --touch-events --user-data-dir='/data/volumiokiosk' --force-device-scale-factor=1.2 --load-extension='/data/volumiokioskextensions/VirtualKeyboard/' --no-first-run --app=http://localhost:3000 
-" > /opt/volumiokiosk.sh 
+' > /opt/volumiokiosk.sh 
 
 /bin/chmod +x /opt/volumiokiosk.sh
 
