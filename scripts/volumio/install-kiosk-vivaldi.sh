@@ -13,7 +13,7 @@ CMP_PACKAGES=(
   # Keyboard config
   "keyboard-configuration"
   # Display stuff
-  "openbox" "xorg" "xinit" "libexif12" "unclutter" "libu2f-udev" "libvulkan1"
+  "openbox" "xorg" "xinit" "libexif12" "unclutter" "libu2f-udev" "libvulkan1" "xinput"
   # Browser dependencies 
   "fonts-liberation" "libatk-bridge2.0-0" "libatk1.0-0" "libatspi2.0-0" "libgtk-3-0" "libnspr4" "libnss3" "xdg-utils"
   # Fonts
