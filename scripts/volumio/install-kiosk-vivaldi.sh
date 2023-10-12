@@ -13,7 +13,7 @@ CMP_PACKAGES=(
   # Keyboard config
   "keyboard-configuration"
   # Display stuff
-  "openbox" "unclutter" "xorg" "xinit" "libexif12" "unclutter" "libu2f-udev" "libvulkan1"
+  "openbox" "xorg" "xinit" "libexif12" "unclutter" "libu2f-udev" "libvulkan1"
   # Browser dependencies 
   "fonts-liberation" "libatk-bridge2.0-0" "libatk1.0-0" "libatspi2.0-0" "libgtk-3-0" "libnspr4" "libnss3" "xdg-utils"
   # Fonts
@@ -82,7 +82,7 @@ After=volumio.service
 Type=simple
 User=root
 Group=root
-ExecStart=/usr/bin/startx /etc/X11/Xsession /opt/volumiokiosk.sh -- -keeptty
+ExecStart=/usr/bin/startx /etc/X11/Xsession /opt/volumiokiosk.sh -- -keeptty -- -nocursor
 # Give a reasonable amount of time for the server to start up/shut down
 TimeoutSec=300
 [Install]
