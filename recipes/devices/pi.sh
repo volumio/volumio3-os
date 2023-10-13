@@ -143,20 +143,14 @@ device_chroot_tweaks_pre() {
 		[5.10.73]="1597995e94e7ba3cd8866d249e6df1cf9a790e49|master|1470"
 		[5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
 		[5.10.92]="ea9e10e531a301b3df568dccb3c931d52a469106|stable|1514"
-		[5.10.95]="27714acc7d19cfae3dcf8c7631eeb29df0135974|master|1521"
 		[5.15.84]="a99e144e939bf93bbd03e8066601a8d3eae640f7|stable|1613"
 		[6.1.19]="fa51258e0239eaf68d9dff9c156cec3a622fbacc|stable|1637"
 		[6.1.21]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1642"
-		[6.1.39]="d873621b557928d397f3aa9707ce57d3ff313752|master|1664"
-		[6.1.42]="fc879d483956bb67ff5f4fc1a83b3df0f10222a2|master|1668"
-		[6.1.43]="5eaa5839de98012c21fb75cd0a075ecfcb573bff|master|1669"
-		[6.1.44]="30c05a7bcc43c27f230876779a87899b57278a0b|master|1670"
-		[6.1.45]="a88533edd6d3c0ea93ddd5bb5c89f47ec8fb6e98|master|1671"
-		[6.1.46]="c1ed09b26ca8bacfbce15e87001d69923a364413|master|1673"
-		[6.1.47]="abe4079532454173630b07123369fc4ba219502b|stable|1674"
+		[6.1.47]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1674"
+		[6.1.57]="12833d1bee03c4ac58dc4addf411944a189f1dfd|master|1688" # Support for Pi5
 	)
 	# Version we want
-	KERNEL_VERSION="5.10.92"
+	KERNEL_VERSION="6.1.57"
 
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
@@ -197,40 +191,19 @@ device_chroot_tweaks_pre() {
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}"
-	echo y | SKIP_BACKUP=1 WANT_PI4=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
+	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=0 WANT_PI4=1 WANT_PI5=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
 
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
-		log "Removing v8+ (pi4) Kernels" "info"
+		log "Removing v8+ (Pi4) Kernel and modules" "info"
 		rm /boot/kernel8.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
 	fi
 
-        if [ "$ KERNEL_VERSION" = "5.4.83" ]; then
-          ### Temporary fix for Rasbperry PI 1.5
-          ### We use this as kernel 5.10.89 does not work with some USB DACs preventing latest kernel to be used
-          log "Downloading Firmware to support PI4 v 1.5"
-					### DTBs not included in 5.4.83
-					wget -O /boot/bcm2710-rpi-zero-2-w.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-zero-2-w.dtb
-					wget -O /boot/bcm2710-rpi-zero-2.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2710-rpi-zero-2.dtb
-					wget -O /boot/bcm2711-rpi-cm4s.dtb https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/bcm2711-rpi-cm4s.dtb
-					### ELFs to support new PI versions
-					wget -O /boot/fixup.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup.dat
-					wget -O /boot/fixup4.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup4.dat
-					wget -O /boot/fixup4cd.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup4cd.dat
-					wget -O /boot/fixup4db.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup4db.dat
-					wget -O /boot/fixup4x.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup4x.dat
-					wget -O /boot/fixup_cd.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup_cd.dat
-					wget -O /boot/fixup_db.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup_db.dat
-					wget -O /boot/fixup_x.dat https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/fixup_x.dat
-					wget -O /boot/start.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start.elf
-					wget -O /boot/start4.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start4.elf
-					wget -O /boot/start4cd.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start4cd.elf
-					wget -O /boot/start4db.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start4db.elf
-					wget -O /boot/start4x.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start4x.elf
-					wget -O /boot/start_cd.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start_cd.elf
-					wget -O /boot/start_db.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start_db.elf
-					wget -O /boot/start_x.elf https://github.com/raspberrypi/firmware/raw/9c04ed2c1ad06a615d8e6479806ab252dbbeb95a/boot/start_x.elf
-        fi
+	if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
+		log "Removing v8_16k+ (Pi5) Kernel and modules" "info"
+		rm /boot/kernel_2712.img
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
+	fi
 
 	log "Finished Kernel installation" "okay"
 
@@ -286,39 +259,6 @@ device_chroot_tweaks_pre() {
 		rm "$key.tar.gz"
 	done
 
-	# Fetch and install additional WiFi drivers
-	WifiRepo="http://wifi-drivers.volumio.org/wifi-drivers"
-	WifiDrivers=("8188eu" "8188fu" "8192eu" "8812au" "8821cu" "8822bu")
-	archs=("arm-v7l" "arm-v7" "arm")
-	log "Installing additional wireless drivers. Many thanks MrEngman!" "info" "${WifiDrivers[*]}"
-	WifiDir=/tmp/wifi
-	[[ ! -d "${WifiDir}" ]] && mkdir -p "${WifiDir}"
-	pushd "${WifiDir}" || log "Can't change to ${WifiDir}" "error"
-	for driver in "${WifiDrivers[@]}"; do
-		for arch in "${archs[@]}"; do
-			log "[${arch}] Fetching driver" "${driver}"
-			archiveName=${driver}-${KERNEL_VERSION}${arch:3}-${KERNEL_REV}.tar.gz
-			archiveUrl=${WifiRepo}/${driver}-drivers/${archiveName}
-			# The Volumio mirror will always return a 200 code,
-			# and even give you a file to download for a missing driver, so usual curl tricks won't work here..
-			curl -sLO "${archiveUrl}"
-			# So test the file before continuing, or gracefully move on
-			[[ ! -s ${archiveName} ]] && {
-				log "[${arch}] Failed fetching ${driver}" "err" "${archiveUrl}"
-				continue
-			}
-			# Kinda messy, but the tarball doesn't always extract fully - so try and protect against that as well
-			(
-				tar xz -f "${archiveName}" &&
-					sed -i 's|sudo ||' install.sh &&
-					./install.sh &&
-					log "[${arch}] Installed" "okay" "${driver}"
-			) || log "[${arch}] Installation failed" "err" "${driver} -- $(stat --printf="%s" "${archiveName}")"
-		done
-	done
-	popd || log "Can't change dir" "error"
-	rm -r "${WifiDir}"
-
 	log "Starting Raspi platform tweaks" "info"
 	plymouth-set-default-theme volumio
 
@@ -368,6 +308,7 @@ device_chroot_tweaks_pre() {
 	log "Writing config.txt file"
 	cat <<-EOF >/boot/config.txt
 		initramfs volumio.initrd
+		arm_64bit=0
 		gpu_mem=32
 		max_usb_current=1
 		dtparam=audio=on
@@ -376,6 +317,9 @@ device_chroot_tweaks_pre() {
 		disable_splash=1
 		hdmi_force_hotplug=1
 		force_eeprom_read=0
+		[cm4]
+		dtoverlay=dwc2,dr_mode=host
+		[all]
 
 		include userconfig.txt
 	EOF
@@ -408,14 +352,7 @@ device_chroot_tweaks_pre() {
 	# Buster tweaks
 	kernel_params+=("${DISABLE_PN}")
 	# ALSA tweaks
-	# ALSA compatibility needs to be set depending on kernel version,
-	# so use hacky semver check here in the odd case we want to go back to a lower kernel
-	[[ ${KERNEL_SEMVER[0]} == 5 ]] && compat_alsa=0 || compat_alsa=1
-	# https://github.com/raspberrypi/linux/commit/88debfb15b3ac9059b72dc1ebc5b82f3394cac87
-	if [[ ${KERNEL_SEMVER[0]} == 5 ]] && [[ ${KERNEL_SEMVER[2]} -le 4 ]] && [[ ${KERNEL_SEMVER[2]} -le 79 ]]; then
-		kernel_params+=("snd_bcm2835.enable_headphones=1")
-	fi
-	kernel_params+=("snd-bcm2835.enable_compat_alsa=${compat_alsa}" "snd_bcm2835.enable_hdmi=1")
+	kernel_params+=("snd-bcm2835.enable_compat_alsa=${compat_alsa}" "snd_bcm2835.enable_hdmi=1" "snd_bcm2835.enable_headphones=1")
 
 	if [[ $DEBUG_IMAGE == yes ]]; then
 		log "Creating debug image" "wrn"
@@ -445,7 +382,7 @@ device_chroot_tweaks_pre() {
 	log "Finalising drivers installation with depmod on ${KERNEL_VERSION}+,-v7+ and -v7l+"
 	depmod "${KERNEL_VERSION}+"     # Pi 1, Zero, Compute Module
 	depmod "${KERNEL_VERSION}-v7+"  # Pi 2,3 CM3
-	depmod "${KERNEL_VERSION}-v7l+" # Pi4
+	depmod "${KERNEL_VERSION}-v7l+" # Pi 4,5 CM4
 
 	log "Raspi Kernel and Modules installed" "okay"
 
