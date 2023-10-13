@@ -110,7 +110,7 @@ device_image_tweaks() {
 	EOF
 
 	log "Fetching rpi-update" "info"
-	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/volumio/rpi-update/master/rpi-update &&
+	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/volumioteam/rpi-update/master/rpi-update &&
 		chmod +x "${ROOTFSMNT}/usr/bin/rpi-update"
 	#TODO: Look into moving kernel stuff outside chroot using ROOT/BOOT_PATH to speed things up
 	# ROOT_PATH=${ROOTFSMNT}
@@ -136,17 +136,11 @@ device_chroot_tweaks_pre() {
 		#[KERNEL_VERSION]="SHA|Branch|Rev"
 		[5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
 		[5.10.92]="ea9e10e531a301b3df568dccb3c931d52a469106|stable|1514"
-		[5.10.95]="27714acc7d19cfae3dcf8c7631eeb29df0135974|master|1521"
 		[5.15.84]="a99e144e939bf93bbd03e8066601a8d3eae640f7|stable|1613"
 		[6.1.19]="fa51258e0239eaf68d9dff9c156cec3a622fbacc|stable|1637"
 		[6.1.21]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1642"
-		[6.1.39]="d873621b557928d397f3aa9707ce57d3ff313752|master|1664"
-		[6.1.42]="fc879d483956bb67ff5f4fc1a83b3df0f10222a2|master|1668"
-		[6.1.43]="5eaa5839de98012c21fb75cd0a075ecfcb573bff|master|1669"
-		[6.1.44]="30c05a7bcc43c27f230876779a87899b57278a0b|master|1670"
-		[6.1.45]="a88533edd6d3c0ea93ddd5bb5c89f47ec8fb6e98|master|1671"
-		[6.1.46]="c1ed09b26ca8bacfbce15e87001d69923a364413|master|1673"
-		[6.1.47]="abe4079532454173630b07123369fc4ba219502b|stable|1674"
+		[6.1.47]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1674"
+		[6.1.57]="12833d1bee03c4ac58dc4addf411944a189f1dfd|master|1688" # Support for Pi5
 	)
 	# Version we want
 	KERNEL_VERSION="5.10.92"
@@ -164,7 +158,7 @@ device_chroot_tweaks_pre() {
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}"
-	echo y | SKIP_BACKUP=1 WANT_PI4=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
+	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=0 WANT_PI4=1 WANT_PI5=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
 
 	if [ -d "/lib/modules/${KERNEL_VERSION}+" ]; then
 		log "Removing ${KERNEL_VERSION}+ Kernel and modules" "info"
@@ -182,6 +176,12 @@ device_chroot_tweaks_pre() {
 		log "Removing ${KERNEL_VERSION}-v8+ Kernel and modules" "info"
 		rm /boot/kernel8.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
+	fi
+	
+	if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
+		log "Removing ${KERNEL_VERSION}-v8_16k+ Kernel and modules" "info"
+		rm /boot/kernel_2712.img
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
 	fi
 
 	log "Finished Kernel installation" "okay"
