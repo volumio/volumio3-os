@@ -107,7 +107,7 @@ device_image_tweaks() {
 	EOF
 
 	log "Fetching rpi-update" "info"
-	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/volumio/rpi-update/master/rpi-update &&
+	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/volumioteam/rpi-update/master/rpi-update &&
 		chmod +x "${ROOTFSMNT}/usr/bin/rpi-update"
 	#TODO: Look into moving kernel stuff outside chroot using ROOT/BOOT_PATH to speed things up
 	# ROOT_PATH=${ROOTFSMNT}
