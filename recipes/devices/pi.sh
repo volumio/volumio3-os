@@ -310,6 +310,9 @@ device_chroot_tweaks_pre() {
 	log "Writing config.txt file"
 	cat <<-EOF >/boot/config.txt
 		initramfs volumio.initrd
+		[cm4]
+		dtoverlay=dwc2,dr_mode=host
+		[all]
 		arm_64bit=0
 		gpu_mem=32
 		max_usb_current=1
@@ -319,9 +322,6 @@ device_chroot_tweaks_pre() {
 		disable_splash=1
 		hdmi_force_hotplug=1
 		force_eeprom_read=0
-		[cm4]
-		dtoverlay=dwc2,dr_mode=host
-		[all]
 
 		include userconfig.txt
 	EOF
