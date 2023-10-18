@@ -148,9 +148,10 @@ device_chroot_tweaks_pre() {
 		[6.1.21]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1642"
 		[6.1.47]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1674"
 		[6.1.57]="12833d1bee03c4ac58dc4addf411944a189f1dfd|master|1688" # Support for Pi5
+		[6.1.58]="7b859959a6642aff44acdfd957d6d66f6756021e|master|1690"
 	)
 	# Version we want
-	KERNEL_VERSION="6.1.57"
+	KERNEL_VERSION="5.10.92"
 
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
@@ -198,12 +199,13 @@ device_chroot_tweaks_pre() {
 		rm /boot/kernel8.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
 	fi
-
-	if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
-		log "Removing v8_16k+ (Pi5) Kernel and modules" "info"
-		rm /boot/kernel_2712.img
-		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
-	fi
+	
+	## Comment to keep RPi5 kernel
+	#if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
+	#	log "Removing v8_16k+ (Pi5) Kernel and modules" "info"
+	#	rm /boot/kernel_2712.img
+	#	rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
+	#fi
 
 	log "Finished Kernel installation" "okay"
 
