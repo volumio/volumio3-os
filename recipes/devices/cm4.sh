@@ -141,6 +141,7 @@ device_chroot_tweaks_pre() {
 		[6.1.21]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1642"
 		[6.1.47]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1674"
 		[6.1.57]="12833d1bee03c4ac58dc4addf411944a189f1dfd|master|1688" # Support for Pi5
+		[6.1.58]="7b859959a6642aff44acdfd957d6d66f6756021e|master|1690"
 	)
 	# Version we want
 	KERNEL_VERSION="5.10.92"
