@@ -151,7 +151,7 @@ device_chroot_tweaks_pre() {
 		[6.1.58]="7b859959a6642aff44acdfd957d6d66f6756021e|master|1690"
 	)
 	# Version we want
-	KERNEL_VERSION="5.10.92"
+	KERNEL_VERSION="6.1.58"
 
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
@@ -192,20 +192,32 @@ device_chroot_tweaks_pre() {
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}"
-	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
+	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=0 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
 
-	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
-		log "Removing v8+ (Pi4) Kernel and modules" "info"
-		rm /boot/kernel8.img
-		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
-	fi
-	
-	## Comment to keep RPi5 kernel
-	#if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
-	#	log "Removing v8_16k+ (Pi5) Kernel and modules" "info"
-	#	rm /boot/kernel_2712.img
-	#	rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
+	log "Adding Custom DAC firmware from github" "info"
+	for key in "${!CustomFirmware[@]}"; do
+		wget -nv "${CustomFirmware[$key]}" -O "$key.tar.gz" || {
+			log "Failed to get firmware:" "err" "${key}"
+			rm "$key.tar.gz"
+			continue
+		}
+		tar --strip-components 1 --exclude "*.hash" --exclude "*.md" -xf "$key.tar.gz"
+		rm "$key.tar.gz"
+	done
+
+	## Comment to keep RPi4/RPi5 64bit kernel
+	#if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
+	#	log "Removing v8+ (Pi4/5) Kernel and modules" "info"
+	#	rm -rf /boot/kernel8.img
+	#	rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
 	#fi
+
+	## Comment to keep RPi5 64bit 16k page size kernel
+	if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
+		log "Removing v8_16k+ (Pi5 16k) Kernel and modules" "info"
+		rm -rf /boot/kernel_2712.img
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
+	fi
 
 	log "Finished Kernel installation" "okay"
 
@@ -249,17 +261,6 @@ device_chroot_tweaks_pre() {
 			Pin-Priority: -1
 		EOF
 	fi
-
-	log "Adding Custom DAC firmware from github" "info"
-	for key in "${!CustomFirmware[@]}"; do
-		wget -nv "${CustomFirmware[$key]}" -O "$key.tar.gz" || {
-			log "Failed to get firmware:" "err" "${key}"
-			rm "$key.tar.gz"
-			continue
-		}
-		tar --strip-components 1 --exclude "*.hash" --exclude "*.md" -xf "$key.tar.gz"
-		rm "$key.tar.gz"
-	done
 
 	log "Starting Raspi platform tweaks" "info"
 	plymouth-set-default-theme volumio
@@ -384,7 +385,9 @@ device_chroot_tweaks_pre() {
 	log "Finalising drivers installation with depmod on ${KERNEL_VERSION}+,-v7+ and -v7l+"
 	depmod "${KERNEL_VERSION}+"     # Pi 1, Zero, Compute Module
 	depmod "${KERNEL_VERSION}-v7+"  # Pi 2,3 CM3
-	depmod "${KERNEL_VERSION}-v7l+" # Pi 4,5 CM4
+	depmod "${KERNEL_VERSION}-v7l+" # Pi 4 CM4
+	depmod "${KERNEL_VERSION}-v8+"  # Pi 4,5 CM4 64bit
+	#depmod "${KERNEL_VERSION}-v8_16k+"  # Pi 4,5 CM4 64bit
 
 	log "Raspi Kernel and Modules installed" "okay"
 
