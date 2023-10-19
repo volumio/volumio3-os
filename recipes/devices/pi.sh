@@ -104,6 +104,10 @@ device_image_tweaks() {
 		Package: raspberrypi-kernel
 		Pin: release *
 		Pin-Priority: -1
+
+                Package: libraspberrypi0
+                Pin: release *
+                Pin-Priority: -1
 	EOF
 
 	log "Fetching rpi-update" "info"
@@ -222,7 +226,12 @@ device_chroot_tweaks_pre() {
 	log "Finished Kernel installation" "okay"
 
 	### Other Rpi specific stuff
-	## Lets update some packages from raspbian repos now
+	log "Installing fake libraspberrypi0 package"
+        wget -nv  https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/libraspberrypi0/libraspberrypi0_1.20230509-buster-1_armhf.deb
+        dpkg -i libraspberrypi0_1.20230509-buster-1_armhf.deb
+        rm libraspberrypi0_1.20230509-buster-1_armhf.deb
+
+        ## Lets update some packages from raspbian repos now
 	apt-get update && apt-get -y upgrade
 
 	NODE_VERSION=$(node --version)
