@@ -159,29 +159,40 @@ device_chroot_tweaks_pre() {
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}"
-	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
+	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=0 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
+
+	log "Adding Custom firmware from github" "info"
+	for key in "${!CustomFirmware[@]}"; do
+		wget -nv "${CustomFirmware[$key]}" -O "$key.tar.gz" || {
+			log "Failed to get firmware:" "err" "${key}"
+			rm "$key.tar.gz"
+			continue
+		}
+		tar --strip-components 1 --exclude "*.hash" --exclude "*.md" -xf "$key.tar.gz"
+		rm "$key.tar.gz"
+	done
 
 	if [ -d "/lib/modules/${KERNEL_VERSION}+" ]; then
 		log "Removing ${KERNEL_VERSION}+ Kernel and modules" "info"
-		rm /boot/kernel.img
+		rm -rf /boot/kernel.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}+"
 	fi
 
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v7+" ]; then
 		log "Removing ${KERNEL_VERSION}-v7+ Kernel and modules" "info"
-		rm /boot/kernel7.img
+		rm -rf /boot/kernel7.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v7+"
 	fi
 
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
 		log "Removing ${KERNEL_VERSION}-v8+ Kernel and modules" "info"
-		rm /boot/kernel8.img
+		rm -rf /boot/kernel8.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
 	fi
 	
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
 		log "Removing ${KERNEL_VERSION}-v8_16k+ Kernel and modules" "info"
-		rm /boot/kernel_2712.img
+		rm -rf /boot/kernel_2712.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
 	fi
 
@@ -227,17 +238,6 @@ device_chroot_tweaks_pre() {
 			Pin-Priority: -1
 		EOF
 	fi
-
-	log "Adding Custom firmware from github" "info"
-	for key in "${!CustomFirmware[@]}"; do
-		wget -nv "${CustomFirmware[$key]}" -O "$key.tar.gz" || {
-			log "Failed to get firmware:" "err" "${key}"
-			rm "$key.tar.gz"
-			continue
-		}
-		tar --strip-components 1 --exclude "*.hash" --exclude "*.md" -xf "$key.tar.gz"
-		rm "$key.tar.gz"
-	done
 
 	log "Starting Raspi platform tweaks" "info"
 	plymouth-set-default-theme volumio
