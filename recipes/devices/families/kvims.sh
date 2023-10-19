@@ -37,6 +37,7 @@ MODULES=("overlay" "squashfs" "nls_cp437")
 # Packages that will be installed
 PACKAGES=("lirc" "fbset" "mc" "abootimg" "bluez-firmware"
   "bluetooth" "bluez" "bluez-tools" "linux-base" "triggerhappy"
+  "plymouth" "plymouth-themes"
 )
 
 ### Device customisation
