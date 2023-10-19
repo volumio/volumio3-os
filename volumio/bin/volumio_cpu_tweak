@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
+# MPD AFFINITY CONTROL
 CORES=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1`
 MPD_PID=`/bin/pidof mpd`
 
-echo "Real-time Kernel Environment"
 echo "Setting RT Priority for mpd"
 /usr/bin/chrt -f -p -a 35 $MPD_PID
 
@@ -13,5 +13,29 @@ if [ "$CORES" -gt 2 ]; then
      else
    echo "Not enough cores to set MPD affinity"
 fi
+
+# CPU GOVERNOR CONTROL
+
+# DEFAULT GOVERNOR
+GOVERNOR="performance"
+
+# Define the array of strings for devices that require the conservative governor
+GOVERNOR_CONSERVATIVE_DEVICES=("Raspberry Pi Compute Module" "Raspberry Pi 5")
+
+# Check if the file /sys/firmware/devicetree/base/model exists, in this case we are running on a Raspberry Pi
+if [ -f /sys/firmware/devicetree/base/model ]; then
+  model_content=$(cat /sys/firmware/devicetree/base/model)
+
+  # Check if the model content contains any of the strings in the array
+  for device in "${GOVERNOR_CONSERVATIVE_DEVICES[@]}"; do
+    if [[ $model_content == *"$device"* ]]; then
+      GOVERNOR="conservative"
+      break
+    fi
+  done
+fi
+
+echo "VOLUMIO CPU TWEAK: Setting CPU Governor: $GOVERNOR"
+/usr/bin/cpufreq-set -g $GOVERNOR
 
 exit 0

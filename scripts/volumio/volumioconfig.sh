@@ -472,10 +472,6 @@ rm -f /etc/avahi/services/udisks.service
 #####################
 #CPU  Optimizations#-----------------------------------------
 #####################
-
-log "Setting CPU governor to performance" "info"
-echo 'GOVERNOR="performance"' >/etc/default/cpufrequtils
-
 log "Finished Volumio chroot configuration for ${DISTRO_NAME}" "okay"
 
 #------------------------------------------------------------
