@@ -338,6 +338,9 @@ ln -s /lib/systemd/system/volumiossh.service /etc/systemd/system/multi-user.targ
 log "Enable Volumio Log Rotation Service"
 ln -s /lib/systemd/system/volumiologrotate.service /etc/systemd/system/multi-user.target.wants/volumiologrotate.service
 
+log "Enable Volumio CPU Tweak Service"
+ln -s /lib/systemd/system/volumio_cpu_tweak.service /etc/systemd/system/multi-user.target.wants/volumio_cpu_tweak.service
+
 log "Setting Mpd to SystemD instead of Init"
 update-rc.d mpd remove
 systemctl enable mpd.service
