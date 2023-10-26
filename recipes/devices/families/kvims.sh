@@ -125,7 +125,7 @@ EOF
   echo "dhd" >>"/etc/modules"
 
   log "Configuring boot splash"
-  plymouth-set-default-theme volumio
+  #plymouth-set-default-theme volumio
 
   log "Disabling login prompt"
   systemctl disable getty@tty1.service
