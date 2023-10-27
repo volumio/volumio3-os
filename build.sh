@@ -132,7 +132,7 @@ function fetch_volumio_from_repo() {
 	EOF
 
   log "Adding wireless.js"
-  cp "${SRC}/volumio/bin/wireless.js" "${ROOTFS}/volumio/app/plugins/system_controller/network/wireless.js"
+  cp "${SRC}/volumio/volumio/app/plugins/system_controller/network/wireless.js" "${ROOTFS}/volumio/app/plugins/system_controller/network/wireless.js"
   log 'Cloning Volumio UI'
   git clone --depth 1 -b dist --single-branch https://github.com/volumio/Volumio2-UI.git "${ROOTFS}/volumio/http/www"
   git clone --depth 1 -b dist3 --single-branch https://github.com/volumio/Volumio2-UI.git "${ROOTFS}/volumio/http/www3"
