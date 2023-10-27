@@ -4,10 +4,16 @@
 declare -A SecureApt=(
   [debian_10.gpg]="https://repo.volumio.org/Volumio2/archive-key-10.asc"
   [nodesource.gpg]="https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
-  [lesbonscomptes.gpg]="https://www.lesbonscomptes.com/pages/jf-at-dockes.org.pub"
+  [lesbonscomptes.gpg]="https://www.lesbonscomptes.com/pages/lesbonscomptes.gpg"
   #TODO Not needed for arm64 and x86
   [raspbian.gpg]="https://archive.raspbian.org/raspbian.public.key"
   [raspberrypi.gpg]="http://archive.raspberrypi.org/debian/raspberrypi.gpg.key"
+)
+
+declare -A SecureAptKeys=(
+  [debian1.gpg]="0E98404D386FA1D9"
+  [debian2.gpg]="6ED0E7B82643E131"
+  [debian3.gpg]="F8D2585B8783D481"
 )
 
 # Repo locations that are utilised to create source.list in the rootfs

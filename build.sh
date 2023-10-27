@@ -192,6 +192,10 @@ function setup_multistrap() {
     apt-key --keyring "${DirEtctrustedparts}/${key}" \
       adv --fetch-keys "${SecureApt[$key]}"
   done
+  for key in "${!SecureAptKeys[@]}"; do
+    apt-key --keyring "${DirEtctrustedparts}/${key}" \
+      adv --keyserver keyserver.ubuntu.com --recv-keys "${SecureAptKeys[$key]}"
+  done
   if [[ ${ARCH} == $(dpkg --print-architecture) ]]; then
     # Some packages need more help, give it to them
     log "Creating /dev/urandom for multistrap on native arch"
