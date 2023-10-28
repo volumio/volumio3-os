@@ -8,8 +8,8 @@ Wants=swap.target
 
 [Service]
 ExecStart=/bin/dynswap.sh
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=journal
+StandardError=journal
 SyslogIdentifier=volumio
 User=root
 Group=root

@@ -4,8 +4,8 @@ Description = Volumio Splash
 
 [Service]
 ExecStart=/bin/volumiosplash.sh
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=journal
+StandardError=journal
 SyslogIdentifier=volumio-splash
 User=root
 Group=root

@@ -4,8 +4,8 @@ After=volumio.service
 
 [Service]
 ExecStart=/bin/volumio_cpu_tweak
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=journal
+StandardError=journal
 SyslogIdentifier=volumio-cpu-tweak
 User=root
 Group=root

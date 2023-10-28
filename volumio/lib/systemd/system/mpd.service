@@ -1,11 +1,21 @@
 [Unit]
 Description=Music Player Daemon
 Documentation=man:mpd(1) man:mpd.conf(5)
+Documentation=file:///usr/share/doc/mpd/user-manual.html
 After=network.target sound.target
 
 [Service]
 Type=notify
-ExecStart=/usr/bin/mpd --no-daemon
+EnvironmentFile=/etc/default/mpd
+ExecStartPre=touch /var/log/mpd.log
+ExecStartPre=chown volumio /var/log/mpd.log
+ExecStart=/usr/bin/mpd --no-daemon $MPDCONF
+
+# Enable this setting to ask systemd to watch over MPD, see
+# systemd.service(5).  This is disabled by default because it causes
+# periodic wakeups which are unnecessary if MPD is not playing.
+#WatchdogSec=120
+
 # allow MPD to use real-time priority 50
 LimitRTPRIO=50
 LimitRTTIME=infinity

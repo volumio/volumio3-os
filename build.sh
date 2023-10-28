@@ -27,7 +27,7 @@ log "Running Volumio Image Builder -" "info"
 
 ARCH=""
 # This isn't being used currently..
-SUITE="buster"
+SUITE="bullseye"
 #Help function
 function HELP() {
   cat <<-EOF
@@ -213,8 +213,8 @@ function patch_multistrap_conf() {
     log "Patching multistrap config to point to Raspbian sources" "info"
     BASECONF=recipes/base/VolumioBase.conf
     export RASPBIANCONF=recipes/base/arm-raspbian.conf
-    debian_source=http://deb.debian.org/debian
-    rapsbian_source=http://mirrordirector.raspbian.org/raspbian
+    debian_source=https://deb.debian.org/debian
+    rapsbian_source=https://archive.raspbian.org/raspbian
 
     cat <<-EOF >"${SRC}/${RASPBIANCONF}"
 		# Auto generated multistrap configuration for Raspberry Pi
@@ -318,8 +318,8 @@ if [ -n "${BUILD}" ]; then
   #TODO Check naming conventions!
   BASE="Debian"
   if [[ -z "$SUITE" ]]; then
-    log "Defaulting to release" "" "Buster"
-    SUITE="buster"
+    log "Defaulting to release" "" "Bullseye"
+    SUITE="bullseye"
   fi
 
   MULTISTRAPCONF=${BUILD}
@@ -548,7 +548,7 @@ if [[ -n "${DEVICE}" ]]; then
     for key in "${!CUSTOM_PKGS[@]}"; do
       # TODO: Test if key is specific to BUILD or not!
       url=${CUSTOM_PKGS[$key]}
-      [[ "$url" != *".deb"$ ]] && url="${url}_${BUILD}.deb"
+      [[ "$url" =~ .*".deb"$ ]] || url="${url}_${BUILD}.deb"
       # log "Fetching ${key} from ${url}"
       wget -nv "${url}" -P "${ROOTFS}/volumio/customPkgs/" || {
         log "${key} wasn't successful for ${BUILD}!" "err"

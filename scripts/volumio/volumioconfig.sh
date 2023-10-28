@@ -56,7 +56,7 @@ export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
 export LC_ALL=C LANGUAGE=C LANG=C
 
 log "Running dpkg fixes for ${DISTRO_NAME}(${DISTRO_VER})"
-if [[ ${DISTRO_VER} = 10 ]]; then
+if [[ ${DISTRO_VER} -ge 10 ]]; then
   # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=924401
   log "Running base-passwd.preinst" "wrn"
   /var/lib/dpkg/info/base-passwd.preinst install
@@ -249,6 +249,17 @@ apt-get -y install $packages
 
 log "Node $(node --version) arm_version: $(node <<<'console.log(process.config.variables.arm_version)')" "info"
 log "nodejs installed at $(command -v node)" "info"
+
+# Install upmpdcli and libraries from Lesbonscomptes packages instead of custom
+log "Attempting to install upmpdcli"
+log "Adding Lesbonscomptes lists"
+cat <<-EOF >/etc/apt/sources.list.d/lesboncomptes.list
+deb https://www.lesbonscomptes.com/upmpdcli/downloads/raspbian $DISTRO_NAME main
+deb-src https://www.lesbonscomptes.com/upmpdcli/downloads/raspbian $DISTRO_NAME main
+EOF
+apt-get update
+apt-get -y install upmpdcli libnpupnp2 libupnpp7
+log "upmpdcli installed" "info"
 
 #TODO: Refactor this!
 # Binaries
@@ -480,7 +491,7 @@ log "Finished Volumio chroot configuration for ${DISTRO_NAME}" "okay"
 #------------------------------------------------------------
 
 log "Allowing UDEV To make rest calls to make usb detection work"
-echo "IPAddressAllow=127.0.0.1" >> /lib/systemd/system/udev.service
+echo "IPAddressAllow=127.0.0.1" >> /lib/systemd/system/systemd-udev.service
 
 log "Allowing UDEV to bring up HCI devices"
-sed -i 's/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6 AF_BLUETOOTH/' /lib/systemd/system/udev.service
+sed -i 's/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6 AF_BLUETOOTH/' /lib/systemd/system/systemd-udev.service

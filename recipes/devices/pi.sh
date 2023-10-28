@@ -39,13 +39,14 @@ PACKAGES=(# Bluetooth packages
 	# Foundation stuff
 	"raspberrypi-sys-mods"
 	# "rpi-eeprom"\ Needs raspberrypi-bootloader that we hold back
-	# GPIO stuff
-	"wiringpi"
 	# Boot splash
 	"plymouth" "plymouth-themes"
 	# Wireless firmware
 	"firmware-atheros" "firmware-ralink" "firmware-realtek" "firmware-brcm80211"
 )
+
+# Add WiringPi package for GPIO support to CUSTOM_PKGS list
+CUSTOM_PKGS[wiringpi]="https://github.com/WiringPi/WiringPi/releases/download/2.61-1/wiringpi-2.61-1-armhf.deb"
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
@@ -85,9 +86,11 @@ device_image_tweaks() {
 
 	log "Adding archive.raspberrypi debian repo"
 	cat <<-EOF >"${ROOTFSMNT}/etc/apt/sources.list.d/raspi.list"
-		deb http://archive.raspberrypi.org/debian/ buster main ui
+		deb https://archive.raspberrypi.org/debian/ bullseye main
 		# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-		#deb-src http://archive.raspberrypi.org/debian/ buster main ui
+		#deb-src https://archive.raspberrypi.org/debian/ bullseye main
+		deb https://archive.raspbian.org/raspbian bullseye main firmware non-free rpi
+		#deb-src https://archive.raspbian.org/raspbian bullseye main firmware non-free rpi
 	EOF
 
 	# raspberrypi-{kernel,bootloader} packages update kernel & firmware files
@@ -104,10 +107,6 @@ device_image_tweaks() {
 		Package: raspberrypi-kernel
 		Pin: release *
 		Pin-Priority: -1
-
-                Package: libraspberrypi0
-                Pin: release *
-                Pin-Priority: -1
 	EOF
 
 	log "Fetching rpi-update" "info"
@@ -225,51 +224,8 @@ device_chroot_tweaks_pre() {
 
 	log "Finished Kernel installation" "okay"
 
-	### Other Rpi specific stuff
-	log "Installing fake libraspberrypi0 package"
-        wget -nv  https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/libraspberrypi0/libraspberrypi0_1.20230509-buster-1_armhf.deb
-        dpkg -i libraspberrypi0_1.20230509-buster-1_armhf.deb
-        rm libraspberrypi0_1.20230509-buster-1_armhf.deb
-
         ## Lets update some packages from raspbian repos now
 	apt-get update && apt-get -y upgrade
-
-	NODE_VERSION=$(node --version)
-	log "Node version installed:" "dbg" "${NODE_VERSION}"
-	# drop the leading v
-	NODE_VERSION=${NODE_VERSION:1}
-	if [[ ${USE_NODE_ARMV6:-yes} == yes && ${NODE_VERSION%%.*} -ge 8 ]]; then
-		log "Using a compatible nodejs version for all pi images" "info"
-		# We don't know in advance what version is in the repo, so we have to hard code it.
-		# This is temporary fix - make this smarter!
-		declare -A NodeVersion=(
-			[14]="https://repo.volumio.org/Volumio2/nodejs_14.15.4-1unofficial_armv6l.deb"
-			[8]="https://repo.volumio.org/Volumio2/nodejs_8.17.0-1unofficial_armv6l.deb"
-		)
-		# TODO: Warn and proceed or exit the build?
-		local arch=armv6l
-		wget -nv "${NodeVersion[${NODE_VERSION%%.*}]}" -P /volumio/customNode || log "Failed fetching Nodejs for armv6!!" "wrn"
-		# Proceed only if there is a deb to install
-		if compgen -G "/volumio/customNode/nodejs_*-1unofficial_${arch}.deb" >/dev/null; then
-			# Get rid of armv7 nodejs and pick up the armv6l version
-			if dpkg -s nodejs &>/dev/null; then
-				log "Removing previous nodejs installation from $(command -v node)"
-				log "Removing Node $(node --version) arm_version: $(node <<<'console.log(process.config.variables.arm_version)')" "info"
-				apt-get -y purge nodejs
-			fi
-			log "Installing Node for ${arch}"
-			dpkg -i /volumio/customNode/nodejs_*-1unofficial_${arch}.deb
-			log "Installed Node $(node --version) arm_version: $(node <<<'console.log(process.config.variables.arm_version)')" "info"
-			rm -rf /volumio/customNode
-		fi
-		# Block upgrade of nodejs from raspi repos
-		log "Blocking nodejs upgrades for ${NODE_VERSION}"
-		cat <<-EOF >"${ROOTFSMNT}/etc/apt/preferences.d/nodejs"
-			Package: nodejs
-			Pin: release *
-			Pin-Priority: -1
-		EOF
-	fi
 
 	log "Starting Raspi platform tweaks" "info"
 	plymouth-set-default-theme volumio

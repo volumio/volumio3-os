@@ -37,14 +37,7 @@ declare -A VOLBINS=(
 # Note the use of $BUILD (arm/armv7/armv8/x86/x64) and not $ARCH(armel/armhf/arm64/i386/amd64) thanks to raspberrypi compatibility naming quirks
 declare -A CUSTOM_PKGS=(
   [volumio_remote_updater]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/volumio-remote-updater/volumio-remote-updater_1.7"
-  [libnpupnp1]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/upmpdcli/libnpupnp1_4.0.14-1"
-  [libupnpp6]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/upmpdcli/libupnpp6_0.20.2-1"
-  [upmpdcli]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/upmpdcli/upmpdcli_1.5.8-1"
-  [shairport-sync]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/shairport-sync/shairport-sync_3.2.2-1"
-  [mpd]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/mpd/mpd_0.21.18"
   [alsacap]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/alsacap/alsacap_1.0-1"
-  [libcurl]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/curl/00libcurl4_7.74.0-1.2~bpo10%2B1"
-  [curl]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/curl/curl_7.74.0-1.2~bpo10%2B1"
 )
 
 ## Backend and Frontend Repository details
