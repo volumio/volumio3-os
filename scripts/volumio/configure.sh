@@ -30,5 +30,5 @@ if [[ ${BUILD:0:3} == arm ]]; then
 fi
 
 log "Copying misc config/tweaks to rootfs" "info"
-cp -rp "${SRC}/volumio/*" "${ROOTFS}/"
+cp -pr --no-preserve=ownership "${SRC}"/volumio/* "${ROOTFS}"/
 log 'Done Copying Custom Volumio System Files' "okay"
