@@ -108,6 +108,9 @@ device_image_tweaks() {
 		Pin: release *
 		Pin-Priority: -1
 	EOF
+#                Package: libraspberrypi0
+#                Pin: release *
+#                Pin-Priority: -1
 
 	log "Fetching rpi-update" "info"
 	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/volumioteam/rpi-update/master/rpi-update &&
