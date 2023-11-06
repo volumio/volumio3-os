@@ -12,4 +12,5 @@ source "${SRC}"/recipes/devices/families/x86.sh
 # Base system
 ARCH="amd64"
 BUILD="x64"
+DEVICE="x86_amd64"
 DEVICENAME="x86_64"

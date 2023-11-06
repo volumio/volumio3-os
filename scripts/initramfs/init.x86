@@ -256,7 +256,13 @@ fi
 # 1) mount the partition where the squash image resides
 [ -d /mnt/imgpart ] || mkdir /mnt/imgpart
 mount -t ext4 "${IMGPART}" /mnt/imgpart
-
+echo " "
+echo " "
+echo " "
+echo " "
+echo " "
+echo " "
+echo "[init] Initializing Volumio startup..."
 if [ ! -e "/mnt/imgpart/kernel_current.tar" ] || [ -e "/mnt/imgpart/current_kernel_creation" ]; then
   print_msg "Creating archive for current kernel..."
   touch /mnt/imgpart/current_kernel_creation
@@ -305,6 +311,7 @@ if [ ! -z "${BOOTDELAY}" ]; then
 fi
 
 print_msg "Checking for a volumio rootfs update on a USB device"
+
 mkdir /mnt/usb
 for devlink in /dev/sd[a-z]; do
   if [ "${devlink}" == "/dev/sd[a-z]" ]; then
@@ -317,12 +324,15 @@ for devlink in /dev/sd[a-z]; do
     mount -t vfat ${devlink}1 /mnt/usb >/dev/null 2>&1
     print_msg "Checking ${devlink}1 for a volumio rootfs update"
     if [ -e /mnt/usb/*.fir ]; then
+      echo "[init] Performing Volumio Update from USB..."
       print_msg "New rootfs firmware found"
       print_msg "Updating can take several minutes, please wait...."
       mkdir /mnt/boot
       mount -t vfat "${BOOTPART}" /mnt/boot
       volumio-init-updater
       print_msg "USB Update applied"
+      echo "[init] USB Update finished, rebooting..."
+      sleep 2
       umount /mnt/usb >/dev/null 2>&1
       rm -r /mnt/boot
       rm -r /mnt/usb
@@ -369,6 +379,7 @@ print_msg "Checking for factory or user-data reset on boot device"
 mkdir /mnt/factory
 mount -t vfat "${BOOTPART}" /mnt/factory
 if [ -e "/mnt/factory/user_data" ]; then
+  echo "[init] Performing Factory Reset..."
   print_msg "Deleting User Data..."
   #mke2fsfull is used since busybox mke2fs does not include ext4 support
   /sbin/mke2fsfull -t ext4 -F -E stride=2,stripe-width=1024 -b 4096 "${DATAPART}" -L volumio_data >/dev/null 2>&1
@@ -401,7 +412,9 @@ fi
 # These need to be edited into the new boot configs to make the new update bootable
 # This is an update on an existing installation, do not resize the data partition
 # Just remove the sentinel
+
 if [ -e "/boot/kernel_update" ]; then
+  echo "[init] Performing Volumio update..."
   print_msg "unpacking kernel"
   tar xf /mnt/imgpart/kernel_current.tar -C /boot
   #TODO: Will the second mounting of BOOTPART fail?
@@ -410,6 +423,8 @@ if [ -e "/boot/kernel_update" ]; then
   rm /boot/kernel_update
   umount /boot
   rm -rf /boot
+  echo "[init] Volumio updated, rebooting..."
+  sleep 2
   echo b >/proc/sysrq-trigger
 fi
 
@@ -421,6 +436,7 @@ DATADEV=/dev/$(lsblk -no PKNAME "${DATAPART}")
 # Re-sizing is not necessary when we already reached maximum (shows with decimals less than 1MB).
 FREESIZE="$(parted -s "${DATADEV}" unit MB print free | tail -n 2 | grep Free | awk '{print $3}' | awk -F 'MB' '{print $1}')"
 if [ "$(awk 'BEGIN {print ("'$FREESIZE'" >= "'1'")}')" -eq "1" ]; then
+  echo "[init] Re-sizing Volumio data partition..."
   print_msg "Re-sizing Volumio data partition..."
   END="$(parted -s "${DATADEV}" unit MB print free | grep Free | tail -1 | awk '{print $2}' | grep -o '[0-9]\+')"
   parted -s "${DATADEV}" resizepart 3 "${END}" >/dev/null 2>&1
@@ -487,7 +503,7 @@ if ! grep -q "^UUID=${UUID_BOOT}" /mnt/ext/union/etc/fstab; then
 fi
 print_msg "Volumio: ${VOLUMIO_VERSION}"
 print_msg "Finishing initramfs, switching rootfs and starting the boot process..."
-
+echo "[init] Volumio ${VOLUMIO_VERSION} startup initialized, please wait for Volumio to start up..."
 # Move /run to the root so our logs are there when we boot
 mount -n -o move /run /mnt/ext/union/run
 [ -f log_pipe ] && rm log_pipe
