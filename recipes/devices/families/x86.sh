@@ -140,6 +140,18 @@ write_device_bootloader() {
 device_image_tweaks() {
   log "Running device_image_tweaks" "ext"
 
+  log "Some wireless network drivers (e.g. for Marvell chipsets) create device 'mlan0'"
+  log "Rename these to 'wlan0' using a systemd link"
+  cat <<-EOF > "${ROOTFSMNT}/etc/systemd/network/10-rename-mlan0.link"
+[Match]
+Type=wlan
+Driver=mwifiex_sdio
+OriginalName=mlan0
+
+[Link]
+Name=wlan0
+EOF
+
   log "Add service to set sane defaults for baytrail/cherrytrail and HDA soundcards"
   cat <<-EOF >"${ROOTFSMNT}/usr/local/bin/soundcard-init.sh"
 #!/bin/sh -e
