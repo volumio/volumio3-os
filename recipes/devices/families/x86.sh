@@ -54,27 +54,34 @@ MODULES=("overlay" "squashfs"
 # Packages that will be installed
 PACKAGES=()
 
+# Copy in the kernel version we are interested in
+# This will be expanded as a glob, you can be as specific or vague as required
+# KERNEL_VERSION=5.10
+KERNEL_VERSION=6.1
+# KERNEL_VERSION=6.6
+
+# Copy in the firmware version we are interested in
+# FIRMWARE_VERSION="20211027"
+# FIRMWARE_VERSION="20221216"
+FIRMWARE_VERSION="20230804"
+  
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
   log "Running write_device_files" "ext"
   log "Copying kernel files"
   pkg_root="${PLTDIR}/packages-buster"
-  # Copy in the kernel version we are interested in
-  # This will be expanded as a glob, you can be as specific or vague as required
-  # KERNEL_VERSION=4.19
-  KERNEL_VERSION=5.10
+
   cp "${pkg_root}"/linux-image-${KERNEL_VERSION}*_${ARCH}.deb "${ROOTFSMNT}"
+
+  log "Copying header files, when present"
+  if [ -f "${pkg_root}"/linux-headers-${KERNEL_VERSION}*_${ARCH}.deb ]; then
+    cp "${pkg_root}"/linux-headers-${KERNEL_VERSION}*_${ARCH}.deb "${ROOTFSMNT}"
+  fi
+
   log "Copying the latest firmware into /lib/firmware"
-  tar xfJ "${pkg_root}"/linux-firmware-buster.tar.xz -C "${ROOTFSMNT}"
-
-  log "Copying firmware additions"
-  tar xf "${pkg_root}"/firmware-brcm-sdio-nvram/broadcom-nvram.tar.xz -C "${ROOTFSMNT}"
-  cp "${pkg_root}"/firmware-cfg80211/* "${ROOTFSMNT}"/lib/firmware
-
-  log "Copy firmware needed by the b43 kernel driver..."
-  log "... for some Broadcom 43xx wireless network cards."
-  tar xfJ "${pkg_root}"/firmware-b43/firmware-b43.tar.xz -C "${ROOTFSMNT}"/lib
+  log "Unpacking the tar file firmware-${FIRMWARE_VERSION}"
+  tar xfJ "${pkg_root}"/firmware-${FIRMWARE_VERSION}.tar.xz -C "${ROOTFSMNT}"
 
   #log "Copying Alsa Use Case Manager files"
   #With Buster we seem to have a default install, but it is not complete. Add the missing codecs.
@@ -200,6 +207,15 @@ device_chroot_tweaks_pre() {
   rm -r /usr/share/doc/linux-image*
   rm linux-image-*_"${ARCH}".deb
 
+  log "Installing the headers, when present"
+  if [ -f linux-headers-*_"${ARCH}".deb ]; then
+    mkdir /tmpheaders
+    dpkg-deb -R linux-headers-*_"${ARCH}".deb ./tmpheaders
+    cp -R /tmpheaders/usr/src/linux-headers*/include /usr/src
+    rm -r /tmpheaders
+    rm linux-headers-*_"${ARCH}".deb
+  fi
+
   log "Change linux kernel image name to 'vmlinuz'"
   # Rename linux kernel to a fixed name, like we do for any other platform.
   # We only have one and we should not start multiple versions.
@@ -238,7 +254,7 @@ device_chroot_tweaks_pre() {
   )
 
   if [[ $DEBUG_IMAGE == yes ]]; then
-    log "Creaing debug image" "wrn"
+    log "Creating debug image" "wrn"
     KERNEL_LOGLEVEL="loglevel=8" # KERN_DEBUG
     kernel_params+=("debug")     # keep intiramfs logs
     log "Enabling ssh on boot"
@@ -257,7 +273,7 @@ device_chroot_tweaks_pre() {
   cat <<-EOF >/boot/syslinux.tmpl
 DEFAULT volumio
 LABEL volumio
-	SAY Booting Volumio Audiophile Music Player, please wait...
+	SAY Booting Volumio Audiophile Music Player...
   LINUX vmlinuz
   APPEND ${kernel_params[@]}
   INITRD volumio.initrd
@@ -292,7 +308,6 @@ EOF
   log "Notebook-specific: ignore 'cover closed' event"
   sed -i "s/#HandleLidSwitch=suspend/HandleLidSwitch=ignore/g" /etc/systemd/logind.conf
   sed -i "s/#HandleLidSwitchExternalPower=suspend/HandleLidSwitchExternalPower=ignore/g" /etc/systemd/logind.conf
-
 
 }
 
