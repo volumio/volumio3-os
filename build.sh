@@ -27,7 +27,7 @@ log "Running Volumio Image Builder -" "info"
 
 ARCH=""
 # This isn't being used currently..
-SUITE="buster"
+SUITE="bullseye"
 #Help function
 function HELP() {
   cat <<-EOF
@@ -131,8 +131,6 @@ function fetch_volumio_from_repo() {
 	#npm run lint-staged
 	EOF
 
-  log "Adding wireless.js"
-  cp "${SRC}/volumio/bin/wireless.js" "${ROOTFS}/volumio/app/plugins/system_controller/network/wireless.js"
   log 'Cloning Volumio UI'
   git clone --depth 1 -b dist --single-branch https://github.com/volumio/Volumio2-UI.git "${ROOTFS}/volumio/http/www"
   git clone --depth 1 -b dist3 --single-branch https://github.com/volumio/Volumio2-UI.git "${ROOTFS}/volumio/http/www3"
@@ -192,6 +190,10 @@ function setup_multistrap() {
     apt-key --keyring "${DirEtctrustedparts}/${key}" \
       adv --fetch-keys "${SecureApt[$key]}"
   done
+  for key in "${!SecureAptKeys[@]}"; do
+    apt-key --keyring "${DirEtctrustedparts}/${key}" \
+      adv --keyserver keyserver.ubuntu.com --recv-keys "${SecureAptKeys[$key]}"
+  done
   if [[ ${ARCH} == $(dpkg --print-architecture) ]]; then
     # Some packages need more help, give it to them
     log "Creating /dev/urandom for multistrap on native arch"
@@ -209,8 +211,8 @@ function patch_multistrap_conf() {
     log "Patching multistrap config to point to Raspbian sources" "info"
     BASECONF=recipes/base/VolumioBase.conf
     export RASPBIANCONF=recipes/base/arm-raspbian.conf
-    debian_source=http://deb.debian.org/debian
-    rapsbian_source=http://mirrordirector.raspbian.org/raspbian
+    debian_source=https://deb.debian.org/debian
+    rapsbian_source=https://archive.raspbian.org/raspbian
 
     cat <<-EOF >"${SRC}/${RASPBIANCONF}"
 		# Auto generated multistrap configuration for Raspberry Pi
@@ -314,8 +316,8 @@ if [ -n "${BUILD}" ]; then
   #TODO Check naming conventions!
   BASE="Debian"
   if [[ -z "$SUITE" ]]; then
-    log "Defaulting to release" "" "Buster"
-    SUITE="buster"
+    log "Defaulting to release" "" "Bullseye"
+    SUITE="bullseye"
   fi
 
   MULTISTRAPCONF=${BUILD}
@@ -544,7 +546,7 @@ if [[ -n "${DEVICE}" ]]; then
     for key in "${!CUSTOM_PKGS[@]}"; do
       # TODO: Test if key is specific to BUILD or not!
       url=${CUSTOM_PKGS[$key]}
-      [[ "$url" != *".deb"$ ]] && url="${url}_${BUILD}.deb"
+      [[ "$url" =~ .*".deb"$ ]] || url="${url}_${BUILD}.deb"
       # log "Fetching ${key} from ${url}"
       wget -nv "${url}" -P "${ROOTFS}/volumio/customPkgs/" || {
         log "${key} wasn't successful for ${BUILD}!" "err"
