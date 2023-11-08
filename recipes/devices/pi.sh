@@ -105,9 +105,9 @@ device_image_tweaks() {
 		Pin: release *
 		Pin-Priority: -1
 
-                Package: libraspberrypi0
-                Pin: release *
-                Pin-Priority: -1
+		Package: libraspberrypi0
+		Pin: release *
+		Pin-Priority: -1
 	EOF
 
 	log "Fetching rpi-update" "info"
@@ -129,8 +129,8 @@ device_chroot_tweaks() {
 # Will be run in chroot - Pre initramfs
 # TODO Try and streamline this!
 device_chroot_tweaks_pre() {
-        log "Changing initramfs module config to 'modules=list' to limit volumio.initrd size" "cfg"
-        sed -i "s/MODULES=most/MODULES=list/g" /etc/initramfs-tools/initramfs.conf
+	log "Changing initramfs module config to 'modules=list' to limit volumio.initrd size" "cfg"
+	sed -i "s/MODULES=most/MODULES=list/g" /etc/initramfs-tools/initramfs.conf
 
 	## Define parameters
 	declare -A PI_KERNELS=(
@@ -153,6 +153,7 @@ device_chroot_tweaks_pre() {
 		[6.1.47]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1674"
 		[6.1.57]="12833d1bee03c4ac58dc4addf411944a189f1dfd|master|1688" # Support for Pi5
 		[6.1.58]="7b859959a6642aff44acdfd957d6d66f6756021e|master|1690"
+		[6.1.61]="d1ba55dafdbd33cfb938bca7ec325aafc1190596|master|1696"
 	)
 	# Version we want
 	KERNEL_VERSION="6.1.58"
@@ -227,11 +228,11 @@ device_chroot_tweaks_pre() {
 
 	### Other Rpi specific stuff
 	log "Installing fake libraspberrypi0 package"
-        wget -nv  https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/libraspberrypi0/libraspberrypi0_1.20230509-buster-1_armhf.deb
-        dpkg -i libraspberrypi0_1.20230509-buster-1_armhf.deb
-        rm libraspberrypi0_1.20230509-buster-1_armhf.deb
+	wget -nv  https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/libraspberrypi0/libraspberrypi0_1.20230509-buster-1_armhf.deb
+	dpkg -i libraspberrypi0_1.20230509-buster-1_armhf.deb
+	rm libraspberrypi0_1.20230509-buster-1_armhf.deb
 
-        ## Lets update some packages from raspbian repos now
+	## Lets update some packages from raspbian repos now
 	apt-get update && apt-get -y upgrade
 
 	NODE_VERSION=$(node --version)
