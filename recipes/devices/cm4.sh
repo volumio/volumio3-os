@@ -151,7 +151,7 @@ device_chroot_tweaks_pre() {
 	# List of custom firmware -
 	# github archives that can be extracted directly
 	declare -A CustomFirmware=(
-		[MotivoDisplay]="https://github.com/volumio/volumio3-os-static-assets/raw/master/drivers/motivo/modules-rpi-${KERNEL_VERSION}-ili9881c.tar.gz"
+		[MotivoDisplay]="https://github.com/volumio/volumio-ili9881c/raw/main/output/modules-rpi-${KERNEL_VERSION}-ili9881c.tar.gz"
 	)
 
 	### Kernel installation
