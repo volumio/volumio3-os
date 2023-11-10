@@ -41,7 +41,7 @@ declare -A CUSTOM_PKGS=(
 )
 
 ## Backend and Frontend Repository details
-VOL_BE_REPO="https://github.com/volumio/volumio3-backend.git"
+VOL_BE_REPO="https://github.com/raetha/volumio3-backend.git"
 VOL_BE_REPO_BRANCH="master"
 # VOL_BE_REPO_SHA="d7a5678" # Workaround for BE repo having incompatible package.json for Node v8
 
