@@ -54,13 +54,13 @@ MODULES=("overlay" "squashfs"
 # Packages that will be installed
 PACKAGES=()
 
-# Copy in the kernel version we are interested in
+# Kernel selection
 # This will be expanded as a glob, you can be as specific or vague as required
 # KERNEL_VERSION=5.10
-KERNEL_VERSION=6.1
-# KERNEL_VERSION=6.6
+# KERNEL_VERSION=6.1
+KERNEL_VERSION=6.6
 
-# Copy in the firmware version we are interested in
+# Firmware selection
 # FIRMWARE_VERSION="20211027"
 # FIRMWARE_VERSION="20221216"
 FIRMWARE_VERSION="20230804"
