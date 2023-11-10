@@ -1,3 +1,6 @@
+### Raetha Fork Details
+This fork has modifications to use Debian/RaspberryPiOS Bullseye as the base OS and to support Pulse Audio and ALSA dmix/dsnoop in order to allow multiple applications to play/record audio at once. It is not be compaible with the stock Volumio3-OS. If running this build do not use the auto-update features. Please do not seek assistance from the Volumio staff and community as this is unsupported.
+
 ### Buildscripts for Volumio System
 
 Copyright Volumio SRL
