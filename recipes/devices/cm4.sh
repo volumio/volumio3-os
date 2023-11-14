@@ -189,22 +189,32 @@ device_chroot_tweaks_pre() {
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v7+"
 	fi
 
-#	if [ -d "/lib/modules/${KERNEL_VERSION}-v7l+" ]; then
-#		log "Removing ${KERNEL_VERSION}-v7l+ Kernel and modules" "info"
-#		rm -rf /boot/kernel7l.img
-#		rm -rf "/lib/modules/${KERNEL_VERSION}-v7l+"
-#	fi
-
-	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
-		log "Removing ${KERNEL_VERSION}-v8+ Kernel and modules" "info"
-		rm -rf /boot/kernel8.img
-		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
+	if [ -d "/lib/modules/${KERNEL_VERSION}-v7l+" ]; then
+		log "Removing ${KERNEL_VERSION}-v7l+ Kernel and modules" "info"
+		rm -rf /boot/kernel7l.img
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v7l+"
 	fi
+
+#	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
+#		log "Removing ${KERNEL_VERSION}-v8+ Kernel and modules" "info"
+#		rm -rf /boot/kernel8.img
+#		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
+#	fi
 
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
 		log "Removing ${KERNEL_VERSION}-v8_16k+ Kernel and modules" "info"
 		rm -rf /boot/kernel_2712.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
+	fi
+
+	### Remove ili9881c compressed module, we use a custom uncompressed one
+	if [ -e "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko.xz" ]; then
+		log "Removing ${KERNEL_VERSION}-v7l+ ili9881c compressed module" "info"
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko.xz"
+	fi
+	if [ -e "/lib/modules/${KERNEL_VERSION}-v8+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko.xz" ]; then
+		log "Removing ${KERNEL_VERSION}-v8+ ili9881c compressed module" "info"
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko.xz"
 	fi
 
 	log "Finished Kernel installation" "okay"
@@ -383,11 +393,15 @@ device_chroot_tweaks_pre() {
 	EOF
 
 	# Rerun depmod for new drivers
-	log "Finalising drivers installation with depmod on ${KERNEL_VERSION}-v7l+"
-	depmod "${KERNEL_VERSION}-v7l+" # CM4 with 32bit kernel
-
+	if [ -d "/lib/modules/${KERNEL_VERSION}-v7l+" ]; then
+		log "Finalising drivers installation with depmod on ${KERNEL_VERSION}-v7l+"
+		depmod "${KERNEL_VERSION}-v7l+" # CM4 with 32bit kernel
+	fi
+	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
+		log "Finalising drivers installation with depmod on ${KERNEL_VERSION}-v7l+"
+		depmod "${KERNEL_VERSION}-v8+" # CM4 with 64bit kernel
+	fi
 	log "CM4 Kernel and Modules installed" "okay"
-
 }
 
 # Will be run in chroot - Post initramfs
