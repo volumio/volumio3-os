@@ -156,7 +156,7 @@ device_chroot_tweaks_pre() {
 		[6.1.61]="d1ba55dafdbd33cfb938bca7ec325aafc1190596|master|1696"
 	)
 	# Version we want
-	KERNEL_VERSION="6.1.58"
+	KERNEL_VERSION="6.1.61"
 
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
