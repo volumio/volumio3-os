@@ -189,11 +189,11 @@ device_chroot_tweaks_pre() {
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v7+"
 	fi
 
-	if [ -d "/lib/modules/${KERNEL_VERSION}-v7l+" ]; then
-		log "Removing ${KERNEL_VERSION}-v7l+ Kernel and modules" "info"
-		rm -rf /boot/kernel7l.img
-		rm -rf "/lib/modules/${KERNEL_VERSION}-v7l+"
-	fi
+#	if [ -d "/lib/modules/${KERNEL_VERSION}-v7l+" ]; then
+#		log "Removing ${KERNEL_VERSION}-v7l+ Kernel and modules" "info"
+#		rm -rf /boot/kernel7l.img
+#		rm -rf "/lib/modules/${KERNEL_VERSION}-v7l+"
+#	fi
 
 #	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
 #		log "Removing ${KERNEL_VERSION}-v8+ Kernel and modules" "info"
