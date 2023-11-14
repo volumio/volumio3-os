@@ -326,7 +326,7 @@ device_chroot_tweaks_pre() {
 		dtparam=uart1=off
 		dtoverlay=uart4
 		display_auto_detect=1
-		dtoverlay=motivo-panel
+		dtoverlay=motivo-panel-old
 		start_x=1
 		gpu_mem=256
 		dtoverlay=vc4-kms-v3d,cma-384,audio=off,noaudio=on
