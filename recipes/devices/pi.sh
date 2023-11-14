@@ -148,6 +148,7 @@ device_chroot_tweaks_pre() {
 		[5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
 		[5.10.92]="ea9e10e531a301b3df568dccb3c931d52a469106|stable|1514"
 		[5.15.84]="a99e144e939bf93bbd03e8066601a8d3eae640f7|stable|1613"
+		[5.15.92]="f5c4fc199c8d8423cb427e509563737d1ac21f3c|master|1627"
 		[6.1.19]="fa51258e0239eaf68d9dff9c156cec3a622fbacc|stable|1637"
 		[6.1.21]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1642"
 		[6.1.47]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1674"
