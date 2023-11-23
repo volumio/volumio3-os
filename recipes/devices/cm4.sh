@@ -151,12 +151,12 @@ device_chroot_tweaks_pre() {
 		[6.1.61]="d1ba55dafdbd33cfb938bca7ec325aafc1190596|master|1696"
 	)
 	# Version we want
-	KERNEL_VERSION="5.10.92"
+	KERNEL_VERSION="5.10.92
 
 	# List of custom firmware -
 	# github archives that can be extracted directly
 	declare -A CustomFirmware=(
-		[MotivoDisplay]="https://github.com/volumio/volumio-ili9881c/raw/main/output/modules-rpi-${KERNEL_VERSION}-ili9881c.tar.gz"
+		[MotivoCustom]="https://github.com/volumio/motivo-drivers/raw/main/output/modules-rpi-${KERNEL_VERSION}-motivo.tar.gz"
 	)
 
 	### Kernel installation
@@ -209,14 +209,22 @@ device_chroot_tweaks_pre() {
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
 	fi
 
-	### Remove ili9881c compressed module, we use a custom uncompressed one
-	if [ -e "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko.xz" ]; then
+	### Remove compressed modules, if a custom uncompressed one is available
+	if [ -e "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko" ]; then
 		log "Removing ${KERNEL_VERSION}-v7l+ ili9881c compressed module" "info"
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko.xz"
 	fi
-	if [ -e "/lib/modules/${KERNEL_VERSION}-v8+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko.xz" ]; then
+	if [ -e "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/sound/usb/snd-usb-audio.ko" ]; then
+		log "Removing ${KERNEL_VERSION}-v7l+ usb-audio compressed module" "info"
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/sound/usb/snd-usb-audio.ko.xz"
+	fi
+	if [ -e "/lib/modules/${KERNEL_VERSION}-v8+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko" ]; then
 		log "Removing ${KERNEL_VERSION}-v8+ ili9881c compressed module" "info"
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko.xz"
+	fi
+	if [ -e "/lib/modules/${KERNEL_VERSION}-v8+/kernel/sound/usb/snd-usb-audio.ko" ]; then
+		log "Removing ${KERNEL_VERSION}-v8+ usb-audio compressed module" "info"
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+/kernel/sound/usb/snd-usb-audio.ko.xz"
 	fi
 
 	log "Finished Kernel installation" "okay"
@@ -327,7 +335,7 @@ device_chroot_tweaks_pre() {
 		dtparam=uart1=off
 		dtoverlay=uart4
 		display_auto_detect=1
-		dtoverlay=motivo-panel-old
+		dtoverlay=motivo-panel-a
 		start_x=1
 		gpu_mem=256
 		dtoverlay=vc4-kms-v3d,cma-384,audio=off,noaudio=on
