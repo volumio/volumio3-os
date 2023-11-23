@@ -151,7 +151,7 @@ device_chroot_tweaks_pre() {
 		[6.1.61]="d1ba55dafdbd33cfb938bca7ec325aafc1190596|master|1696"
 	)
 	# Version we want
-	KERNEL_VERSION="5.10.92"
+	KERNEL_VERSION="5.10.95"
 
 	# List of custom firmware -
 	# github archives that can be extracted directly
