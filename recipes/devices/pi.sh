@@ -156,9 +156,10 @@ device_chroot_tweaks_pre() {
 		[6.1.57]="12833d1bee03c4ac58dc4addf411944a189f1dfd|master|1688" # Support for Pi5
 		[6.1.58]="7b859959a6642aff44acdfd957d6d66f6756021e|master|1690"
 		[6.1.61]="d1ba55dafdbd33cfb938bca7ec325aafc1190596|master|1696"
+		[6.1.64]="01145f0eb166cbc68dd2fe63740fac04d682133e|master|1702"
 	)
 	# Version we want
-	KERNEL_VERSION="6.1.61"
+	KERNEL_VERSION="6.1.64"
 
 	MAJOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 1)
 	MINOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 2)
