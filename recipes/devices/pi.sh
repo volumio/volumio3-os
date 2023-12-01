@@ -160,6 +160,10 @@ device_chroot_tweaks_pre() {
 	# Version we want
 	KERNEL_VERSION="6.1.61"
 
+	MAJOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 1)
+	MINOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 2)
+	PATCH_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 3)
+
 	# For bleeding edge, check what is the latest on offer
 	# Things *might* break, so you are warned!
 	if [[ ${RPI_USE_LATEST_KERNEL:-no} == yes ]]; then
@@ -311,10 +315,16 @@ device_chroot_tweaks_pre() {
 		ln -s "/opt/vc/bin/${bin}" "/usr/bin/${bin}"
 	done
 
-	log "Fixing vcgencmd permissions"
+	log "Fixing vcgencmd permissions"  "info"
 	cat <<-EOF >/etc/udev/rules.d/10-vchiq.rules
 		SUBSYSTEM=="vchiq",GROUP="video",MODE="0660"
 	EOF
+
+	# Rename gpiomem in udev rules if kernel is equal or greater than 6.1.54
+	if [ "$MAJOR_VERSION" -gt 6 ] || { [ "$MAJOR_VERSION" -eq 6 ] && { [ "$MINOR_VERSION" -gt 1 ] || [ "$MINOR_VERSION" -eq 1 ] && [ "$PATCH_VERSION" -ge 54 ]; }; }; then
+		log "Rename gpiomem in udev rules"  "info"
+		sed -i 's/bcm2835-gpiomem/gpiomem/g' /etc/udev/rules.d/99-com.rules
+	fi
 
 	log "Setting bootparms and modules" "info"
 	log "Enabling i2c-dev module"
