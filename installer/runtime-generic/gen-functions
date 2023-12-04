@@ -99,12 +99,12 @@ swap_uuids()
 	export UUID_IMAGE=$(blkid -s UUID -o value ${TARGETIMAGE})
 	export UUID_DATA=$(blkid -s UUID -o value ${TARGETDATA})
 	cp $BOOT/temp/boot/$BOOTCONFIG $BOOT/temp/boot/$BOOTCONFIG.old
-cat $BOOT/temp/boot/$BOOTCONFIG >> /dev/kmsg
+
 	sed -i "s/imgpart=UUID=[a-fA-F0-9]\{8\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{12\}/imgpart=UUID=${UUID_IMAGE}/g" $BOOT/temp/boot/${BOOTCONFIG}
 	sed -i "s/datapart=UUID=[a-fA-F0-9]\{8\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{12\}/datapart=UUID=${UUID_DATA}/g" $BOOT/temp/boot/${BOOTCONFIG}
 	sed -i "s/bootpart=UUID=[a-fA-F0-9]\{4\}-[a-fA-F0-9]\{4\}/bootpart=UUID=${UUID_BOOT}/g" $BOOT/temp/boot/${BOOTCONFIG}
   sync
-cat $BOOT/temp/boot/$BOOTCONFIG >> /dev/kmsg
+
 }
 
 mount_target_boot()

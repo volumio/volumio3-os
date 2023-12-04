@@ -1,15 +1,26 @@
 #!/bin/bash
-
+#set -x
 SRC="$(pwd)"
 FAILED=0
 
 . ${SRC}/scripts/helpers.sh
 
+if [ "$EUID" -ne 0 ]
+  then log "Please run as root" "err"
+  exit
+fi
+
+if [ ! "$#" == "2" ]; then
+   log "Incorrect number of parameters supplied, aborting" "err"
+   log "Usage: sudo ./mkinstaller -i <image>" "info"
+   exit
+fi
+
 while getopts ":i:" opt; do
   case $opt in
 
     i)
-	  if [ ! -e $OPTARG ]; then
+      if [ ! -e $OPTARG ]; then
          log "Volumio image $OPTARG does not exist, aborting..." "err"
          exit 1
       fi
@@ -26,8 +37,16 @@ while getopts ":i:" opt; do
       BUILDVER=$(echo $IMAGENAME | awk -F "-" '{print $2}')
       BUILDDATE=$(echo $IMAGENAME | awk -F "-" '{print $3"-"$4"-"$5}')
 
-      # get player and file extension
+      # get player extension
+      ext=$(echo $(echo $IMAGENAME | awk -F "-" '{print $7}') | awk -F "." '{print $1}')
       PLAYER=$(echo $(echo $IMAGENAME | awk -F "-" '{print $6}') | awk -F "." '{print $1}')
+      if [ ! "${ext}*" == "*" ]; then
+        PLAYER="${PLAYER}-${ext}"
+      fi
+      ;;
+    *)
+      echo "Invalid parameter, aborted"
+      exit
       ;;
   esac
 done
@@ -98,7 +117,7 @@ log "[Stage 1] Creating boot and rootfs filesystem" "info"
 mkfs -t vfat -n BOOT "${FLASH_PART}"
 fetch_bootpart_uuid
 
-echo "[Stage 1] Preparing for the  kernel/ platform files" "info"
+log "[Stage 1] Preparing for the  kernel/ platform files" "info"
 if [ ! -z $NONSTANDARD_REPO ]; then
    non_standard_repo
 else
@@ -261,7 +280,6 @@ else
 	log "[Stage 5] Copying 'raw' boot & image data" "info"
 	#cd /mnt/volumioimage/boot
 	tar cf $ROOTFSMNT/boot/data/image/kernel_current.tar --exclude='resize-volumio-datapart' -C /mnt/volumioimage/boot .
-
 	cp /mnt/volumioimage/image/* /mnt/volumio/rootfs/boot/data/image
 fi
 

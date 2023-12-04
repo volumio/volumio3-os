@@ -1,0 +1,32 @@
+
+# Board functions RockPi 4B
+write_device_bootloader()
+{
+   echo "[info] Flashing u-boot"
+   dd if=${BOOT}/u-boot/idbloader.img of=$1 seek=64 conv=notrunc status=none
+   dd if=${BOOT}/u-boot/u-boot.itb of=$1 seek=16384 conv=notrunc status=none
+}
+
+led_show_init_signal()
+{
+   echo default-on > /sys/class/leds/blue:status/trigger
+}
+
+led_show_start_signal()
+{
+   echo heartbeat > /sys/class/leds/blue:status/trigger
+   sleep 1
+   echo none  > /sys/class/leds/blue:status/trigger
+   sleep 1
+   echo heartbeat  > /sys/class/leds/blue:status/trigger
+   sleep 1
+   echo none  > /sys/class/leds/blue:status/trigger
+   sleep 1
+   echo heartbeat  > /sys/class/leds/blue:status/trigger
+}
+
+led_show_finish_signal()
+{
+   echo default-on > /sys/class/leds/blue:status/trigger
+}
+
