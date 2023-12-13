@@ -101,6 +101,7 @@ modprobe usbhid
 modprobe hid_cherry
 modprobe hid_generic
 modprobe loop
+modprobe uas
 
 # Mount the /proc and /sys filesystems.
 [ -d /proc ] || mkdir /proc
