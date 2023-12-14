@@ -4,7 +4,7 @@
 declare -A SecureApt=(
   [debian_10.gpg]="https://repo.volumio.org/Volumio2/archive-key-10.asc"
   [nodesource.gpg]="https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
-  [lesbonscomptes.gpg]="https://www.lesbonscomptes.com/pages/jf-at-dockes.org.pub"
+  [lesbonscomptes.gpg]="https://www.lesbonscomptes.com/pages/lesbonscomptes.gpg"
   #TODO Not needed for arm64 and x86
   [raspbian.gpg]="https://archive.raspbian.org/raspbian.public.key"
   [raspberrypi.gpg]="http://archive.raspberrypi.org/debian/raspberrypi.gpg.key"
