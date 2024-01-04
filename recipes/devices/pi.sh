@@ -341,8 +341,6 @@ device_chroot_tweaks_pre() {
 		dtoverlay=dwc2,dr_mode=host
 		[pi5]
 		dtoverlay=vc4-kms-v3d-pi5
-		[pi4]
-		dtoverlay=vc4-kms-v3d-pi4
 		[all]
 		arm_64bit=0
 		gpu_mem=32
