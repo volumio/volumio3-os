@@ -112,25 +112,18 @@ git clone https://github.com/volumio/chrome-virtual-keyboard.git /data/volumioki
 log "  Allowing volumio to start an xsession"
 #/bin/sed -i "s/allowed_users=console/allowed_users=anybody/" /etc/X11/Xwrapper.config
 
+log "Setting HDMI UI enabled by default"
+config_path="/volumio/app/plugins/system_controller/system/config.json"
+#shellcheck disable=SC2094
+cat <<<"$(jq '.hdmi_enabled={value:true, type:"boolean"}' ${config_path})" >${config_path}
 
-log "Enabling kiosk"
-#/bin/ln -s /lib/systemd/system/volumio-kiosk.service /etc/systemd/system/multi-user.target.wants/volumio-kiosk.service
+# TODO USE GLOBAL VARIABLE FOR DEVICES WITH INTEGRATED TOUCHSCREEN
+if [[ ${VOLUMIO_HARDWARE} = cm4 ]]; then
 
-if [[ ${VOLUMIO_HARDWARE} != motivo ]]; then
-
-  log "Enabling UI for HDMI output selection"
+  log "Hide HDMI output selection"
   echo '[{"value": true,"id":"section_hdmi_settings","attribute_name": "hidden"}]' >/volumio/app/plugins/system_controller/system/override.json
 
-  log "Setting HDMI UI enabled by default"
-  config_path="/volumio/app/plugins/system_controller/system/config.json"
-  # Should be okay right?
-  #shellcheck disable=SC2094
-  cat <<<"$(jq '.hdmi_enabled={value:true, type:"boolean"}' ${config_path})" >${config_path}
-fi
-
-if [[ ${VOLUMIO_HARDWARE} = motivo ]]; then
-
-  log "Disabling cursor by default on Motivo"
+  log "Disabling cursor by default on touchscreen devices"
   echo '-- -nocursor' > /data/kioskargs
   chmod 777 /data/kioskargs
 fi
