@@ -69,9 +69,23 @@ openbox-session &
 sleep 4 
 
 /usr/bin/vivaldi --kiosk --no-sandbox --disable-background-networking --disable-remote-extensions --disable-pinch --ignore-gpu-blacklist --use-gl=egl --disable-gpu-compositing --enable-gpu-rasterization --enable-zero-copy --disable-smooth-scrolling --enable-scroll-prediction --max-tiles-for-interest-area=512 --num-raster-threads=4 --enable-low-res-tiling --user-agent="volumiokiosk-memorysave-touch" --touch-events --user-data-dir='/data/volumiokiosk' --force-device-scale-factor=1.2 --load-extension='/data/volumiokioskextensions/VirtualKeyboard/' --no-first-run --app=http://localhost:3000 
-' > /opt/volumiokiosk.sh 
+' > /opt/volumiokiosk.sh
 
 /bin/chmod +x /opt/volumiokiosk.sh
+
+log "Creating start script for X and Kioks"
+echo '#!/bin/bash
+
+echo "Starting Volumio Kiosk with arguments for cursor display"
+
+KIOSK_ARGUMENTS_FILE=/data/kioskargs
+[[ -f $KIOSK_ARGUMENTS_FILE ]] && ARGS=$(<$KIOSK_ARGUMENTS_FILE) || ARGS=""
+
+/usr/bin/startx /etc/X11/Xsession /opt/volumiokiosk.sh -- -keeptty $ARGS
+' > /opt/startkiosk.sh
+
+/bin/chmod +x /opt/startkiosk.sh
+
 
 log "Creating Systemd Unit for Kiosk"
 echo "[Unit]
@@ -82,7 +96,7 @@ After=volumio.service
 Type=simple
 User=root
 Group=root
-ExecStart=/usr/bin/startx /etc/X11/Xsession /opt/volumiokiosk.sh -- -keeptty -- -nocursor
+ExecStart=/opt/startkiosk.sh
 # Give a reasonable amount of time for the server to start up/shut down
 TimeoutSec=300
 [Install]
@@ -112,4 +126,10 @@ if [[ ${VOLUMIO_HARDWARE} != motivo ]]; then
   # Should be okay right?
   #shellcheck disable=SC2094
   cat <<<"$(jq '.hdmi_enabled={value:true, type:"boolean"}' ${config_path})" >${config_path}
+fi
+
+if [[ ${VOLUMIO_HARDWARE} = motivo ]]; then
+
+  log "Disabling cursor by default on Motivo"
+  echo '-- -nocursor' > /data/kioskargs
 fi
