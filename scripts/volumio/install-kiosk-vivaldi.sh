@@ -61,6 +61,12 @@ fi
   sed -i 's/"exit_type":"Crashed"/"exit_type":"None"/' /data/volumiokiosk/Default/Preferences 
 }
 
+if [ ! -f /data/volumiokiosk/firststartdone ]; then
+  echo "Volumio Kiosk Starting for the first time, giving time for Volumio To start"
+  sleep 15
+  touch /data/volumiokiosk/firststartdone
+fi
+
 
 # Wait for Volumio webUI to be available
 while [[ $(curl -Is http://localhost:3000 | head -n 1 | cut -d " " -f 2) != 200 ]]; do sleep 2; done &
