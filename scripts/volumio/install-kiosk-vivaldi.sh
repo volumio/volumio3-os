@@ -132,4 +132,5 @@ if [[ ${VOLUMIO_HARDWARE} = motivo ]]; then
 
   log "Disabling cursor by default on Motivo"
   echo '-- -nocursor' > /data/kioskargs
+  chmod 777 /data/kioskargs
 fi
