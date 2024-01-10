@@ -341,9 +341,8 @@ ln -s /lib/systemd/system/volumiologrotate.service /etc/systemd/system/multi-use
 log "Enable Volumio CPU Tweak Service"
 ln -s /lib/systemd/system/volumio_cpu_tweak.service /etc/systemd/system/multi-user.target.wants/volumio_cpu_tweak.service
 
-log "Setting Mpd to SystemD instead of Init"
-update-rc.d mpd remove
-systemctl enable mpd.service
+log "Disable MPD autostart"
+systemctl disable mpd.service
 
 log "Preventing hotspot (hostapd/dnsmasq) services from starting at boot"
 systemctl disable hostapd.service
