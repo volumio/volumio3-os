@@ -68,6 +68,7 @@ apt-get install -y "${PACKAGES[@]}" --no-install-recommends
 
 # Custom packages for Volumio
 #TODO THIS SHALL RUN ONLY FOR SOME DEVICES WHERE WE WANT TO INSTALL KIOSK
+#TODO: This shall happen before configure.sh which substitutes conf files
 [ -f "/install-kiosk.sh" ] && log "Installing kiosk" "info" && bash install-kiosk.sh
 if [[ -d "/volumio/customPkgs" ]] && [[ $(ls /volumio/customPkgs/*.deb 2>/dev/null) ]]; then
   log "Installing Volumio customPkgs" "info"
@@ -76,6 +77,10 @@ if [[ -d "/volumio/customPkgs" ]] && [[ $(ls /volumio/customPkgs/*.deb 2>/dev/nu
     dpkg -i --force-confold "${deb}"
   done
 fi
+
+# MPD systemd file
+log "Copying MPD custom systemd file"
+cp "${SRC}/volumio/usr/lib/systemd/system/mpd.service" "${ROOTFS}/usr/lib/systemd/system/mpd.service"
 
 log "Entering device_chroot_tweaks_pre" "cfg"
 device_chroot_tweaks_pre
