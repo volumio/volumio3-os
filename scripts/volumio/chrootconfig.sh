@@ -68,6 +68,7 @@ apt-get install -y "${PACKAGES[@]}" --no-install-recommends
 
 # Custom packages for Volumio
 #TODO THIS SHALL RUN ONLY FOR SOME DEVICES WHERE WE WANT TO INSTALL KIOSK
+#TODO: This shall happen before configure.sh which substitutes conf files
 [ -f "/install-kiosk.sh" ] && log "Installing kiosk" "info" && bash install-kiosk.sh
 if [[ -d "/volumio/customPkgs" ]] && [[ $(ls /volumio/customPkgs/*.deb 2>/dev/null) ]]; then
   log "Installing Volumio customPkgs" "info"
@@ -76,6 +77,51 @@ if [[ -d "/volumio/customPkgs" ]] && [[ $(ls /volumio/customPkgs/*.deb 2>/dev/nu
     dpkg -i --force-confold "${deb}"
   done
 fi
+
+# MPD systemd file
+log "Copying MPD custom systemd file"
+## TODO: FIND A MORE ELEGANT SOLUTION
+echo "[Unit]
+Description=Music Player Daemon
+Documentation=man:mpd(1) man:mpd.conf(5)
+After=network.target sound.target
+Wants=mpd.socket
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/mpd --systemd
+ExecStartPre=-/usr/bin/sudo /bin/chown mpd:audio /var/log/mpd.log
+# Enable this setting to ask systemd to watch over MPD, see
+# systemd.service(5).  This is disabled by default because it causes
+# periodic wakeups which are unnecessary if MPD is not playing.
+#WatchdogSec=120
+
+# allow MPD to use real-time priority 40
+LimitRTPRIO=40
+LimitRTTIME=infinity
+
+# for io_uring
+LimitMEMLOCK=64M
+
+# disallow writing to /usr, /bin, /sbin, ...
+ProtectSystem=yes
+
+# more paranoid security settings
+NoNewPrivileges=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+# AF_NETLINK is required by libsmbclient, or it will exit() .. *sigh*
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+RestrictNamespaces=yes
+
+[Install]
+WantedBy=multi-user.target
+Also=mpd.socket" > /usr/lib/systemd/system/mpd.service
+
+log "Disabling MPD Service"
+systemctl disable mpd.service
+
 
 log "Entering device_chroot_tweaks_pre" "cfg"
 device_chroot_tweaks_pre
@@ -89,8 +135,6 @@ apt-get clean
 
 # Fix services for tmpfs logs
 log "Ensuring /var/log has right folders and permissions"
-sed -i '/^ExecStart=.*/i ExecStartPre=touch /var/log/mpd.log' /lib/systemd/system/mpd.service
-sed -i '/^ExecStart=.*/i ExecStartPre=chown volumio /var/log/mpd.log' /lib/systemd/system/mpd.service
 sed -i '/^ExecStart=.*/i ExecStartPre=mkdir -m 700 -p /var/log/samba/cores' /lib/systemd/system/nmbd.service
 # sed -i '/^ExecStart=.*/i ExecStartPre=chmod 700 /var/log/samba/cores' /lib/systemd/system/nmbd.service
 

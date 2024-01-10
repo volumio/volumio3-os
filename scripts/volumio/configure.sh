@@ -63,6 +63,9 @@ cp "${SRC}/volumio/etc/ssh/sshd_config" "${ROOTFS}/etc/ssh/sshd_config"
 
 #Mpd
 cp "${SRC}/volumio/etc/mpd.conf" "${ROOTFS}/etc/mpd.conf"
+# MPD systemd file
+mkdir -p "${ROOTFS}/usr/lib/systemd/system/"
+cp "${SRC}/volumio/usr/lib/systemd/system/mpd.service" "${ROOTFS}/usr/lib/systemd/system/mpd.service"
 chmod 777 "${ROOTFS}/etc/mpd.conf"
 
 #Log via JournalD in RAM
