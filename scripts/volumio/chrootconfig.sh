@@ -80,7 +80,48 @@ fi
 
 # MPD systemd file
 log "Copying MPD custom systemd file"
-cp "${SRC}/volumio/usr/lib/systemd/system/mpd.service" "${ROOTFS}/usr/lib/systemd/system/mpd.service"
+## TODO: FIND A MORE ELEGANT SOLUTION
+echo "[Unit]
+Description=Music Player Daemon
+Documentation=man:mpd(1) man:mpd.conf(5)
+After=network.target sound.target
+Wants=mpd.socket
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/mpd --systemd
+ExecStartPre=-/usr/bin/sudo /bin/chown mpd:audio /var/log/mpd.log
+# Enable this setting to ask systemd to watch over MPD, see
+# systemd.service(5).  This is disabled by default because it causes
+# periodic wakeups which are unnecessary if MPD is not playing.
+#WatchdogSec=120
+
+# allow MPD to use real-time priority 40
+LimitRTPRIO=40
+LimitRTTIME=infinity
+
+# for io_uring
+LimitMEMLOCK=64M
+
+# disallow writing to /usr, /bin, /sbin, ...
+ProtectSystem=yes
+
+# more paranoid security settings
+NoNewPrivileges=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+# AF_NETLINK is required by libsmbclient, or it will exit() .. *sigh*
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+RestrictNamespaces=yes
+
+[Install]
+WantedBy=multi-user.target
+Also=mpd.socket" > /usr/lib/systemd/system/mpd.service
+
+log "Disabling MPD Service"
+systemctl disable mpd.service
+
 
 log "Entering device_chroot_tweaks_pre" "cfg"
 device_chroot_tweaks_pre
