@@ -361,10 +361,6 @@ device_chroot_tweaks_pre() {
                 hdmi_force_hotplug=1
                 force_eeprom_read=0
         EOF
-        
-        # TEMPORARILY HIDING HDMI DEVICES ON PI5
-        log "Writing ignoreCards File"
-        echo '["vc4-hdmi-0","vc4-hdmi-1"]' > /volumio/app/plugins/audio_interface/alsa_controller/ignoreCards.json
 
 	log "Writing cmdline.txt file"
 	KERNEL_LOGLEVEL="loglevel=0" # Default to KERN_EMERG
