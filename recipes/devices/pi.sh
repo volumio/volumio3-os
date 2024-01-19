@@ -360,7 +360,7 @@ device_chroot_tweaks_pre() {
                 disable_splash=1
                 hdmi_force_hotplug=1
                 force_eeprom_read=0
-        EOF
+	EOF
 
 	log "Writing cmdline.txt file"
 	KERNEL_LOGLEVEL="loglevel=0" # Default to KERN_EMERG
