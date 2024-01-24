@@ -128,7 +128,7 @@ log "Show HDMI output selection"
 echo '[{"value": false,"id":"section_hdmi_settings","attribute_name": "hidden"},{"value": false,"id":"hdmi_enabled","attribute_name": "hidden"}]' >/volumio/app/plugins/system_controller/system/override.json
 
 # TODO USE GLOBAL VARIABLE FOR DEVICES WITH INTEGRATED TOUCHSCREEN
-if [[ ${VOLUMIO_HARDWARE} = cm4 ]]; then
+if [[ ${VOLUMIO_HARDWARE} = cm4 || ${VOLUMIO_HARDWARE} = pi-kiosk ]]; then
 
   log "Hide HDMI output selection"
   echo '[{"value": false,"id":"section_hdmi_settings","attribute_name": "hidden"},{"value": true,"id":"hdmi_enabled","attribute_name": "hidden"},{"value": false,"id":"show_mouse_pointer","attribute_name": "hidden"}]' >/volumio/app/plugins/system_controller/system/override.json
