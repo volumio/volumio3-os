@@ -1,0 +1,36 @@
+
+# Board functions Odroid M1S
+write_device_bootloader()
+{
+   echo "[info] Flashing u-boot"
+   dd if=$BOOT/u-boot/idblock.bin of=$1 conv=fsync bs=512 seek=64
+   dd if=$BOOT/u-boot/uboot.img of=$1 conv=fsync bs=512 seek=2048
+}
+
+led_show_init_signal()
+{
+   echo none > /sys/class/leds/red/trigger
+   echo none > /sys/class/leds/blue/trigger
+}
+
+led_show_start_signal()
+{
+   echo heartbeat > /sys/class/leds/red/trigger
+   sleep 1
+   echo heartbeat > /sys/class/leds/blue/trigger
+   sleep 1
+   echo none  > /sys/class/leds/red/trigger
+   sleep 1
+   echo none  > /sys/class/leds/blue/trigger
+   sleep 1
+   echo heartbeat  > /sys/class/leds/red/trigger
+   sleep 1
+   echo heartbeat  > /sys/class/leds/blue/trigger
+}
+
+led_show_finish_signal()
+{
+   echo none > /sys/class/leds/red/trigger
+   echo none > /sys/class/leds/blue/trigger
+}
+
