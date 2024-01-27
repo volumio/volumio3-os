@@ -449,30 +449,22 @@ if [ -e "/boot/kernel_update" ]; then
   do_reboot
   #echo b > /proc/sysrq-trigger
 fi
-
-DATADEV=$(echo $DATAPART | grep -o mmcblk)
-if [ ! -z "${DATADEV}" ]; then
-  DATADEV=$(echo ${DATAPART} | awk -F'/' '{print substr($3,0,7)}')
-else
-  DATADEV=$(echo ${DATAPART} | grep -o sd)
-  if [ ! -z "${DATADEV}" ]; then
-    DATADEV=$(echo ${DATAPART} | awk -F'/' '{print substr($3,0,3)}')
-  else
-    print_msg "Unexpected data device, DATAPART=${DATAPART}, aborting"
-    exec sh
-  fi
-fi
-
-FREESIZE="$(parted -s /dev/${DATADEV} unit MB print free | tail -n 2 | grep Free | awk '{print $3}' | awk -F 'MB' '{print $1}')"
+#
+# Re-size the data partition
+# ==================================
+#
+DATADEV=/dev/$(lsblk -no PKNAME "${DATAPART}")
+# Re-sizing is not necessary when we already reached maximum (shows with decimals less than 1MB).
+FREESIZE="$(parted -s "${DATADEV}" unit MB print free | tail -n 2 | grep Free | awk '{print $3}' | awk -F 'MB' '{print $1}')"
 if [ "$(awk 'BEGIN {print ("'$FREESIZE'" >= "'1'")}')" -eq "1" ]; then
-  print_msg "Re-sizing Volumio data partition"
-  END="$(parted -s /dev/${DATADEV} unit MB print free | grep Free | tail -1 | awk '{print $2}' | grep -o '[0-9]\+')"
-  parted -s /dev/${DATADEV} resizepart 3 ${END}
-  e2fsck -fy ${DATAPART}
-  #force resize as we did just run e2fsck. Resize2fs seems ro not detect this occasionally
-  resize2fs -f ${DATAPART}
+  echo "[init] Re-sizing Volumio data partition..."
+  print_msg "Re-sizing Volumio data partition..."
+  END="$(parted -s "${DATADEV}" unit MB print free | grep Free | tail -1 | awk '{print $2}' | grep -o '[0-9]\+')"
+  parted -s "${DATADEV}" resizepart 3 "${END}" >/dev/null 2>&1
+  e2fsck -f "${DATAPART}" -y >/dev/null 2>&1
+  resize2fs -p "${DATAPART}" >/dev/null 2>&1
   print_msg "Volumio data partition successfully resized"
-  parted -s /dev/${DATADEV} unit MB print
+  parted -s "${DATADEV}" unit MB print >/dev/null 2>&1
   rm /boot/resize-volumio-datapart
 fi
 
