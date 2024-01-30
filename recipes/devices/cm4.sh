@@ -150,6 +150,7 @@ device_chroot_tweaks_pre() {
 		[6.1.58]="7b859959a6642aff44acdfd957d6d66f6756021e|master|1690"
 		[6.1.61]="d1ba55dafdbd33cfb938bca7ec325aafc1190596|master|1696"
 		[6.1.64]="01145f0eb166cbc68dd2fe63740fac04d682133e|master|1702"
+		[6.1.69]="ec8e8136d773de83e313aaf983e664079cce2815|master|1710"
 		[6.1.70]="fc9319fda550a86dc6c23c12adda54a0f8163f22|master|1712"
 	)
 	# Version we want
