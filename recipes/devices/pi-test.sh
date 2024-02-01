@@ -15,10 +15,10 @@ BUILD="arm"
 #VOL_DEVICE_ID="pi"
 DEVICENAME="Raspberry Pi"
 # This is useful for multiple devices sharing the same/similar kernel
-#DEVICEFAMILY="raspberry"
+DEVICEFAMILY="raspberry"
 
 # Disable to ensure the script doesn't look for `platform-xxx`
-#DEVICEREPO=""
+DEVICEREPO="https://github.com/foonerd/platform-${DEVICEFAMILY}.git"
 
 ### What features do we want to target
 # TODO: Not fully implemented
@@ -52,7 +52,31 @@ PACKAGES=(# Bluetooth packages
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
-	:
+	log "Running write_device_files" "ext"
+	log "Copying additional utils files"
+	pkg_root="${PLTDIR}/utils"
+
+	mkdir -p "${ROOTFSMNT}"/usr/local/bin/
+		declare -A CustomScripts=(
+    	[PiInstaller.sh]="/PiInstaller.sh"
+	)
+	log "Adding ${#CustomScripts[@]} custom scripts to /usr/local/bin: " "" "${CustomScripts[@]}"
+		for script in "${!CustomScripts[@]}"; do
+    		cp "${pkg_root}/${CustomScripts[$script]}" "${ROOTFSMNT}"/usr/local/bin/"${script}"
+    		chmod +x "${ROOTFSMNT}"/usr/local/bin/"${script}"
+  		done
+
+	log "Copying current partition data for use in runtime fast 'installToDisk'"
+	cat <<-EOF >"${ROOTFSMNT}/boot/partconfig.json"
+{
+  "params":[
+  {"name":"boot_start","value":"$BOOT_START"},
+  {"name":"boot_end","value":"$BOOT_END"},
+  {"name":"volumio_end","value":"$IMAGE_END"},
+  {"name":"boot_type","value":"$BOOT_TYPE"}
+  ]
+}
+	EOF
 }
 
 write_device_bootloader() {
@@ -353,7 +377,7 @@ device_chroot_tweaks_pre() {
 		[pi5]
 		dtoverlay=vc4-kms-v3d-pi5
 		dtparam=nvme
-		dtparam=pciex1_gen=3
+		dtparam=pciex1_gen=2
 		[all]
 		arm_64bit=0
 		gpu_mem=32
@@ -384,7 +408,7 @@ device_chroot_tweaks_pre() {
 		# A quirk of Linux on ARM that may result in suboptimal performance
 		"pcie_aspm=off" "pci=pcie_bus_safe"
 		# Wait for root device
-		"rootwait" "bootdelay=5"
+		"bootdelay=5"
 		# Disable linux logo during boot
 		"logo.nologo"
 		# Disable cursor

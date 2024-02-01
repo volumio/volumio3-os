@@ -42,8 +42,8 @@ declare -A CUSTOM_PKGS=(
 )
 
 ## Backend and Frontend Repository details
-VOL_BE_REPO="https://github.com/volumio/volumio3-backend.git"
-VOL_BE_REPO_BRANCH="master"
+VOL_BE_REPO="https://github.com/foonerd/volumio3-backend.git"
+VOL_BE_REPO_BRANCH="pi-installer"
 # VOL_BE_REPO_SHA="d7a5678" # Workaround for BE repo having incompatible package.json for Node v8
 
 ## NodeJS Controls
@@ -53,7 +53,7 @@ VOL_BE_REPO_BRANCH="master"
 NODE_VERSION=14.15.4
 # Used to pull the right version of modules
 # expected format node_modules_{arm/x86}-v${NODE_VERSION}.tar.gz
-NODE_MODULES_REPO="http://repo.volumio.org/Volumio3/node_modules"
+NODE_MODULES_REPO="http://repo.volumio.org/Volumio2/"
 
 ## 
 # Array of custom ALSA plugins
