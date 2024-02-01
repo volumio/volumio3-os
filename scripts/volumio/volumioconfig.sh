@@ -341,9 +341,6 @@ ln -s /lib/systemd/system/volumiologrotate.service /etc/systemd/system/multi-use
 log "Enable Volumio CPU Tweak Service"
 ln -s /lib/systemd/system/volumio_cpu_tweak.service /etc/systemd/system/multi-user.target.wants/volumio_cpu_tweak.service
 
-log "Enable Volumio Log Rotate Service"
-ln -s /lib/systemd/system/volumiologrotate.service /etc/systemd/system/multi-user.target.wants/volumiologrotate.service
-
 log "Disable MPD autostart"
 systemctl disable mpd.service
 
