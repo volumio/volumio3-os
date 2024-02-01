@@ -352,9 +352,9 @@ device_chroot_tweaks_pre() {
 		dtoverlay=dwc2,dr_mode=host
 		[pi5]
 		dtoverlay=vc4-kms-v3d-pi5
- 		dtparam=uart0_console
+		dtparam=uart0_console
 		dtparam=nvme
-		dtparam=pciex1_gen=3
+		dtparam=pciex1_gen=2
 		[all]
 		arm_64bit=0
 		gpu_mem=32
@@ -385,7 +385,7 @@ device_chroot_tweaks_pre() {
 		# A quirk of Linux on ARM that may result in suboptimal performance
 		"pcie_aspm=off" "pci=pcie_bus_safe"
 		# Wait for root device
-		"rootwait" "bootdelay=5"
+		"bootdelay=5"
 		# Disable linux logo during boot
 		"logo.nologo"
 		# Disable cursor
