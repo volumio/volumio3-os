@@ -18,7 +18,7 @@ DEVICENAME="Raspberry Pi"
 DEVICEFAMILY="raspberry"
 
 # Disable to ensure the script doesn't look for `platform-xxx`
-DEVICEREPO="https://github.com/foonerd/platform-${DEVICEFAMILY}.git"
+DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
 
 ### What features do we want to target
 # TODO: Not fully implemented
