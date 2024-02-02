@@ -47,6 +47,8 @@ PACKAGES=(# Bluetooth packages
 	"plymouth" "plymouth-themes"
 	# Wireless firmware
 	"firmware-atheros" "firmware-ralink" "firmware-realtek" "firmware-brcm80211"
+	# Install to disk tools
+	"liblzo2-2" "squashfs-tools"
 )
 
 ### Device customisation
