@@ -376,6 +376,7 @@ device_chroot_tweaks_pre() {
 		dtoverlay=dwc2,dr_mode=host
 		[pi5]
 		dtoverlay=vc4-kms-v3d-pi5
+		dtparam=uart0_console
 		dtparam=nvme
 		dtparam=pciex1_gen=2
 		[all]
