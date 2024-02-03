@@ -127,6 +127,9 @@ log "Show HDMI output selection"
 
 echo '[{"value": false,"id":"section_hdmi_settings","attribute_name": "hidden"},{"value": false,"id":"hdmi_enabled","attribute_name": "hidden"}]' >/volumio/app/plugins/system_controller/system/override.json
 
+log "Disable login prompt before browser starts"
+systemctl disable getty@tty1.service
+
 # TODO USE GLOBAL VARIABLE FOR DEVICES WITH INTEGRATED TOUCHSCREEN
 if [[ ${VOLUMIO_HARDWARE} = cm4 || ${VOLUMIO_HARDWARE} = pi-kiosk ]]; then
 
