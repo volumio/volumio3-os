@@ -1,6 +1,8 @@
 [Unit]
 Description = Volumio Splash
-
+Before=basic.target
+After=local-fs.target sysinit.target
+DefaultDependencies=no
 
 [Service]
 ExecStart=/bin/volumiosplash.sh
@@ -11,4 +13,4 @@ User=root
 Group=root
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target 

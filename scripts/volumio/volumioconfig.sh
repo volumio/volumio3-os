@@ -341,6 +341,9 @@ ln -s /lib/systemd/system/volumiologrotate.service /etc/systemd/system/multi-use
 log "Enable Volumio CPU Tweak Service"
 ln -s /lib/systemd/system/volumio_cpu_tweak.service /etc/systemd/system/multi-user.target.wants/volumio_cpu_tweak.service
 
+log "Enable Volumio Splash"
+ln -s /lib/systemd/system/volumiosplash.service /etc/systemd/system/basic.target.wants/volumiosplash.service
+
 log "Disable MPD autostart"
 systemctl disable mpd.service
 
@@ -483,3 +486,15 @@ echo "IPAddressAllow=127.0.0.1" >> /lib/systemd/system/udev.service
 
 log "Allowing UDEV to bring up HCI devices"
 sed -i 's/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6 AF_BLUETOOTH/' /lib/systemd/system/udev.service
+
+#####################
+#Miscellanea#-----------------------------------------
+#####################
+
+log "Setting default Volumio Splash Theme"
+cat <<-EOF >/etc/plymouth/plymouthd.conf
+[Daemon]
+Theme=volumio
+EOF
+
+
