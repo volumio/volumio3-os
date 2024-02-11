@@ -492,10 +492,11 @@ sed -i 's/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6/RestrictAd
 #Miscellanea#-----------------------------------------
 #####################
 
-log "Setting default Volumio Splash Theme"
-cat <<-EOF >/etc/plymouth/plymouthd.conf
-[Daemon]
-Theme=volumio
-EOF
+# TODO: FIX the volumio theme. it makes mp1 build fail
+#log "Setting default Volumio Splash Theme"
+#cat <<-EOF >/etc/plymouth/plymouthd.conf
+#[Daemon]
+#Theme=volumio
+#EOF
 
 
