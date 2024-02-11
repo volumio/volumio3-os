@@ -83,7 +83,7 @@ copy_device_bootloader_files()
 write_boot_parameters()
 {
    echo "
-BOOTARGS_USER=loglevel=0 quiet splash bootdelay=1
+BOOTARGS_USER=quiet splash bootdelay=1 loglevel=0
 bootpart=/dev/mmcblk1p1
 imgpart=/dev/mmcblk1p2
 datapart=/dev/mmcblk1p3
