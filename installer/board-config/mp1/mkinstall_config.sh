@@ -15,8 +15,6 @@ BOOT_TYPE=msdos			# msdos or gpt
 BOOT_START=16
 BOOT_END=80
 IMAGE_END=3900
-# Temporary added for mp1
-INIT_TYPE="init.mp1" # init.{x86/nextarm/nextarm_tvbox}
 BOOT=/mnt/boot
 BOOTDELAY=1
 BOOTDEV="mmcblk1"
@@ -85,7 +83,7 @@ copy_device_bootloader_files()
 write_boot_parameters()
 {
    echo "
-BOOTARGS_USER=quiet loglevel=0 splash bootdelay=1
+BOOTARGS_USER=quiet splash bootdelay=1 loglevel=0
 bootpart=/dev/mmcblk1p1
 imgpart=/dev/mmcblk1p2
 datapart=/dev/mmcblk1p3
