@@ -215,6 +215,11 @@ device_chroot_tweaks_pre() {
 		rm -rf /boot/kernel_2712.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
 	fi
+	if [ -d "/lib/modules/${KERNEL_VERSION}-v8-16k+" ]; then
+		log "Removing v8-16k+ (Pi5 16k) Kernel and modules" "info"
+		rm -rf /boot/kernel_2712.img
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v8-16k+"
+	fi
 
 	### Remove compressed modules, if a custom uncompressed one is available
 	if [ -e "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/drivers/gpu/drm/panel/panel-ilitek-ili9881c.ko" ]; then
