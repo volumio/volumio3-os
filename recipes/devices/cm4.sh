@@ -331,7 +331,6 @@ device_chroot_tweaks_pre() {
 		max_framebuffers=1
 		disable_splash=1
 		force_eeprom_read=0
-		dtoverlay=dwc2,dr_mode=host
 		dtparam=audio=off
 		start_x=1
 		include volumioconfig.txt
@@ -346,6 +345,7 @@ device_chroot_tweaks_pre() {
 		enable_uart=1
 		dtparam=uart0=on
 		dtparam=uart1=off
+		dtoverlay=dwc2,dr_mode=host
 		dtoverlay=vc4-kms-v3d,cma-384,audio=off,noaudio=on
 	EOF
 
