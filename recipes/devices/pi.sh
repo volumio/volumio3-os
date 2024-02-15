@@ -240,25 +240,6 @@ device_chroot_tweaks_pre() {
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8-16k+"
 	fi
 
-	### Remove compressed modules, if a custom uncompressed one is available
-	if [ -e "/lib/modules/${KERNEL_VERSION}+/kernel/drivers/gpu/drm/panel/panel-waveshare-dsi.ko" ]; then
-		log "Removing ${KERNEL_VERSION}+ waveshare-dsi compressed module" "info"
-		rm -rf "/lib/modules/${KERNEL_VERSION}+/kernel/drivers/gpu/drm/panel/panel-waveshare-dsi.ko.xz"
-	fi
-	if [ -e "/lib/modules/${KERNEL_VERSION}-v7+/kernel/drivers/gpu/drm/panel/panel-waveshare-dsi.ko" ]; then
-		log "Removing ${KERNEL_VERSION}-v7+ waveshare-dsi compressed module" "info"
-		rm -rf "/lib/modules/${KERNEL_VERSION}-v7+/kernel/drivers/gpu/drm/panel/panel-waveshare-dsi.ko.xz"
-	fi
-	if [ -e "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/drivers/gpu/drm/panel/panel-waveshare-dsi.ko" ]; then
-		log "Removing ${KERNEL_VERSION}-v7l+ waveshare-dsi compressed module" "info"
-		rm -rf "/lib/modules/${KERNEL_VERSION}-v7l+/kernel/drivers/gpu/drm/panel/panel-waveshare-dsi.ko.xz"
-	fi
-	if [ -e "/lib/modules/${KERNEL_VERSION}-v8+/kernel/drivers/gpu/drm/panel/panel-waveshare-dsi.ko" ]; then
-		log "Removing ${KERNEL_VERSION}-v8+ waveshare-dsi compressed module" "info"
-		rm -rf "/lib/modules/${KERNEL_VERSION}-v8+/kernel/drivers/gpu/drm/panel/panel-waveshare-dsi.ko.xz"
-	fi
-
-
 	log "Finished Kernel installation" "okay"
 
 	### Other Rpi specific stuff
