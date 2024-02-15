@@ -15,10 +15,10 @@ BUILD="arm"
 #VOL_DEVICE_ID="pi"
 DEVICENAME="Raspberry Pi"
 # This is useful for multiple devices sharing the same/similar kernel
-#DEVICEFAMILY="raspberry"
+DEVICEFAMILY="raspberry"
 
-# Disable to ensure the script doesn't look for `platform-xxx`
-#DEVICEREPO=""
+# Install to disk tools including PiInstaller 
+DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
 
 ### What features do we want to target
 # TODO: Not fully implemented
@@ -238,7 +238,7 @@ device_chroot_tweaks_pre() {
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}"
 	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=0 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
 
-	log "Adding Custom firmware from github" "info"
+	log "Adding Custom DAC firmware from github" "info"
 	for key in "${!CustomFirmware[@]}"; do
 		wget -nv "${CustomFirmware[$key]}" -O "$key.tar.gz" || {
 			log "Failed to get firmware:" "err" "${key}"
@@ -261,11 +261,6 @@ device_chroot_tweaks_pre() {
 		log "Removing v8_16k+ (Pi5 16k) Kernel and modules" "info"
 		rm -rf /boot/kernel_2712.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
-	fi
-	if [ -d "/lib/modules/${KERNEL_VERSION}-v8-16k+" ]; then
-		log "Removing v8-16k+ (Pi5 16k) Kernel and modules" "info"
-		rm -rf /boot/kernel_2712.img
-		rm -rf "/lib/modules/${KERNEL_VERSION}-v8-16k+"
 	fi
 
 	log "Finished Kernel installation" "okay"
