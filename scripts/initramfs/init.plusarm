@@ -61,21 +61,20 @@ fi
 # Parse the kernel command line
 
 parse_disk() {
-  if [ "$(echo $1|cut -c -5)" = "UUID=" ]; then
-    # $1 is a UUID
-    echo $(findfs $1)
-  elif [ "$(echo $1|cut -c -6)" = "LABEL=" ]; then
-    # $1 is a LABEL
-    echo $(findfs $1)
-  elif [ "$(echo $1|cut -c -5)" = "/dev/" ]; then
-    # $1 is a device name
-    echo $1
+  disc="$1"
+  if [ "${disc%%=*}" = 'UUID' ] || [ "${disc%%=*}" = 'LABEL' ]; then
+    # Is UUID=xxx || Label=xxx
+    findfs "$disc"
+  elif [ "${disc%/*}" = '/dev' ]; then
+    # is a device name
+    echo "$disc"
   else
-    # $1 is unrecognized.
-    echo "unknown-disk"
+    print_msg "unknown-disk ${disc}"
+    exec sh
+    exit 0
   fi
-
 }
+
 
 do_reboot() {
 
@@ -232,16 +231,46 @@ modprobe squashfs
 modprobe nls_cp437
 modprobe fuse
 
+if [ -z "${BOOTPART}" ]; then
+  print_msg "Missing BOOTPART"
+  print_msg "Current command: ${CMDLINE}"
+  print_msg "Specify the boot, data and squash image partition on the kernel command"
+  print_msg "example: kernel... imgpart=/dev/mmcblk0p2 bootpart=/dev/mmcblk0p1 datapart=/dev/mmcblk0p3 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=UUID=b99ad11b-ec63-4a8b-8010-816893807ad6 bootpart=UUID=4A8B-8010 datapart=b44ac11b-eabb-5add-8211-816893807ad6 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=LABEL=volumioimg bootpart=LABEL=volumioboot datapart=LABEL=volumiodata imgfile=/volumio_current.sqs"
+  exec sh
+  exit 0
+fi
+
 if [ -z "${IMGPART}" ]; then
-  print_msg "Specify the squash image partition after the kernel command ${CMDLINE}"
-  print_msg "example: kernel... imgpart=/dev/sda2 imgfile=/gentoo.sqs"
+  print_msg "Missing IMGPART"
+  print_msg "Current command: ${CMDLINE}"
+  print_msg "Specify the boot, data and squash image partition on the kernel command"
+  print_msg "example: kernel... imgpart=/dev/mmcblk0p2 bootpart=/dev/mmcblk0p1 datapart=/dev/mmcblk0p3 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=UUID=b99ad11b-ec63-4a8b-8010-816893807ad6 bootpart=UUID=4A8B-8010 datapart=b44ac11b-eabb-5add-8211-816893807ad6 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=LABEL=volumioimg bootpart=LABEL=volumioboot datapart=LABEL=volumiodata imgfile=/volumio_current.sqs"
+  exec sh
+  exit 0
+fi
+
+if [ -z "${DATAPART}" ]; then
+  print_msg "Missing DATAPART"
+  print_msg "Current command: ${CMDLINE}"
+  print_msg "Specify the boot, data and squash image partition on the kernel command"
+  print_msg "example: kernel... imgpart=/dev/mmcblk0p2 bootpart=/dev/mmcblk0p1 datapart=/dev/mmcblk0p3 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=UUID=b99ad11b-ec63-4a8b-8010-816893807ad6 bootpart=UUID=4A8B-8010 datapart=b44ac11b-eabb-5add-8211-816893807ad6 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=LABEL=volumioimg bootpart=LABEL=volumioboot datapart=LABEL=volumiodata imgfile=/volumio_current.sqs"
   exec sh
   exit 0
 fi
 
 if [ -z "${IMGFILE}" ]; then
-  print_msg "Specify the squash image file after the kernel command ${CMDLINE}"
-  print_msg "example: kernel... imgpart=/dev/sda2 imgfile=/gentoo.sqs"
+  print_msg "Missing IMGFILE"
+  print_msg "Current command: ${CMDLINE}"
+  print_msg "Specify the boot, data and squash image partition on the kernel command"
+  print_msg "example: kernel... imgpart=/dev/mmcblk0p2 bootpart=/dev/mmcblk0p1 datapart=/dev/mmcblk0p3 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=UUID=b99ad11b-ec63-4a8b-8010-816893807ad6 bootpart=UUID=4A8B-8010 datapart=b44ac11b-eabb-5add-8211-816893807ad6 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=LABEL=volumioimg bootpart=LABEL=volumioboot datapart=LABEL=volumiodata imgfile=/volumio_current.sqs"
   exec sh
   exit 0
 fi
@@ -285,59 +314,88 @@ fi
 # Mount the partitions
 # 1) mount the partition where the squash image resides
 [ -d /mnt/imgpart ] || mkdir /mnt/imgpart
-mount -t ext4 ${IMGPART} /mnt/imgpart
-
-if [ ! -e "/mnt/imgpart/kernel_current.tar" ] || [ -e "/mnt/imgpart/curret_kernel_creation" ]; then
+mount -t ext4 "${IMGPART}" /mnt/imgpart
+echo " "
+echo " "
+echo "[init] Initializing Volumio startup..."
+if [ ! -e "/mnt/imgpart/kernel_current.tar" ] || [ -e "/mnt/imgpart/current_kernel_creation" ]; then
   print_msg "Creating archive for current kernel..."
-  touch /mnt/imgpart/curret_kernel_creation
+  touch /mnt/imgpart/current_kernel_creation
   mkdir /mnt/factory
   mount -t vfat ${BOOTPART} /mnt/factory
   tar cf /mnt/imgpart/kernel_current.tar -C /mnt/factory .
   umount /mnt/factory
   rm -r /mnt/factory
-  rm /mnt/imgpart/curret_kernel_creation
+  rm /mnt/imgpart/current_kernel_creation
   sync
 fi
 
-print_msg "Checking for USB updates if you did not boot from USB..."
-[ -e /dev/sda1 ] || mdev -s
-if [ -e /dev/sda1 ] && [ ! "/dev/sda1" ==  "${BOOTPART}" ]; then
-  [ -d /mnt/usb ] || mkdir /mnt/usb
-  mount -t auto /dev/sda1 /mnt/usb
-  #If there is a firmware file inside the usb
+echo " "
+echo " "
+print_msg "Checking for a volumio rootfs update on a USB device"
+
+mkdir /mnt/usb
+for devlink in /dev/sd[a-z]; do
+  if [ "${devlink}" == "/dev/sd[a-z]" ]; then
+  # no usb devices present
+    break
+  fi
+  # do the first partition of a usb device, must be removable and not the boot device!
+  if [ $(lsblk ${devlink} --list -no tran) == usb ] && \
+     [ ${BOOTDEV} != ${devlink} ]; then
+    mount -t vfat ${devlink}1 /mnt/usb >/dev/null 2>&1
+    print_msg "Checking ${devlink}1 for a volumio rootfs update"
   if [ -e /mnt/usb/*.fir ]; then
-    print_msg "Firmware found, updating will take a few minutes, please wait..."
+    echo "[init] Performing Volumio Update from USB..."
+    print_msg "New rootfs firmware found"
+    print_msg "Updating can take several minutes, please wait...."
     mkdir /mnt/boot
-    mount -t auto ${BOOTPART} /mnt/boot
-    #when the partitions are mounted we can launch the update script
-    volumio-init-updater
+    mount -t vfat "${BOOTPART}" /mnt/boot
+        volumio-init-updater
     sync
     print_msg "USB Update applied"
-    umount /mnt/boot
+    echo "[init] USB Update finished, rebooting..."
+      sleep 2
+      umount /mnt/usb >/dev/null 2>&1
     rm -r /mnt/boot
+    rm -r /mnt/usb
     print_msg "Restarting"
     do_reboot
     #echo b > /proc/sysrq-trigger
+      break
+    fi
+    umount /mnt/usb >/dev/null 2>&1
   fi
+done
+
+echo " "
+echo " "
+print_msg "Checking for factory reset on a USB device"
+for devlink in /dev/sd[a-z]; do
+  if [ "${devlink}" == "/dev/sd[a-z]" ]; then
+  # no usb devices present
+    break
+  fi
+  # do the first partition of a usb device, must be removable and not the boot device!
+  if [ $(lsblk ${devlink} --list -no tran) == usb ] && \
+     [ ${BOOTDEV} != ${devlink} ]; then
+    mount -t vfat ${devlink}1 /mnt/usb >/dev/null 2>&1
+    print_msg "Checking ${devlink}1 for a factory reset"
   if [ -e /mnt/usb/factory_reset ]; then
     print_msg "Factory Reset on USB"
     mkdir /mnt/factory
-    mount -t auto ${BOOTPART} /mnt/factory
-    echo " " > /mnt/factory/user_data
+    mount -t vfat "${BOOTPART}" /mnt/factory
+    echo " " >/mnt/factory/user_data
+    print_msg "Factory reset initiated"
     umount /mnt/factory
     rm -r /mnt/factory
-    rm /mnt/usb/factory_reset
+    umount /mnt/usb >/dev/null 2>&1
+    break
   fi
-  umount /dev/sda1
-  rm -r /mnt/usb
-else
-  if [ "/dev/sda1" == "${BOOTPART}" ]; then
-    print_msg "Not checking for firmware if you boot from USB. Sorry!"
-  else
-    print_msg "No USB device detected (when incorrect, try adding 'bootdelay=5' to your boot cmdline)"
-  fi
+  umount /mnt/usb >/dev/null 2>&1
 fi
-
+done
+rmdir /mnt/usb
 
 # 2) init a loop pointing to the image file
 loop_free=$(losetup -f | sed s#p/#p#)
@@ -358,10 +416,10 @@ VOLUMIO_VERSION="$(cat /mnt/static/etc/os-release | grep VOLUMIO_VERSION)"
 #if there is user_data file then format data partition
 #
 mkdir /mnt/factory
-mount -t auto ${BOOTPART} /mnt/factory
-
+mount -t vfat "${BOOTPART}" /mnt/factory
 if [ -e "/mnt/factory/user_data" ]; then
-  print_msg "Deleting User Data"
+  echo "[init] Performing Factory Reset..."
+  print_msg "Deleting User Data..."
   #mke2fsfull is used since busybox mke2fs does not include ext4 support
   /sbin/mke2fsfull -t ext4 -F -E stride=2,stripe-width=1024 -b 4096 ${DATAPART} -L volumio_data
   rm /mnt/factory/user_data
@@ -446,33 +504,29 @@ if [ -e "/boot/kernel_update" ]; then
   sync
   umount /boot
   rm -rf /boot
+  echo "[init] Volumio updated, rebooting..."
+  sleep 2
   do_reboot
   #echo b > /proc/sysrq-trigger
 fi
-
-DATADEV=$(echo $DATAPART | grep -o mmcblk)
-if [ ! -z "${DATADEV}" ]; then
-  DATADEV=$(echo ${DATAPART} | awk -F'/' '{print substr($3,0,7)}')
-else
-  DATADEV=$(echo ${DATAPART} | grep -o sd)
-  if [ ! -z "${DATADEV}" ]; then
-    DATADEV=$(echo ${DATAPART} | awk -F'/' '{print substr($3,0,3)}')
-  else
-    print_msg "Unexpected data device, DATAPART=${DATAPART}, aborting"
-    exec sh
-  fi
-fi
-
-FREESIZE="$(parted -s /dev/${DATADEV} unit MB print free | tail -n 2 | grep Free | awk '{print $3}' | awk -F 'MB' '{print $1}')"
+#
+# Re-size the data partition
+# ==================================
+#
+echo " "
+echo " "
+DATADEV=/dev/$(lsblk -no PKNAME "${DATAPART}")
+# Re-sizing is not necessary when we already reached maximum (shows with decimals less than 1MB).
+FREESIZE="$(parted -s "${DATADEV}" unit MB print free | tail -n 2 | grep Free | awk '{print $3}' | awk -F 'MB' '{print $1}')"
 if [ "$(awk 'BEGIN {print ("'$FREESIZE'" >= "'1'")}')" -eq "1" ]; then
-  print_msg "Re-sizing Volumio data partition"
-  END="$(parted -s /dev/${DATADEV} unit MB print free | grep Free | tail -1 | awk '{print $2}' | grep -o '[0-9]\+')"
-  parted -s /dev/${DATADEV} resizepart 3 ${END}
-  e2fsck -fy ${DATAPART}
-  #force resize as we did just run e2fsck. Resize2fs seems ro not detect this occasionally
-  resize2fs -f ${DATAPART}
+  echo "[init] Re-sizing Volumio data partition..."
+  print_msg "Re-sizing Volumio data partition..."
+  END="$(parted -s "${DATADEV}" unit MB print free | grep Free | tail -1 | awk '{print $2}' | grep -o '[0-9]\+')"
+  parted -s "${DATADEV}" resizepart 3 "${END}" >/dev/null 2>&1
+  e2fsck -f "${DATAPART}" -y >/dev/null 2>&1
+  resize2fs -p "${DATAPART}" >/dev/null 2>&1
   print_msg "Volumio data partition successfully resized"
-  parted -s /dev/${DATADEV} unit MB print
+  parted -s "${DATADEV}" unit MB print >/dev/null 2>&1
   rm /boot/resize-volumio-datapart
 fi
 
