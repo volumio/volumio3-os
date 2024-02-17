@@ -450,24 +450,40 @@ fi
 
 # if the kernel has been updated, and no error has occurred before completition
 if [ -e "/boot/kernel_update" ]; then
-  # Commented but to be restored when moving to kernel 5.X
-  #if [ "${HWDEVICE}" == "VIM3L" ]; then
-  #	get_old_kernel
-  #fi
-  print_msg "unpacking kernel"
-# remove all previous kernel config files
-  rm /boot/config-*
-  tar xf /mnt/imgpart/kernel_current.tar -C /boot
+  print_msg "Making current configuration backup"
   BACKUP=""
   if [ -e "/mnt/imgpart/config.txt.bak" ]; then
 ### DT overlay and config backup from RPi
     BACKUP="/mnt/imgpart/config.txt.bak"
-	CONFIGORG="/boot/config.txt"
+	  CONFIGORG="/boot/config.txt"
   elif [ -e "/mnt/imgpart/hw_intf.conf.bak" ]; then
 ### DT overlay backup from Tinkerboard
     BACKUP="/mnt/imgpart/hw_intf.conf.bak"
-	CONFIGORG="/boot/hw_intf.conf"
+	  CONFIGORG="/boot/hw_intf.conf"
   fi
+  # Commented but to be restored when moving to kernel 5.X
+  #if [ "${HWDEVICE}" == "VIM3L" ]; then
+  #	get_old_kernel
+  #fi
+  print_msg "remove all previous kernel config files"
+# remove all previous kernel config files
+  rm /boot/config-*
+# When a new volumio version is loaded, the currently used block device will need to be changed to UUID.
+# So if the boot cmdline uses /dev/mmcblk0 format for disk parsing, there will be a mismatch.
+  if [ -z "${UUIDFMT}" ]; then
+    print_msg "unpacking kernel without cmdline.txt"
+    tar xf /mnt/imgpart/kernel_current.tar --exclude=cmdlinux.txt -C /boot
+    print_msg "The boot configuration holds block device information, replace them with discovered UUIDs."
+    UUID_BOOT=$(blkid -s UUID -o value ${BOOTPART})
+    UUID_IMG=$(blkid -s UUID -o value ${IMGPART})
+    UUID_DATA=$(blkid -s UUID -o value ${DATAPART})
+    cp $BOOTCONFIG $BOOTCONFIG.old
+    sed -i "s/imgpart=/dev/[a-z]\{3,6\}[0-9]\{1,2\}[a-z]\{0,1\}[0-9]\{0,2\}/imgpart=UUID=${UUID_IMG} datapart=UUID=${UUID_DATA} bootpart=UUID=${UUID_BOOT} bootconfig=cmdline.txt/g" ${BOOTCONFIG}
+  else 
+    print_msg "unpacking kernel"
+    tar xf /mnt/imgpart/kernel_current.tar -C /boot
+  fi
+
   if [ ! -z $BACKUP ]; then
     print_msg "Restoring custom config.txt content"
     I2S=`sed -n -e '/#### Volumio i2s setting below: do not alter ####/,$p' ${BACKUP}`
