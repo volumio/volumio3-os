@@ -434,6 +434,7 @@ fi
 umount /mnt/factory
 rm -r /mnt/factory
 
+
 # if the update failed before completion
 mkdir boot
 mount -t vfat ${BOOTPART} /boot
@@ -506,7 +507,6 @@ fi
 # Re-size the data partition
 # ==================================
 #
-
 DATADEV=/dev/$(lsblk -no PKNAME "${DATAPART}")
 # Re-sizing is not necessary when we already reached maximum (shows with decimals less than 1MB).
 FREESIZE="$(parted -s "${DATADEV}" unit MB print free | tail -n 2 | grep Free | awk '{print $3}' | awk -F 'MB' '{print $1}')"
@@ -556,82 +556,27 @@ chmod -R 777 /mnt/ext/union/imgpart
 # The value in fstab could differ after updating to a new image version in case someone
 # manually edited the bootdevice in cmdline before OR when a UUID is used to find the boot partition.
 UUID_BOOT=$(blkid -s UUID -o value ${BOOTPART})
-BOOTFSTAB=`cat /mnt/ext/union/etc/fstab | grep -E "[0-9A-F]{4}-[0-9A-F]{4}" -o`
-if [ ! -z "${BOOTFSTAB}" ]; then
-  print_msg "found fstab entry with UUID=${BOOTFSTAB} for /boot"
-  if [ ! $UUID_BOOT == $BOOTFSTAB ]; then
-    sed -i "s/${BOOTFSTAB}/${UUID_BOOT}/g" /mnt/ext/union/etc/fstab
-    print_msg "fstab entry updated to UUID=${BOOTFSTAB}"
+DEVFSTAB=`cat /mnt/ext/union/etc/fstab | grep -E "[0-9A-F]{4}-[0-9A-F]{4}" -o`
+if [ ! -z "${DEVFSTAB}" ]; then
+  print_msg "found fstab entry with UUID=${DEVFSTAB} for /boot"
+  if [ ! $UUID_BOOT == $DEVFSTAB ]; then
+    sed -i "s/${DEVFSTAB}/${UUID_BOOT}/g" /mnt/ext/union/etc/fstab
+    print_msg "fstab entry updated to UUID=${DEVFSTAB}"
   fi
 else
-  BOOTFSTAB=`cat /mnt/ext/union/etc/fstab | grep -E "^/dev/[a-z]{3,6}[0-9]{1,2}[a-z]{0,1}[0-9]{0,2}" -o`
-  if [ -z "${BOOTFSTAB}" ]; then
+  DEVFSTAB=`cat /mnt/ext/union/etc/fstab | grep -E "^/dev/[a-z]{3,6}[0-9]{1,2}[a-z]{0,1}[0-9]{0,2}" -o`
+  if [ -z "${DEVFSTAB}" ]; then
 #   normally never gets here ;)
     print_msg "Incompatible fstab, no entry found for /boot"
     exec sh
     exit 0
   fi
-  print_msg "found fstab entry with device ${BOOTFSTAB} for /boot"
-  if [ ! $BOOTPART == $BOOTFSTAB ]; then
-    sed -i "s/${BOOTFSTAB}/${BOOTPART}/g" /mnt/ext/union/etc/fstab
-    print_msg "fstab entry updated to ${BOOTFSTAB}"
+  print_msg "found fstab entry with device ${DEVFSTAB} for /boot"
+  if [ ! $BOOTPART == $DEVFSTAB ]; then
+    sed -i "s/${DEVFSTAB}/${BOOTPART}/g" /mnt/ext/union/etc/fstab
+    print_msg "fstab entry updated to ${DEVFSTAB}"
   fi
 fi
-
-# 7) We know the current image partition parsed from /proc/cmdline
-# Ensure the /imagepart entry in fstab matches the UUID (or the device) from the cmdline
-# The value in fstab could differ after updating to a new image version in case someone
-# manually edited the imagepart in cmdline before OR when a UUID is used to find the image partition.
-UUID_IMG=$(blkid -s UUID -o value ${IMGPART})
-IMGFSTAB=`cat /mnt/ext/union/etc/fstab | grep -E "[a-fA-F0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}" -o`
-if [ ! -z "${IMGFSTAB}" ]; then
-  print_msg "found fstab entry with UUID=${IMGFSTAB} for /volumio"
-  if [ ! $UUID_IMG == $IMGFSTAB ]; then
-    sed -i "s/${IMGFSTAB}/${UUID_IMG}/g" /mnt/ext/union/etc/fstab
-    print_msg "fstab entry updated to UUID=${IMGFSTAB}"
-  fi
-else
-  IMGFSTAB=`cat /mnt/ext/union/etc/fstab | grep -E "^/dev/[a-z]{3,6}[0-9]{1,2}[a-z]{0,1}[0-9]{0,2}" -o`
-  if [ -z "${IMGFSTAB}" ]; then
-#   normally never gets here ;)
-    print_msg "Incompatible fstab, no entry found for /volumio"
-    exec sh
-    exit 0
-  fi
-  print_msg "found fstab entry with device ${IMGFSTAB} for /volumio"
-  if [ ! $IMGPART == $IMGFSTAB ]; then
-    sed -i "s/${IMGFSTAB}/${IMGPART}/g" /mnt/ext/union/etc/fstab
-    print_msg "fstab entry updated to ${IMGFSTAB}"
-  fi
-fi
-
-# 8) We know the current data partition parsed from /proc/cmdline
-# Ensure the /data entry in fstab matches the UUID (or the device) from the cmdline
-# The value in fstab could differ after updating to a new image version in case someone
-# manually edited the datapart in cmdline before OR when a UUID is used to find the image partition.
-UUID_DATA=$(blkid -s UUID -o value ${DATAPART})
-DATAFSTAB=`cat /mnt/ext/union/etc/fstab | grep -E "[a-fA-F0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}" -o`
-if [ ! -z "${DATAFSTAB}" ]; then
-  print_msg "found fstab entry with UUID=${DATAFSTAB} for /volumio_data"
-  if [ ! $UUID_DATA == $DATAFSTAB ]; then
-    sed -i "s/${DATAFSTAB}/${UUID_DATA}/g" /mnt/ext/union/etc/fstab
-    print_msg "fstab entry updated to UUID=${DATAFSTAB}"
-  fi
-else
-  DATAFSTAB=`cat /mnt/ext/union/etc/fstab | grep -E "^/dev/[a-z]{3,6}[0-9]{1,2}[a-z]{0,1}[0-9]{0,2}" -o`
-  if [ -z "${DATAFSTAB}" ]; then
-#   normally never gets here ;)
-    print_msg "Incompatible fstab, no entry found for /volumio_data"
-    exec sh
-    exit 0
-  fi
-  print_msg "found fstab entry with device ${DATAFSTAB} for /volumio_data"
-  if [ ! $DATAPART == $DATAFSTAB ]; then
-    sed -i "s/${DATAFSTAB}/${DATAPART}/g" /mnt/ext/union/etc/fstab
-    print_msg "fstab entry updated to ${DATAFSTAB}"
-  fi
-fi
-
 
 umount /proc
 umount /sys
