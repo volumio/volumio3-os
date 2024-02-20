@@ -61,20 +61,18 @@ fi
 # Parse the kernel command line
 
 parse_disk() {
-  if [ "$(echo $1|cut -c -5)" = "UUID=" ]; then
-    # $1 is a UUID
-    echo $(findfs $1)
-  elif [ "$(echo $1|cut -c -6)" = "LABEL=" ]; then
-    # $1 is a LABEL
-    echo $(findfs $1)
-  elif [ "$(echo $1|cut -c -5)" = "/dev/" ]; then
-    # $1 is a device name
-    echo $1
+  disc="$1"
+  if [ "${disc%%=*}" = 'UUID' ] || [ "${disc%%=*}" = 'LABEL' ]; then
+    # Is UUID=xxx || Label=xxx
+    findfs "$disc"
+  elif [ "${disc%/*}" = '/dev' ]; then
+    # is a device name
+    echo "$disc"
   else
-    # $1 is unrecognized.
-    echo "unknown-disk"
+    print_msg "unknown-disk ${disc}"
+    exec sh
+    exit 0
   fi
-
 }
 
 do_reboot() {
@@ -232,16 +230,46 @@ modprobe squashfs
 modprobe nls_cp437
 modprobe fuse
 
+if [ -z "${BOOTPART}" ]; then
+  print_msg "Missing BOOTPART"
+  print_msg "Current command: ${CMDLINE}"
+  print_msg "Specify the boot, data and squash image partition on the kernel command"
+  print_msg "example: kernel... imgpart=/dev/mmcblk0p2 bootpart=/dev/mmcblk0p1 datapart=/dev/mmcblk0p3 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=UUID=b99ad11b-ec63-4a8b-8010-816893807ad6 bootpart=UUID=4A8B-8010 datapart=b44ac11b-eabb-5add-8211-816893807ad6 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=LABEL=volumioimg bootpart=LABEL=volumioboot datapart=LABEL=volumiodata imgfile=/volumio_current.sqs"
+  exec sh
+  exit 0
+fi
+
 if [ -z "${IMGPART}" ]; then
-  print_msg "Specify the squash image partition after the kernel command ${CMDLINE}"
-  print_msg "example: kernel... imgpart=/dev/sda2 imgfile=/gentoo.sqs"
+  print_msg "Missing IMGPART"
+  print_msg "Current command: ${CMDLINE}"
+  print_msg "Specify the boot, data and squash image partition on the kernel command"
+  print_msg "example: kernel... imgpart=/dev/mmcblk0p2 bootpart=/dev/mmcblk0p1 datapart=/dev/mmcblk0p3 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=UUID=b99ad11b-ec63-4a8b-8010-816893807ad6 bootpart=UUID=4A8B-8010 datapart=b44ac11b-eabb-5add-8211-816893807ad6 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=LABEL=volumioimg bootpart=LABEL=volumioboot datapart=LABEL=volumiodata imgfile=/volumio_current.sqs"
+  exec sh
+  exit 0
+fi
+
+if [ -z "${DATAPART}" ]; then
+  print_msg "Missing DATAPART"
+  print_msg "Current command: ${CMDLINE}"
+  print_msg "Specify the boot, data and squash image partition on the kernel command"
+  print_msg "example: kernel... imgpart=/dev/mmcblk0p2 bootpart=/dev/mmcblk0p1 datapart=/dev/mmcblk0p3 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=UUID=b99ad11b-ec63-4a8b-8010-816893807ad6 bootpart=UUID=4A8B-8010 datapart=b44ac11b-eabb-5add-8211-816893807ad6 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=LABEL=volumioimg bootpart=LABEL=volumioboot datapart=LABEL=volumiodata imgfile=/volumio_current.sqs"
   exec sh
   exit 0
 fi
 
 if [ -z "${IMGFILE}" ]; then
-  print_msg "Specify the squash image file after the kernel command ${CMDLINE}"
-  print_msg "example: kernel... imgpart=/dev/sda2 imgfile=/gentoo.sqs"
+  print_msg "Missing IMGFILE"
+  print_msg "Current command: ${CMDLINE}"
+  print_msg "Specify the boot, data and squash image partition on the kernel command"
+  print_msg "example: kernel... imgpart=/dev/mmcblk0p2 bootpart=/dev/mmcblk0p1 datapart=/dev/mmcblk0p3 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=UUID=b99ad11b-ec63-4a8b-8010-816893807ad6 bootpart=UUID=4A8B-8010 datapart=b44ac11b-eabb-5add-8211-816893807ad6 imgfile=/volumio_current.sqs or"
+  print_msg "         kernel... imgpart=LABEL=volumioimg bootpart=LABEL=volumioboot datapart=LABEL=volumiodata imgfile=/volumio_current.sqs"
   exec sh
   exit 0
 fi
@@ -286,16 +314,17 @@ fi
 # 1) mount the partition where the squash image resides
 [ -d /mnt/imgpart ] || mkdir /mnt/imgpart
 mount -t ext4 ${IMGPART} /mnt/imgpart
+echo "[init] Initializing Volumio startup..."
 
 if [ ! -e "/mnt/imgpart/kernel_current.tar" ] || [ -e "/mnt/imgpart/curret_kernel_creation" ]; then
   print_msg "Creating archive for current kernel..."
-  touch /mnt/imgpart/curret_kernel_creation
+  touch /mnt/imgpart/current_kernel_creation
   mkdir /mnt/factory
   mount -t vfat ${BOOTPART} /mnt/factory
   tar cf /mnt/imgpart/kernel_current.tar -C /mnt/factory .
   umount /mnt/factory
   rm -r /mnt/factory
-  rm /mnt/imgpart/curret_kernel_creation
+  rm /mnt/imgpart/current_kernel_creation
   sync
 fi
 
@@ -432,6 +461,11 @@ if [ -e "/boot/kernel_update" ]; then
     UUID_IMG=$(blkid -s UUID -o value ${IMGPART})
     UUID_DATA=$(blkid -s UUID -o value ${DATAPART})
     cp $BOOTCONFIG $BOOTCONFIG.old
+    # Check if block device is in use for imgpart
+    BLK_IMGPART=`cat /boot/cmdline.txt | grep -E "/dev/[a-z]{3,6}[0-9]{1,2}[a-z]{0,1}[0-9]{0,2}" -o`
+    if [ ! -z "${BLK_IMGPART}" ]; then
+      sed -i "s/imgpart=/dev/[a-z]\{3,6\}[0-9]\{1,2\}[a-z]\{0,1\}[0-9]\{0,2\}/imgpart=UUID=${UUID_IMG} datapart=UUID=${UUID_DATA} bootpart=UUID=${UUID_BOOT} bootconfig=cmdline.txt/g" ${BOOTCONFIG}
+    fi
     sed -i "s/imgpart=UUID=[a-fA-F0-9]\{8\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{12\}/imgpart=UUID=${UUID_IMG}/g" ${BOOTCONFIG}
     sed -i "s/datapart=UUID=[a-fA-F0-9]\{8\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{4\}-[A-Fa-f0-9]\{12\}/datapart=UUID=${UUID_DATA}/g" ${BOOTCONFIG}
     sed -i "s/bootpart=UUID=[a-fA-F0-9]\{4\}-[a-fA-F0-9]\{4\}/bootpart=UUID=${UUID_BOOT}/g" ${BOOTCONFIG}
@@ -446,33 +480,29 @@ if [ -e "/boot/kernel_update" ]; then
   sync
   umount /boot
   rm -rf /boot
+  echo "[init] Volumio updated, rebooting..."
+  sleep 2
   do_reboot
   #echo b > /proc/sysrq-trigger
 fi
-
-DATADEV=$(echo $DATAPART | grep -o mmcblk)
-if [ ! -z "${DATADEV}" ]; then
-  DATADEV=$(echo ${DATAPART} | awk -F'/' '{print substr($3,0,7)}')
-else
-  DATADEV=$(echo ${DATAPART} | grep -o sd)
-  if [ ! -z "${DATADEV}" ]; then
-    DATADEV=$(echo ${DATAPART} | awk -F'/' '{print substr($3,0,3)}')
-  else
-    print_msg "Unexpected data device, DATAPART=${DATAPART}, aborting"
-    exec sh
-  fi
-fi
-
-FREESIZE="$(parted -s /dev/${DATADEV} unit MB print free | tail -n 2 | grep Free | awk '{print $3}' | awk -F 'MB' '{print $1}')"
+#
+# Re-size the data partition
+# ==================================
+#
+echo " "
+echo " "
+DATADEV=/dev/$(lsblk -no PKNAME "${DATAPART}")
+# Re-sizing is not necessary when we already reached maximum (shows with decimals less than 1MB).
+FREESIZE="$(parted -s "${DATADEV}" unit MB print free | tail -n 2 | grep Free | awk '{print $3}' | awk -F 'MB' '{print $1}')"
 if [ "$(awk 'BEGIN {print ("'$FREESIZE'" >= "'1'")}')" -eq "1" ]; then
-  print_msg "Re-sizing Volumio data partition"
-  END="$(parted -s /dev/${DATADEV} unit MB print free | grep Free | tail -1 | awk '{print $2}' | grep -o '[0-9]\+')"
-  parted -s /dev/${DATADEV} resizepart 3 ${END}
-  e2fsck -fy ${DATAPART}
-  #force resize as we did just run e2fsck. Resize2fs seems ro not detect this occasionally
-  resize2fs -f ${DATAPART}
+  echo "[init] Re-sizing Volumio data partition..."
+  print_msg "Re-sizing Volumio data partition..."
+  END="$(parted -s "${DATADEV}" unit MB print free | grep Free | tail -1 | awk '{print $2}' | grep -o '[0-9]\+')"
+  parted -s "${DATADEV}" resizepart 3 "${END}" >/dev/null 2>&1
+  e2fsck -f "${DATAPART}" -y >/dev/null 2>&1
+  resize2fs -p "${DATAPART}" >/dev/null 2>&1
   print_msg "Volumio data partition successfully resized"
-  parted -s /dev/${DATADEV} unit MB print
+  parted -s "${DATADEV}" unit MB print >/dev/null 2>&1
   rm /boot/resize-volumio-datapart
 fi
 
@@ -531,6 +561,28 @@ else
     print_msg "fstab entry updated to ${DEVFSTAB}"
   fi
 fi
+# 7) We know the current boot partition parsed from /proc/cmdline
+# Ensure the imgpart entry in cmdline.txt matches the UUID (or the device) from the cmdline
+# The value in cmdline.txt could differ after upgrading to a new UUID image version in case someone
+# manually edited the bootdevice in cmdline before OR when a block device is used to find the boot partition.
+UUID_BOOT=$(blkid -s UUID -o value ${BOOTPART})
+UUID_IMG=$(blkid -s UUID -o value ${IMGPART})
+UUID_DATA=$(blkid -s UUID -o value ${DATAPART})
+mkdir boot
+mount -t vfat ${BOOTPART} /boot
+BLK_IMGPART=`cat /boot/cmdline.txt | grep -E "/dev/[a-z]{3,6}[0-9]{1,2}[a-z]{0,1}[0-9]{0,2}" -o`
+if [ ! -z "${BLK_IMGPART}" ]; then
+  BOOTCMDLINE=/boot/cmdline.txt
+  # in case we need to revert the change manually
+  cp $BOOTCMDLINE $BOOTCMDLINE.orig
+  print_msg "image prtition uses block device in cmdline.txt"
+  sed -i "s/imgpart=\/dev\/[a-z]\{3,6\}[0-9]\{1,2\}[a-z]\{0,1\}[0-9]\{0,2\}/imgpart=UUID=${UUID_IMG} datapart=UUID=${UUID_DATA} bootpart=UUID=${UUID_BOOT} bootconfig=cmdline.txt/g" ${BOOTCMDLINE}
+  echo "[init] cmdlinux updated updated"
+  sync
+fi
+# clear the mountpoint
+umount /boot
+rm -rf /boot
 
 umount /proc
 umount /sys
