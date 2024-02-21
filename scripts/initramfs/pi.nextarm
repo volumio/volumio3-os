@@ -316,7 +316,7 @@ fi
 mount -t ext4 ${IMGPART} /mnt/imgpart
 echo "[init] Initializing Volumio startup..."
 
-if [ ! -e "/mnt/imgpart/kernel_current.tar" ] || [ -e "/mnt/imgpart/curret_kernel_creation" ]; then
+if [ ! -e "/mnt/imgpart/kernel_current.tar" ] || [ -e "/mnt/imgpart/current_kernel_creation" ]; then
   print_msg "Creating archive for current kernel..."
   touch /mnt/imgpart/current_kernel_creation
   mkdir /mnt/factory
