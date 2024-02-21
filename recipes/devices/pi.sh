@@ -31,7 +31,7 @@ BOOT_START=0
 BOOT_END=96
 BOOT_TYPE=msdos  # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
-INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="pi.nextarm" # init.{x86/nextarm/nextarm_tvbox}
 
 # Modules that will be added to initramfs
 MODULES=("overlay" "squashfs" "fuse" "nvme" "nvme_core" "uas")
@@ -388,7 +388,7 @@ device_chroot_tweaks_pre() {
 		dtoverlay=dwc2,dr_mode=host
 		[pi5]
 		dtoverlay=vc4-kms-v3d-pi5
-		dtparam=uart0_console
+		# dtparam=uart0_console # Disabled by default
 		dtparam=nvme
 		dtparam=pciex1_gen=2
 		[all]
