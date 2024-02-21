@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
-
 ## Setup for Raspberry Pi
 DEVICE_SUPPORT_TYPE="S" # First letter (Community Porting|Supported Officially|OEM)
 DEVICE_STATUS="T"       # First letter (Planned|Test|Maintenance)
@@ -15,10 +14,10 @@ BUILD="arm"
 #VOL_DEVICE_ID="pi"
 DEVICENAME="Raspberry Pi"
 # This is useful for multiple devices sharing the same/similar kernel
-DEVICEFAMILY="raspberry"
+#DEVICEFAMILY="raspberry"
 
-# Install to disk tools including PiInstaller 
-DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
+# Disable to ensure the script doesn't look for `platform-xxx`
+#DEVICEREPO=""
 
 ### What features do we want to target
 # TODO: Not fully implemented
@@ -30,11 +29,10 @@ VOLINITUPDATER=yes
 BOOT_START=0
 BOOT_END=96
 BOOT_TYPE=msdos  # msdos or gpt
-BOOT_USE_UUID=yes        # Add UUID to fstab
 INIT_TYPE="pi.nextarm" # init.{x86/nextarm/nextarm_tvbox}
 
-# Modules that will be added to initramfs
-MODULES=("overlay" "squashfs" "fuse" "nvme" "nvme_core" "uas")
+# Modules that will be added to intramfs
+MODULES=("overlay" "squashfs")
 # Packages that will be installed
 PACKAGES=(# Bluetooth packages
 	"bluez" "bluez-firmware" "pi-bluetooth"
@@ -47,38 +45,12 @@ PACKAGES=(# Bluetooth packages
 	"plymouth" "plymouth-themes"
 	# Wireless firmware
 	"firmware-atheros" "firmware-ralink" "firmware-realtek" "firmware-brcm80211"
-	# Install to disk tools
-	"liblzo2-2" "squashfs-tools"
 )
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
-	log "Running write_device_files" "ext"
-	log "Copying additional utils files"
-	pkg_root="${PLTDIR}/utils"
-
-	mkdir -p "${ROOTFSMNT}"/usr/local/bin/
-		declare -A CustomScripts=(
-		[PiInstaller.sh]="/PiInstaller.sh"
-	)
-	log "Adding ${#CustomScripts[@]} custom scripts to /usr/local/bin: " "" "${CustomScripts[@]}"
-		for script in "${!CustomScripts[@]}"; do
-			cp "${pkg_root}/${CustomScripts[$script]}" "${ROOTFSMNT}"/usr/local/bin/"${script}"
-			chmod +x "${ROOTFSMNT}"/usr/local/bin/"${script}"
-		done
-
-	log "Copying current partition data for use in runtime fast 'installToDisk'"
-	cat <<-EOF >"${ROOTFSMNT}/boot/partconfig.json"
-{
-	"params":[
-	{"name":"boot_start","value":"$BOOT_START"},
-	{"name":"boot_end","value":"$BOOT_END"},
-	{"name":"volumio_end","value":"$IMAGE_END"},
-	{"name":"boot_type","value":"$BOOT_TYPE"}
-	]
-}
-	EOF
+	:
 }
 
 write_device_bootloader() {
@@ -393,9 +365,6 @@ device_chroot_tweaks_pre() {
 		dtoverlay=dwc2,dr_mode=host
 		[pi5]
 		dtoverlay=vc4-kms-v3d-pi5
-		# dtparam=uart0_console # Disabled by default
-		dtparam=nvme
-		dtparam=pciex1_gen=2
 		[all]
 		arm_64bit=0
 		dtparam=audio=on
@@ -420,11 +389,11 @@ device_chroot_tweaks_pre() {
 		# Output console device and options.
 		"quiet" "console=serial0,115200" "console=tty1"
 		# Image params
-		"imgpart=UUID=${UUID_IMG} imgfile=/volumio_current.sqsh bootpart=UUID=${UUID_BOOT} datapart=UUID=${UUID_DATA} bootconfig=cmdline.txt"
-		# A quirk of Linux on ARM that may result in suboptimal performance
-		"pcie_aspm=off" "pci=pcie_bus_safe"
+		"imgpart=/dev/mmcblk0p2" "imgfile=/volumio_current.sqsh"
 		# Wait for root device
-		"bootdelay=5"
+		"rootwait" "bootdelay=5"
+		# I/O scheduler
+		"elevator=noop"
 		# Disable linux logo during boot
 		"logo.nologo"
 		# Disable cursor
