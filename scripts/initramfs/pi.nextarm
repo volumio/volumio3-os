@@ -577,7 +577,7 @@ if [ ! -z "${BLK_IMGPART}" ]; then
   cp $BOOTCMDLINE $BOOTCMDLINE.orig
   print_msg "image prtition uses block device in cmdline.txt"
   sed -i "s/imgpart=\/dev\/[a-z]\{3,6\}[0-9]\{1,2\}[a-z]\{0,1\}[0-9]\{0,2\}/imgpart=UUID=${UUID_IMG} datapart=UUID=${UUID_DATA} bootpart=UUID=${UUID_BOOT} bootconfig=cmdline.txt/g" ${BOOTCMDLINE}
-  echo "[init] cmdlinux updated updated"
+  echo "[init] cmdlinux updated"
   sync
 fi
 # clear the mountpoint
