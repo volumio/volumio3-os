@@ -29,7 +29,7 @@ VOLINITUPDATER=yes
 BOOT_START=0
 BOOT_END=96
 BOOT_TYPE=msdos  # msdos or gpt
-INIT_TYPE="init" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="pi.nextarm" # init.{x86/nextarm/nextarm_tvbox}
 
 # Modules that will be added to intramfs
 MODULES=("overlay" "squashfs")
