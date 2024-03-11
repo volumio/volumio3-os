@@ -405,8 +405,6 @@ device_chroot_tweaks_pre() {
 		disable_splash=1
 		hdmi_force_hotplug=1
 		force_eeprom_read=0
-
-		include userconfig.txt
 	EOF
 
 	log "Writing cmdline.txt file"
