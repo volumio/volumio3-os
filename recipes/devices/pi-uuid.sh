@@ -399,8 +399,6 @@ device_chroot_tweaks_pre() {
 		dtparam=pciex1_gen=2
 		[all]
 		arm_64bit=0
-		gpu_mem=32
-		max_usb_current=1
 		dtparam=audio=on
 		audio_pwm_mode=2
 		dtparam=i2c_arm=on
