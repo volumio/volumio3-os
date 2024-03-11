@@ -4,6 +4,7 @@
 ## Setup for Raspberry Pi
 DEVICE_SUPPORT_TYPE="S" # First letter (Community Porting|Supported Officially|OEM)
 DEVICE_STATUS="T"       # First letter (Planned|Test|Maintenance)
+DEBUG_IMAGE="no"
 
 # Base system
 BASE="Raspbian"
@@ -424,7 +425,7 @@ device_chroot_tweaks_pre() {
 		# A quirk of Linux on ARM that may result in suboptimal performance
 		"pcie_aspm=off" "pci=pcie_bus_safe"
 		# Wait for root device
-		"bootdelay=5"
+		"rootwait" "bootdelay=5"
 		# Disable linux logo during boot
 		"logo.nologo"
 		# Disable cursor
@@ -459,7 +460,13 @@ device_chroot_tweaks_pre() {
 	cat <<-EOF >/boot/cmdline.txt
 		${kernel_params[@]}
 	EOF
-
+	# In init, "quiet" had no influence (unused), but in initv2 it will prevent initrd console output
+	# So, when debugging, remove it
+	if [[ $DEBUG_IMAGE == yes ]]; then
+		log "Bebug image: remove quiet from cmdline.txt"
+	    sed -i "s/quiet//" /boot/cmdline.txt
+		cat /boot/cmdline.txt
+	fi
 	# Rerun depmod for new drivers
 	log "Finalising drivers installation with depmod on ${KERNEL_VERSION}+,-v7+ and -v7l+"
 	depmod "${KERNEL_VERSION}+"     # Pi 1, Zero, Compute Module
