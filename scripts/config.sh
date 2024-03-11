@@ -35,7 +35,7 @@ declare -A CUSTOM_PKGS=(
   [libupnpp6]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/upmpdcli/libupnpp6_0.20.2-1"
   [upmpdcli]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/upmpdcli/upmpdcli_1.5.8-1"
   [shairport-sync]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/shairport-sync/shairport-sync_3.2.2-1"
-  [mpd]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/mpd/mpd_0.23.15-2"
+  [mpd]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/mpd/mpd_0.23.15-3"
   [mpc]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/mpc/mpc_0.34-2"
   [alsacap]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/alsacap/alsacap_1.0-1"
   [libcurl]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/curl/00libcurl4_7.74.0-1.2~bpo10%2B1"
@@ -44,7 +44,7 @@ declare -A CUSTOM_PKGS=(
 
 ## Backend and Frontend Repository details
 VOL_BE_REPO="https://github.com/volumio/volumio3-backend.git"
-VOL_BE_REPO_BRANCH="master"
+VOL_BE_REPO_BRANCH="pi-uuid"
 # VOL_BE_REPO_SHA="d7a5678" # Workaround for BE repo having incompatible package.json for Node v8
 
 ## NodeJS Controls
