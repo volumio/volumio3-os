@@ -33,9 +33,9 @@ cp "${SRC}/volumio/etc/samba/smb.conf" "${ROOTFS}/etc/samba/smb.conf"
 #Udev confs file (NET)
 cp -r "${SRC}/volumio/etc/udev" "${ROOTFS}/etc/"
 
-#Polkit for USB mounts
-cp -r "${SRC}/volumio/etc/polkit-1/localauthority/50-local.d/50-mount-as-pi.pkla" \
-  "${ROOTFS}/etc/polkit-1/localauthority/50-local.d/50-mount-as-pi.pkla"
+# errors cp: cannot create regular file './build/bookworm/armv8/root/etc/polkit-1/localauthority/50-local.d/50-mount-as-pi.pkla': No such file or directory
+# cp -r "${SRC}/volumio/etc/polkit-1/localauthority/50-local.d/50-mount-as-pi.pkla" \
+#   "${ROOTFS}/etc/polkit-1/localauthority/50-local.d/50-mount-as-pi.pkla"
 
 #Inittab file
 cp "${SRC}/volumio/etc/inittab" "${ROOTFS}/etc/inittab"
@@ -56,7 +56,12 @@ chmod 777 "${ROOTFS}/etc/mpd.conf"
 cp "${SRC}/volumio/etc/systemd/journald.conf" "${ROOTFS}/etc/systemd/journald.conf"
 
 #Volumio SystemD Services
-cp -r "${SRC}"/volumio/lib "${ROOTFS}"/
+# The amount of time I've spend debugging strange things only to realise we overwrite everything with these files.
+# cp -r "${SRC}"/volumio/lib "${ROOTFS}"/
+for service in "${SRC}"/volumio/lib/systemd/system/*.service; do
+  log "Copying ${service}" 
+  cp  "${service}" "${ROOTFS}"/lib/systemd/system/
+done
 
 # Network
 cp -r "${SRC}"/volumio/etc/network/* "${ROOTFS}"/etc/network

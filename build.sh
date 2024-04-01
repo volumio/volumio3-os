@@ -186,8 +186,8 @@ function setup_multistrap() {
 
   log "Adding SecureApt keys to rootfs"
   for key in "${!SecureApt[@]}"; do
-    apt-key --keyring "${DirEtctrustedparts}/${key}" \
-      adv --fetch-keys "${SecureApt[$key]}"
+    curl -sS "${SecureApt[$key]}" | gpg --dearmor > "${DirEtctrustedparts}/${key}"
+    log "Added: ${key}"
   done
   if [[ ${ARCH} == $(dpkg --print-architecture) ]]; then
     # Some packages need more help, give it to them
@@ -296,7 +296,7 @@ start=$(date +%s)
 LOG_DIR="${OUTPUT_DIR}/debug_$(date +%Y-%m-%d_%H-%M-%S)"
 
 if [[ -z "${SUITE}" ]]; then
-  SUITE="bullseye"
+  SUITE="bookworm"
   log "Defaulting to release" "" "${SUITE^}"
 fi
 
@@ -318,9 +318,9 @@ if [[ -n "${BUILD}" ]]; then
   BASECONF=recipes/base/VolumioBase.conf
 
   # Check if we need to update our Multistrap config
-  if ! grep -q ${SUITE} "${BASECONF}"; then
+  if ! grep -q "${SUITE}" "${BASECONF}"; then
     log "Updating Multistrap config suite" "wrn" "${SUITE}"
-    log "Please check in new config post testing" "wrn" ""${BASECONF%%.*}_${SUITE}.conf""
+    log "Please check in new config post testing" "wrn" "${BASECONF%%.*}_${SUITE}.conf"
     sed "s|\(^suite=\).*$|\1${SUITE}|g" "${BASECONF}" >>"${BASECONF%%.*}_${SUITE}.conf"
   fi
 
@@ -474,10 +474,19 @@ if [[ -n "${DEVICE}" ]]; then
   fi
   ROOTFS="${BUILD_DIR}/root"
 
+  ## Check suite, and update if required
+  if [[ -z "$SUITE" ]]; then
+    SUITE=$(grep -oP 'VERSION_CODENAME=\K\w+' "${ROOTFS}/etc/os-release")
+  elif ! grep -q "${SUITE}" "${ROOTFS}/etc/os-release"; then
+    log "rootfs suite:$(grep VERSION_CODENAME "${ROOTFS}/etc/os-release") doesn't match desired suite: ${SUITE}" "err"
+    exit 1
+  fi
+  log "Building image with Debian" "info" "${SUITE}"
+
   ## Add in our version details
   check_os_release
 
-  # Patching for advanved Volumio builds
+  # Patching for advanced Volumio builds
   if [[ -n "${PATCH}" ]]; then
     log "Copying Patch ${SDK_PATH-.}/${PATCH} to Rootfs"
     cp -rp "${SDK_PATH-.}/${PATCH}" "${ROOTFS}/"
@@ -528,7 +537,7 @@ if [[ -n "${DEVICE}" ]]; then
   if [[ ${USE_LOCAL_NODE_MODULES} == yes ]]; then
     log "Extracting node_modules for Node v${NODE_VERSION}"
     tar xf "${LOCAL_MODULES_DIR}/node_modules_${BUILD}"_v${NODE_VERSION%%.*}.*.tar.xz -C "${ROOTFS}/volumio"
-    ls "${ROOTFS}/volumio/node_modules"
+    # ls "${ROOTFS}/volumio/node_modules"
   else
     # Current Volumio repo knows only {arm|x86} which is conveniently the same length
     # TODO: Consolidate the naming scheme for node modules - %{BUILD}-v${NODE_VERSION}.tar.xz

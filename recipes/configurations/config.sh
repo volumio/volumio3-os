@@ -2,7 +2,7 @@
 # Location for configuration(s) for rootfs and image creation
 
 declare -A SecureApt=(
-  [debian_10.gpg]="https://repo.volumio.org/Volumio2/archive-key-10.asc"
+  [debian_12.gpg]="https://ftp-master.debian.org/keys/archive-key-12.asc"
   [nodesource.gpg]="https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
   [lesbonscomptes.gpg]="https://www.lesbonscomptes.com/pages/lesbonscomptes.gpg"
   #TODO Not needed for arm64 and x86

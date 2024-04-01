@@ -97,6 +97,12 @@ check_size() {
 	fi
 }
 
+pause() {
+	local timeout=${1:=30}	
+	read -rp "Waiting ${timeout} secs or press any key to continue..."; echo
+	log "Continuing.."
+}
+
 DISTRO_VER="$(lsb_release -s -r)"
 DISTRO_NAME="$(lsb_release -s -c)"
 
