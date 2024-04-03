@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Volumio3
+Description=This is a plymouth theme which simply displays aa sequence of images
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/volumio-player/sequence
+ScriptFile=/usr/share/plymouth/themes/volumio-player/volumio-player.script

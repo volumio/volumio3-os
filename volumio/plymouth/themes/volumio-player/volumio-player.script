@@ -1,0 +1,130 @@
+#  volumio.script - boot splash plugin
+#
+#  Copyright (C) 2024 Volumio Srl
+#  
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2, or (at your option)
+#  any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+#  02111-1307, USA.
+#
+#  Written by: Andrew Seredyn
+#
+#  References:
+#    Freedesktop.org:
+#      https://www.freedesktop.org/wiki/Software/Plymouth/Scripts/
+#
+#
+#    Splash screen from video frames:
+#     https://github.com/ToddServo/Plymouth-Animated-Boot-Screen-Creator
+#
+
+#------------------------------------------------ SEQUENCE ------------------------------------------------#
+
+#  Nice colour on top of the screen fading to
+Window.SetBackgroundTopColor (0.0, 0.00, 0.0);
+
+# an equally nice colour on the bottom
+Window.SetBackgroundBottomColor (0.0, 0.00, 0.0);
+
+# Image animation loop
+for (i = 1; i < 90; i++)
+flyingman_image[i] = Image("progress-" + i + ".png");
+flyingman_sprite = Sprite();
+
+
+flyingman_sprite.SetX(Window.GetWidth() / 2 - flyingman_image[1].GetWidth() / 2); # Place horizontally in the screen centre
+flyingman_sprite.SetY(Window.GetHeight() / 2 - flyingman_image[1].GetHeight() / 2); # Place vertically in the screen centre
+
+progress = 1;
+
+#------------------------------------------------ MESSAGES ------------------------------------------------#
+
+# Restrict text scroll space
+
+num_scroll_lines=5;
+line_width=80;
+
+message.x = (Window.GetWidth() / 2 - flyingman_image[1].GetWidth() / 2); # Align with the image horizontal centre
+message.y = (Window.GetHeight() / 2 - flyingman_image[1].GetHeight() / 2); # Align with the image vertical centre
+message.z = 1000;
+
+message.sprite.SetX (message.x);
+message.sprite.SetY (message.y);
+message.sprite.SetZ (message.z);
+message.sprite.SetOpacity (1);
+
+# Initialising text images and their positions
+# 20 is the height (including line spacing) of each line
+
+for (index = 0; index < num_scroll_lines; index++) {
+  lines[index] = Image.Text ("", 1, 1, 1, 1, "Sans 8");
+  message[index] = Sprite ();
+  message[index].SetX (message.x);
+  message[index].SetY (message.y + (Window.GetHeight() / 3) + (index * 20));
+  message[index].SetZ (10000); 
+  message[index].SetImage (lines[index]);
+}
+
+fun StringLength(string) {
+  pos = 0;
+  str = String (string);
+  while(str.CharAt(pos)) pos++;
+  return pos;
+}
+
+# Scroll message function
+
+fun scroll_message_callback(text) {
+
+# Truncate the message if too long
+  if (StringLength(text) > line_width) {
+    text = text.SubString(0, line_width - 3);
+    text += "...";
+  }
+
+# Shift message one up
+  for (index = 0; index < num_scroll_lines - 1; index++) {
+    lines[index] = lines[index + 1];
+  }
+
+# Create the image for the latest message
+  lines[index] = Image.Text (text, 1, 1, 1, 1, "Sans 8");
+
+# Re-positioning the text images
+  for (index = 0; index < num_scroll_lines; index++) {
+    message[index].SetImage (lines[index]);
+    # Re-position image
+    index_pos_x = Window.GetWidth()/2 - lines[index].GetWidth()/2;
+    message[index].SetX (index_pos_x);
+    message[index].SetY (message.y + (Window.GetHeight() / 3) + (index * 20));
+    message[index].SetZ (10000);
+  }
+}
+
+#------------------------------------------------- STATUS -------------------------------------------------#
+
+# Enable to display service start messages
+
+# Plymouth.SetUpdateStatusFunction(scroll_message_callback);
+
+#------------------------------------------------- RENDER -------------------------------------------------#
+
+Plymouth.SetMessageFunction (scroll_message_callback);
+
+fun refresh_callback ()
+  {
+    flyingman_sprite.SetImage(flyingman_image[Math.Int(progress / 3) % 90]);
+    progress++;
+  }
+  
+Plymouth.SetRefreshFunction (refresh_callback);

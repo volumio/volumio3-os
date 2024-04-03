@@ -48,9 +48,6 @@ write_device_files() {
   cp -dR "${PLTDIR}/${DEVICE}/boot" "${ROOTFSMNT}"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
-
-	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
-	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
 }
 
 write_device_bootloader() {
@@ -134,9 +131,6 @@ device_chroot_tweaks_pre() {
   wget https://github.com/volumio/volumio3-os-static-assets/raw/master/firmwares/firmware-realtek_20210818-1_all.deb
   dpkg -i firmware-realtek_20210818-1_all.deb
   rm firmware-realtek_20210818-1_all.deb
-
-  log "Setting plymouth theme to ${PLYMOUTH_THEME}" "info"
-  plymouth-set-default-theme -R ${PLYMOUTH_THEME}
 
   # echo "Installing Kiosk"
   # sh /install-kiosk.sh

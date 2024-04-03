@@ -85,8 +85,6 @@ write_device_files() {
 }
 	EOF
 
-	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
-	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
 }
 
 write_device_bootloader() {
@@ -257,8 +255,9 @@ device_chroot_tweaks_pre() {
 			rm "$key.tar.gz"
 			continue
 		}
-		tar --strip-components 1 --exclude "*.hash" --exclude "*.md" -xf "$key.tar.gz"
-		rm "$key.tar.gz"
+		log "Skipping extraction that causes ld-linux-armhf.so.3 issues" "wrn"
+		# tar --strip-components 1 --exclude "*.hash" --exclude "*.md" -xf "$key.tar.gz"
+		# rm "$key.tar.gz"
 	done
 
 	## Comment to keep RPi4/RPi5 64bit kernel
@@ -321,9 +320,6 @@ device_chroot_tweaks_pre() {
 			Pin-Priority: -1
 		EOF
 	fi
-
-    log "Setting plymouth theme to ${PLYMOUTH_THEME}" "info"
-    plymouth-set-default-theme -R ${PLYMOUTH_THEME}
 
 	log "Adding gpio & spi group and permissions" "info"
 	groupadd -f --system gpio
