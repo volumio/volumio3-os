@@ -16,8 +16,6 @@ if [[ ${BUILD:0:3} == arm ]]; then
   date -u '+%Y-%m-%d %H:%M:%S' >"${ROOTFS}/etc/fake-hwclock.data"
 fi
 
-# Copy splash, that is utilised for devices with a screen
-cp "${SRC}/volumio/splash/volumio.png" "${ROOTFS}/boot"
 
 log "Copying misc config/tweaks to rootfs" "info"
 # TODO: Streamline this!!
