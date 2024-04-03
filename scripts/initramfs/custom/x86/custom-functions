@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+
+validate_imgfile_imgpart() {
+
+  BOOT_DEVICE=/dev/$(lsblk -no PKNAME "${BOOT_PARTITION}")
+  BOOT_CONFIG="syslinux.cfg efi/BOOT/grub.cfg"
+  
+  log_begin_msg "Current squash image " $SQUASH_FILE && log_end_msg
+  log_begin_msg "Current boot partition " $BOOT_PARTITION && log_end_msg
+  log_begin_msg "Current image partition " $IMAGE_PARTITION && log_end_msg
+  log_begin_msg "Current data partition " $DATA_PARTITION && log_end_msg
+  log_begin_msg "Current boot device" $BOOT_DEVICE && log_end_msg
+  log_begin_msg "Current boot config file(s) " $BOOT_CONFIG && log_end_msg
+
+   maybe_break t1 ${LINENO} ########################################
+}
+
+

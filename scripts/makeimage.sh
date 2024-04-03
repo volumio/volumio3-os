@@ -177,17 +177,25 @@ sync
 #### Build stage 2 - Device specific chroot config
 log "Preparing to run chroot for more ${DEVICE} configuration" "info"
 start_chroot_final=$(date +%s)
+
+log "Copying files for init:" "${INIT_TYPE}"
 cp "${SRC}/scripts/initramfs/${INIT_TYPE}" "${ROOTFSMNT}"/root/init
+if [[ -d "${SRC}/scripts/initramfs/scripts" ]] && [[ "${INIT_TYPE}" == "initv3" ]]; then
+  log "Adding initramfs scripts"
+  [[ -d "${ROOTFSMNT}/root/scripts" ]] || mkdir "${ROOTFSMNT}/root/scripts"
+  cp -pdR "${SRC}"/scripts/initramfs/scripts/* "${ROOTFSMNT}/root/scripts"
+fi
+
 cp "${SRC}"/scripts/initramfs/mkinitramfs-custom.sh "${ROOTFSMNT}"/usr/local/sbin
 cp "${SRC}"/scripts/image/chrootconfig.sh "${ROOTFSMNT}"
 
 if [[ "${KIOSKMODE}" == yes ]]; then
   if [[ "${KIOSKBROWSER}" == vivaldi ]]; then
     log "Copying Vivaldi kiosk scripts to rootfs"
-    cp "${SRC}/scripts/volumio/install-kiosk-vivaldi.sh" ${ROOTFSMNT}/install-kiosk.sh
+    cp "${SRC}/scripts/volumio/install-kiosk-vivaldi.sh" "${ROOTFSMNT}"/install-kiosk.sh
   else
     log "Copying Chromium kiosk scripts to rootfs"
-    cp "${SRC}/scripts/volumio/install-kiosk.sh" ${ROOTFSMNT}/install-kiosk.sh
+    cp "${SRC}/scripts/volumio/install-kiosk.sh" "${ROOTFSMNT}"/install-kiosk.sh
   fi
 fi
 
