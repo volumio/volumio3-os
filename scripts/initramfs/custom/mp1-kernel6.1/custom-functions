@@ -1,0 +1,35 @@
+#!/bin/sh
+
+pre_kernel_update() {
+    echo "[VIM3L] Kernel update requested, overwriting old logfile" > ${BOOTMNT}/kernelupdate.log
+    OLDKERNEL=$(ls /boot | grep "^config-" | cut -c1-8)
+    echo "[VIM3L] Existing kernel: ${OLDKERNEL}" >> ${BOOTMNT}/kernelupdate.log
+}
+
+post_kernel_update() {
+    log_begin_msg "Entering post_kernel_update()"
+    echo "[VIM3L] Checking OTA kernel version" >> ${BOOTMNT}/kernelupdate.log
+    NEWKERNEL=$(ls /boot | grep "^config-" | cut -c1-8)
+
+    echo "[VIM3L] OTA kernel: ${NEWKERNEL}" >> ${BOOTMNT}/kernelupdate.log
+    BOOTDEV=$(lsblk -ndo pkname ${BOOTPART})
+    if [ "${OLDKERNEL}" != "${NEWKERNEL}" ]; then
+      log_end_msg
+      log_begin_msg "Major kernel change V4 -> V6, replacing u-boot""
+      echo "[VIM3L] Kernel change, replacing u-boot" >> ${BOOTMNT}/kernelupdate.log
+
+      echo "[VIM3L] Write u-boot to ${BOOTDEV}" >> ${BOOTMNT}/kernelupdate.log
+      dd if=/boot/uboot/u-boot.bin.sd.bin of=/dev/${BOOTDEV} bs=444 count=1 conv=fsync,notrunc 2>> ${BOOTMNT}/kernelupdate.log
+      dd if=/boot/uboot/u-boot.bin.sd.bin of=/dev/${BOOTDEV} bs=512 skip=1 seek=1 conv=fsync,notrunc 2>> ${BOOTMNT}/kernelupdate.log	
+      echo "[VIM3L] Kernel change, cleaning up" >> ${BOOTMNT}/kernelupdate.log
+      rm -r ${BOOTMNT}/uboot
+      rm -r ${BOOTMNT}/uboot-mainline
+      rm ${BOOTMNT}/boot.ini
+      rm ${BOOTMNT}/dtb/*.dtb
+    else
+      echo "[VIM3L] Minor kernel update, no additional action needed" >> ${BOOTMNT}/kernelupdate.log
+    fi
+    log_end_msg
+}
+
+

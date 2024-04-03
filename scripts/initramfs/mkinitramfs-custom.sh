@@ -318,7 +318,7 @@ build_initramfs() {
   # First file executed by linux
   cp -p /usr/share/initramfs-tools/init "${DESTDIR}/init"
 
-  # add existent boot scripts
+  # add existing boot scripts
   for b in $(cd /usr/share/initramfs-tools/scripts/ && find . \
     -regextype posix-extended -regex '.*/[[:alnum:]\._-]+$' -type f); do
     [ -d "${DESTDIR}/scripts/$(dirname "${b}")" ] ||
@@ -517,7 +517,7 @@ build_volumio_initramfs() {
   DESTDIR=${DESTDIR_VOL}
 
   # Add in VolumioOS customisation
-  log "Addig Volumio specific binaries" "info"
+  log "Adding Volumio specific binaries" "info"
   # Add VolumioOS binaries
   volbins=('/sbin/parted' '/sbin/findfs' '/bin/lsblk' '/sbin/mke2fs'
     '/sbin/e2fsck' '/sbin/resize2fs' '/sbin/mke2fsfull' '/sbin/mkfs.vfat')
@@ -548,7 +548,7 @@ build_initrd() {
   # Add additional init scripts (in case there are any)
   if [ -d /root/scripts ]; then
     mkdir "${DESTDIR}/scripts"
-    cp /root/scripts/* "${DESTDIR}/scripts/"
+    cp -pdR /root/scripts/* "${DESTDIR}/scripts/"
   fi
   cp /root/init "${DESTDIR}"
   cd "${DESTDIR}"

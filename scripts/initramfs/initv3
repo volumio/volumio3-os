@@ -1,0 +1,581 @@
+#!/bin/sh
+
+# Default PATH differs between shells, and is not automatically exported
+# by klibc dash.  Make it consistent.
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+[ -d /dev ] || mkdir -m 0755 /dev
+[ -d /root ] || mkdir -m 0700 /root
+[ -d /sys ] || mkdir /sys
+[ -d /proc ] || mkdir /proc
+[ -d /tmp ] || mkdir /tmp
+mkdir -p /var/lock
+mount -t sysfs -o nodev,noexec,nosuid sysfs /sys
+mount -t proc -o nodev,noexec,nosuid proc /proc
+
+# shellcheck disable=SC2013
+for x in $(cat /proc/cmdline); do
+	case $x in
+	initramfs.clear)
+		clear
+		;;
+	quiet)
+		quiet=y
+		;;
+	esac
+done
+
+if [ "$quiet" != "y" ]; then
+	quiet=n
+	echo "Loading, please wait..."
+fi
+export quiet
+
+# Note that this only becomes /dev on the real filesystem if udev's scripts
+# are used; which they will be, but it's worth pointing out
+mount -t devtmpfs -o nosuid,mode=0755 udev /dev
+
+# Prepare the /dev directory
+[ ! -h /dev/fd ] && ln -s /proc/self/fd /dev/fd
+[ ! -h /dev/stdin ] && ln -s /proc/self/fd/0 /dev/stdin
+[ ! -h /dev/stdout ] && ln -s /proc/self/fd/1 /dev/stdout
+[ ! -h /dev/stderr ] && ln -s /proc/self/fd/2 /dev/stderr
+
+mkdir /dev/pts
+mount -t devpts -o noexec,nosuid,gid=5,mode=0620 devpts /dev/pts || true
+
+# Export the dpkg architecture
+export DPKG_ARCH=
+. /conf/arch.conf
+
+# Set modprobe env
+export MODPROBE_OPTIONS="-qb"
+
+################################## Volumio specific ##################################
+# Export Volumio relevant variables
+
+export BOOT_DELAY=
+export BOOT_PARTITION=
+export DATA_PARTITION=
+export IMAGE_PARTITION=
+export IMAGEMNT="/mnt/imgpart"
+export BOOTMNT="/mnt/boot"
+export USBMNT="/mnt/usb"
+export BOOT_DEVICE="mmcblk0"
+# Device/Partition separator, character between parentdev and partition index
+# required by non-uuid aware devices, used to pi custom-functions
+export DPS="p"
+export BOOT_CONFIG="empty"
+export HW_DEVICE="undefined"
+export SQUASH_FILE="/volumio_current.sqsh"
+# export DO_GEN="yes"
+export IMAGE_PARTITION=
+export REBOOT_MODE="normal"
+export SPLASH=
+export USEKMSG=
+export DATADEV=
+export UUIDFMT=
+export debug=
+
+################################### Debian default ###################################
+
+# Export default relevant variables
+export ROOT=
+export ROOTDELAY=
+export ROOTFLAGS=
+export ROOTFSTYPE=
+export IP=
+export DEVICE=
+export BOOT=
+export BOOTIF=
+export UBIMTD=
+export break=
+export init=/sbin/init
+export readonly=y
+export rootmnt=
+export panic=
+export blacklist=
+export resume=
+export resume_offset=
+export noresume=
+export drop_caps=
+export fastboot=n
+export forcefsck=n
+export fsckfix=
+
+
+# Bring in the main config
+. /conf/initramfs.conf
+for conf in conf/conf.d/*; do
+	[ -f "${conf}" ] && . "${conf}"
+done
+. /scripts/functions
+. /scripts/volumio-functions
+[ -f scripts/custom-functions ] && source scripts/custom-functions
+
+# Parse command line options
+# shellcheck disable=SC2013
+for x in $(cat /proc/cmdline); do
+	case $x in
+################################## Volumio specific ##################################
+	imgpart=*)
+		IMAGE_PARTITION=${x#imgpart=}
+		;;
+	bootpart=*)
+		BOOT_PARTITION=${x#bootpart=}
+		;;
+	datapart=*)
+		DATA_PARTITION=${x#datapart=}
+		;;
+	imgfile=*)
+		SQUASH_FILE=${x#imgfile=}
+		;;
+	dps=*)
+		DPS=${x#dps=}
+		;;
+	genpnames)
+		DO_GEN=yes
+		;;
+	bootdelay=*)
+		BOOT_DELAY=${x#bootdelay=}
+		;;
+	bootdev=*)
+		BOOT_DEVICE=${x#bootdev=}
+		;;
+	uuidconfig=*)
+		BOOT_CONFIG=${x#uuidconfig=}
+		;;
+	hwdevice=*)
+		HW_DEVICE=${x#hwdevice=}
+		;;
+	use_kmsg=*)
+		USEKMSG=${x#use_kmsg=}
+		;;
+		reboot=*)
+	# normal|mcu
+		REBOOT_MODE=${x#reboot=}
+		;;	
+	debug)
+		debug=y
+		quiet=n
+		if [ ${USEKMSG} == yes ]; then
+			log_output=/dev/kmsg
+		else
+			log_output=/run/initramfs/initramfs.debug
+		fi
+		set -x
+		;;
+################################### Debian default ###################################
+	init=*)
+		init=${x#init=}
+		;;
+	root=*)
+		ROOT=${x#root=}
+		if [ -z "${BOOT}" ] && [ "$ROOT" = "/dev/nfs" ]; then
+			BOOT=nfs
+		fi
+		;;
+	rootflags=*)
+		ROOTFLAGS="-o ${x#rootflags=}"
+		;;
+	rootfstype=*)
+		ROOTFSTYPE="${x#rootfstype=}"
+		;;
+	rootdelay=*)
+		ROOTDELAY="${x#rootdelay=}"
+		case ${ROOTDELAY} in
+		*[![:digit:].]*)
+			ROOTDELAY=
+			;;
+		esac
+		;;
+	nfsroot=*)
+		# shellcheck disable=SC2034
+		NFSROOT="${x#nfsroot=}"
+		;;
+	initramfs.runsize=*)
+		RUNSIZE="${x#initramfs.runsize=}"
+		;;
+	ip=*)
+		IP="${x#ip=}"
+		;;
+	boot=*)
+		BOOT=${x#boot=}
+		;;
+	ubi.mtd=*)
+		UBIMTD=${x#ubi.mtd=}
+		;;
+	resume=*)
+		RESUME="${x#resume=}"
+		;;
+	resume_offset=*)
+		resume_offset="${x#resume_offset=}"
+		;;
+	noresume)
+		noresume=y
+		;;
+	drop_capabilities=*)
+		drop_caps="-d ${x#drop_capabilities=}"
+		;;
+	panic=*)
+		panic="${x#panic=}"
+		;;
+	ro)
+		readonly=y
+		;;
+	rw)
+		readonly=n
+		;;
+	debug=*)
+		debug=y
+		quiet=n
+		set -x
+		;;
+	break=*)
+		break=${x#break=}
+		;;
+	break)
+		break=premount
+		;;
+	blacklist=*)
+		blacklist=${x#blacklist=}
+		;;
+	netconsole=*)
+		netconsole=${x#netconsole=}
+		[ "$debug" = "y" ] && log_output=/dev/kmsg
+		;;
+	BOOTIF=*)
+		BOOTIF=${x#BOOTIF=}
+		;;
+	fastboot|fsck.mode=skip)
+		fastboot=y
+		;;
+	forcefsck|fsck.mode=force)
+		forcefsck=y
+		;;
+	fsckfix|fsck.repair=yes)
+		fsckfix=y
+		;;
+	fsck.repair=no)
+		fsckfix=n
+		;;
+	esac
+done
+
+################################### Debian default ###################################
+#
+# Default to BOOT=local if no boot script defined.
+if [ -z "${BOOT}" ]; then
+	BOOT=local
+fi
+
+if [ -n "${noresume}" ] || [ "$RESUME" = none ]; then
+	noresume=y
+else
+	resume=${RESUME:-}
+fi
+
+mount -t tmpfs -o "nodev,noexec,nosuid,size=${RUNSIZE:-10%},mode=0755" tmpfs /run
+mkdir -m 0700 /run/initramfs
+
+if [ -n "$log_output" ]; then
+	exec >$log_output 2>&1
+	unset log_output
+fi
+
+# Volumio required exception from Debian default
+# --- Exception BEGIN ---
+
+maybe_volumio_break top "init: $LINENO"
+
+# ---- Exception END ----
+
+# Don't do log messages here to avoid confusing graphical boots
+run_scripts /scripts/init-top
+
+maybe_volumio_break modules "init: $LINENO"
+[ "$quiet" != "y" ] && log_begin_msg "Loading essential drivers" && log_end_msg
+[ -n "${netconsole}" ] && /sbin/modprobe netconsole netconsole="${netconsole}" && log_end_msg
+
+load_modules
+
+starttime="$(_uptime)"
+starttime=$((starttime + 1)) # round up
+export starttime
+
+if [ "$ROOTDELAY" ]; then
+	sleep "$ROOTDELAY"
+fi
+
+# Volumio required exception from Debian default
+# --- Exception BEGIN ---
+
+maybe_volumio_break premount "init: $LINENO"
+
+# ---- Exception END ----
+
+[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-premount"
+run_scripts /scripts/init-premount
+[ "$quiet" != "y" ] && log_end_msg
+
+# Volumio required exception from Debian default
+# --- Exception BEGIN ---
+
+maybe_volumio_break mount "init: $LINENO"
+
+# ---- Exception END ----
+
+log_begin_msg "Mounting 'root' file system"
+# Always load local and nfs (since these might be needed for /etc or
+# /usr, irrespective of the boot script used to mount the rootfs).
+
+###################################### DISABLED ######################################
+# These functions are part of standard Debian init. Volumio relies on squashfs therefore
+# will not run in root, local nor nfs. Only mount_top is meeded by udev.
+# Enable if change is needed.
+# . /scripts/local
+#. /scripts/nfs
+#. /scripts/${BOOT}
+#parse_numeric "${ROOT}"
+#maybe_break mountroot 
+mount_top
+#mount_premount
+#mountroot
+log_end_msg
+
+################################## Volumio specific ##################################
+#
+# Initialise squashfile parameter and partition devices
+# - imgfile (squashfile) must always be supplied
+# - partition names can be generated with supplied bootdevice and separator (seldomly used)
+# - only imgpart may be supplied as /dev/mmcblk<n>p2 only (or nvme device partition equivalent)
+# - only imgpart may be supplied as /dev/sd<x>
+# in the above two cases, bootpart and datapart will be derived from imgpart's base device name
+#
+# - imgpart may be supplied as UUID= or LABEL=, in that case bootpart and datapart must also be supplied
+# - in case UUID= is used, bootconfig must also be supplied.
+#
+# As a result, bootdev ($BOOT_DEVICE), bootpart (BOOT_PARTITION, imgpart (IMAGE_PARTITION
+# and datapart ($DATA_PARTITION) will be parsed and validated.
+plymouth_msg "Player preparing startup"
+
+# Process UUID - is conversion from genpnames complete?
+#
+maybe_volumio_break cust-init-part "init: $LINENO"
+
+custom_init_partition_params
+
+maybe_volumio_break init-part-pars "init: $LINENO"
+
+init_partition_params
+
+# Wait until partition devices are ready
+# (Some devices can be slow, increase bootdelay when necessary)
+#
+wait_for_partitions_ready
+
+maybe_volumio_break progress "init: $LINENO"
+
+# initialisation finished
+
+# Permanently mount image and boot partition
+[ -d /mnt ] || mkdir /mnt
+[ -d "${IMAGEMNT}" ] || mkdir "${IMAGEMNT}"
+[ -d "${BOOTMNT}" ] || mkdir "${BOOTMNT}"
+
+# Mount partition with the squash file
+mount -t vfat "${BOOT_PARTITION}" "${BOOTMNT}"
+mount -t ext4 "${IMAGE_PARTITION}" "${IMAGEMNT}"
+
+# In case of a gpt boot partition: move the backup table when not done yet
+# This function is also safe for non-gpt boot partitions (it will not trigger a mismatch).
+#
+maybe_volumio_break backup_gpt "init: $LINENO"
+
+move_backup_gpt_table
+
+#
+#
+maybe_volumio_break krnl-archive "init: $LINENO"
+
+create_kernel_archive
+
+if [ ! -z "${BOOT_DELAY}" ]; then
+	log_begin_msg "Doing a ${BOOT_DELAY} second delay here to give kernel load a headstart"
+	sleep ${BOOT_DELAY}
+	log_end_msg
+fi
+
+# ROOTFS update on usb disk?
+#
+maybe_volumio_break search-for-firmw "init: $LINENO"
+
+search_for_firmware_update_rootfs
+
+# Factory reset file on usb or in boot partition?
+# ===============================================
+maybe_volumio_break search-fact-reset "init: $LINENO"
+
+search_for_factory_reset
+
+# Kernel update rollback ?
+# ========================
+maybe_volumio_break krnl-rollbck "init: $LINENO"
+
+search_for_kernel_rollback
+
+# Kernel update?
+#
+maybe_volumio_break krnl-upd "init: $LINENO"
+
+process_kernel_update
+
+# Resize data partition?
+#
+maybe_volumio_break resize-data "init: $LINENO"
+
+resize_datapartition
+
+maybe_volumio_break mnt-overlayfs "init: $LINENO"
+
+# Create writable overlay from squashfs and a data partition folder
+#
+mount_overlay_fs
+
+# Process UUID - is conversion to UUID complete?
+#
+maybe_volumio_break cust-upd-uuid "init: $LINENO"
+
+custom_update_UUID
+
+# Process fstab
+#
+maybe_volumio_break updfstab "init: $LINENO"
+
+update_fstab
+
+################################ Volumio specific END ################################
+################################### Debian default ###################################
+#
+# All done, switch to the permanent init process
+#
+###################################### DISABLED ######################################
+# These functions are part of standard Debian init. Volumio relies on squashfs therefore
+# will not try to read /usr from fstab file.
+# Enable if change is needed.
+#if read_fstab_entry /usr; then
+#	log_begin_msg "Mounting /usr file system"
+#	mountfs /usr
+#	log_end_msg
+#fi
+
+###################################### DISABLED ######################################
+# These functions are part of standard Debian init. Volumio relies on squashfs therefore
+# will not run in root, local nor nfs. Only mount_bottom is meeded by plymouth and udev.
+# Enable if change is needed.
+# Mount cleanup
+mount_bottom
+#nfs_bottom
+#local_bottom
+
+# Volumio required exception from Debian default
+# --- Exception BEGIN ---
+
+maybe_volumio_break bottom $LINENO
+
+# ---- Exception END ----
+
+[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/init-bottom"
+# We expect udev's init-bottom script to move /dev to ${rootmnt}/dev
+run_scripts /scripts/init-bottom
+[ "$quiet" != "y" ] && log_end_msg
+
+# Move /run to the root
+mount -n -o move /run ${rootmnt}/run
+
+validate_init() {
+	run-init -n "${rootmnt}" "${1}"
+}
+
+# Check init is really there
+if ! validate_init "$init"; then
+	echo "Target filesystem doesn't have requested ${init}."
+	init=
+	for inittest in /sbin/init /etc/init /bin/init /bin/sh; do
+		if validate_init "${inittest}"; then
+			init="$inittest"
+			break
+		fi
+	done
+fi
+
+# No init on rootmount
+if ! validate_init "${init}" ; then
+	panic "No init found. Try passing init= bootarg."
+fi
+
+# Volumio required exception from Debian default
+# --- Exception BEGIN ---
+
+maybe_volumio_break init "init: $LINENO"
+
+# ---- Exception END ----
+
+################################## Volumio specific ##################################
+# The /boot mount is held by init. Force /etc/fstab to take over with correct mount
+# permissions.
+# Umount boot partition
+plymouth_msg "Finishing storage preparations."
+
+umount ${BOOTMNT}
+rm -r ${BOOTMNT}
+
+# don't leak too much of env - some init(8) don't clear it
+# (keep init, rootmnt, drop_caps)
+#
+################################## Volumio specific ##################################
+unset BOOT_DELAY
+unset DO_GEN
+unset REBOOT_MODE
+unset SPLASH
+unset USEKMSG
+unset debug
+################################### Debian default ###################################
+unset MODPROBE_OPTIONS
+unset DPKG_ARCH
+unset ROOTFLAGS
+unset ROOTFSTYPE
+unset ROOTDELAY
+unset ROOT
+unset IP
+unset BOOT
+unset BOOTIF
+unset DEVICE
+unset UBIMTD
+unset blacklist
+unset break
+unset noresume
+unset panic
+unset quiet
+unset readonly
+unset resume
+unset resume_offset
+unset noresume
+unset fastboot
+unset forcefsck
+unset fsckfix
+unset starttime
+
+# Move virtual filesystems over to the real filesystem
+mount -n -o move /sys ${rootmnt}/sys
+mount -n -o move /proc ${rootmnt}/proc
+################################## Volumio specific ##################################
+
+plymouth_msg "Version $VOLUMIO_VERSION prepared, please wait for startup to finish"
+
+################################### Debian default ###################################
+# Chain to real filesystem
+# shellcheck disable=SC2086,SC2094
+exec run-init ${drop_caps} "${rootmnt}" "${init}" "$@" <"${rootmnt}/dev/console" >"${rootmnt}/dev/console" 2>&1
+echo "Something went badly wrong in the initramfs."
+panic "Please file a bug on Volumio forum."

@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+#
+custom_init_partition_params() { 
+# Non-uuid device falls back on genpnames:
+log_begin_msg "Device is booted from SD card" && log_end_msg
+  export BOOT_DEVICE="mmcblk0"
+  export DO_GEN="yes"
+  export DPS="p"
+}

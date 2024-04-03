@@ -279,7 +279,7 @@ else
 
 	log "[Stage 5] Copying 'raw' boot & image data" "info"
 	#cd /mnt/volumioimage/boot
-	tar cf $ROOTFSMNT/boot/data/image/kernel_current.tar --exclude='resize-volumio-datapart' -C /mnt/volumioimage/boot .
+	tar cf $ROOTFSMNT/boot/data/image/kernel_current.tar -C /mnt/volumioimage/boot .
 	cp /mnt/volumioimage/image/* /mnt/volumio/rootfs/boot/data/image
 fi
 
