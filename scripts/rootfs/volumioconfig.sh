@@ -368,10 +368,6 @@ ln -s /lib/systemd/system/welcome.service /etc/systemd/system/multi-user.target.
 log "Enable Volumio CPU Tweak Service"
 ln -s /lib/systemd/system/volumio_cpu_tweak.service /etc/systemd/system/multi-user.target.wants/volumio_cpu_tweak.service
 
-log "Enable Volumio Splash"
-mkdir -p /etc/systemd/system/basic.target.wants/
-ln -s /lib/systemd/system/volumiosplash.service /etc/systemd/system/basic.target.wants/volumiosplash.service
-
 log "Disable MPD autostart"
 systemctl disable mpd.service
 
