@@ -189,6 +189,11 @@ fi
 cp "${SRC}"/scripts/initramfs/mkinitramfs-custom.sh "${ROOTFSMNT}"/usr/local/sbin
 cp "${SRC}"/scripts/image/chrootconfig.sh "${ROOTFSMNT}"
 
+if [[ -n "${PLYMOUTH_THEME}" ]]; then
+  log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
+  cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" "${ROOTFSMNT}"/usr/share/plymouth/themes/"${PLYMOUTH_THEME}"
+fi
+
 if [[ "${KIOSKMODE}" == yes ]]; then
   if [[ "${KIOSKBROWSER}" == vivaldi ]]; then
     log "Copying Vivaldi kiosk scripts to rootfs"
@@ -201,11 +206,11 @@ fi
 
 echo "${PATCH}" >"${ROOTFSMNT}"/patch
 if [[ -f "${ROOTFSMNT}/${PATCH}/patch.sh" ]] && [[ -f "${SDK_PATH}"/config.js ]]; then
-  UIVARIANT=$(if [ -f "UIVARIANT" ]; then cat "UIVARIANT"; else echo "none";fi);
+  UIVARIANT=$(if [ -f "UIVARIANT" ]; then cat "UIVARIANT"; else echo "none"; fi)
   log "Starting ${SDK_PATH}/config.js" "ext" "${PATCH}"
   ROOTFSMNT="${ROOTFSMNT}" node "${SDK_PATH}"/config.js "${PATCH}" "${UIVARIANT}" || {
     status=$?
-    log "config.js failed: Err ${status}" "err" "${PATCH} | ${UIVARIANT}"  && exit 10
+    log "config.js failed: Err ${status}" "err" "${PATCH} | ${UIVARIANT}" && exit 10
   }
   log "Completed config.js" "ext" "${PATCH}"
 fi
@@ -234,6 +239,7 @@ UUID_IMG=${UUID_IMG}
 UUID_DATA=${UUID_DATA}
 BOOT_PART=${BOOT_PART}
 LOOP_DEV=${LOOP_DEV}
+PLYMOUTH_THEME=${PLYMOUTH_THEME}
 MODULES=($([[ -n ${MODULES} ]] && printf '\"%s\" ' "${MODULES[@]}"))
 PACKAGES=($([[ -n ${PACKAGES} ]] && printf '\"%s\" ' "${PACKAGES[@]}"))
 $(declare -f device_chroot_tweaks || true)      # Don't trigger our trap when function is empty
@@ -325,4 +331,4 @@ log "Populating image info file" "info"
 
 echo "extract_size=$(stat -c%s $IMG_FILE)
 extract_sha256=$(sha256sum $IMG_FILE | awk '{print $1}')
-release_date=$BUILDDATE" > "${OUTPUT_DIR}"/image_info
+release_date=$BUILDDATE" >"${OUTPUT_DIR}"/image_info

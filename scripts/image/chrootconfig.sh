@@ -37,12 +37,12 @@ tmpfs           /tmp                 tmpfs   defaults,noatime,mode=0755         
 tmpfs           /dev/shm             tmpfs   defaults,nosuid,noexec,nodev              0 0
 EOF
 
-if [ $BUILD == "armv8" ]; then
+if [ "${BUILD}" == "armv8" ]; then
   log "Adding multiarch support for armv8 to support armhf packages"
   dpkg --add-architecture armhf
 fi
 
-if [ $BUILD == "x64" ]; then
+if [ "${BUILD}" == "x64" ]; then
   log "Adding multiarch support for x64 to support i386  packages"
   dpkg --add-architecture i386
 fi
@@ -121,11 +121,10 @@ RestrictNamespaces=yes
 
 [Install]
 WantedBy=multi-user.target
-Also=mpd.socket" > /usr/lib/systemd/system/mpd.service
+Also=mpd.socket" >/usr/lib/systemd/system/mpd.service
 
 log "Disabling MPD Service"
 systemctl disable mpd.service
-
 
 log "Entering device_chroot_tweaks_pre" "cfg"
 device_chroot_tweaks_pre
@@ -136,6 +135,11 @@ apt-get clean
 # rm /usr/sbin/policy-rc.d
 [[ -d /volumio/customPkgs ]] && rm -r "/volumio/customPkgs"
 [[ -f /install-kiosk.sh ]] && rm "/install-kiosk.sh"
+
+if [[ -n "${PLYMOUTH_THEME}" ]]; then
+  log "Setting plymouth theme to ${PLYMOUTH_THEME}" "info"
+  plymouth-set-default-theme -R "${PLYMOUTH_THEME}"
+fi
 
 # Fix services for tmpfs logs
 log "Ensuring /var/log has right folders and permissions"
@@ -177,7 +181,7 @@ else
       bash "${script}" || {
         status=$?
         log "${script} failed: Err ${status}" "err" "${PATCH}" && exit 10
-        }
+      }
     done
     popd
   else

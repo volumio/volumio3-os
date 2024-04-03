@@ -89,9 +89,6 @@ write_device_files() {
   log "Copying triggerhappy configuration"
   cp -pR "${PLTDIR}/${DEVICEBASE}/etc/triggerhappy" "${ROOTFSMNT}/etc"
 
-	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
-	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
-
 }
 
 write_device_bootloader() {
@@ -129,9 +126,6 @@ EOF
 
   log "Adding default wifi"
   echo "dhd" >>"/etc/modules"
-
-  log "Setting plymouth theme to ${PLYMOUTH_THEME}"
-  #plymouth-set-default-theme -R ${PLYMOUTH_THEME}
 
   log "Disabling login prompt"
   systemctl disable getty@tty1.service
