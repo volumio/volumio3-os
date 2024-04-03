@@ -32,7 +32,8 @@ BOOT_START=1
 BOOT_END=64
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
-INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3" # init.{x86/nextarm/nextarm_tvbox}
+PLYMOUTH_THEME="volumio-logo"
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437")
@@ -48,6 +49,8 @@ write_device_files() {
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
 
+	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
+	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
 }
 
 write_device_bootloader() {
@@ -132,8 +135,8 @@ device_chroot_tweaks_pre() {
   dpkg -i firmware-realtek_20210818-1_all.deb
   rm firmware-realtek_20210818-1_all.deb
 
-  log "Configuring boot splash"
-  plymouth-set-default-theme volumio
+  log "Setting plymouth theme to ${PLYMOUTH_THEME}" "info"
+  plymouth-set-default-theme -R ${PLYMOUTH_THEME}
 
   # echo "Installing Kiosk"
   # sh /install-kiosk.sh

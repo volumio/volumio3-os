@@ -78,7 +78,9 @@ write_device_bootloader() {
 
 # Will be called by the image builder for any customisation
 device_image_tweaks() {
-  log "device_image_tweaks() not used"
+	log "Copying custom initramfs script functions" "cfg"
+	[ -d ${ROOTFSMNT}/root/scripts ] || mkdir ${ROOTFSMNT}/root/scripts
+	cp "${SRC}/scripts/initramfs/custom/non-uuid-devices/custom-functions" ${ROOTFSMNT}/root/scripts
 }
 
 # Will be run in chroot - Pre initramfs

@@ -31,7 +31,8 @@ BOOT_END=80
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
 IMAGE_END=3800
-INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3" # init.{x86/nextarm/nextarm_tvbox}
+PLYMOUTH_THEME="volumio-logo"
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "squashfs" "nls_cp437")
@@ -88,6 +89,9 @@ write_device_files() {
   log "Copying triggerhappy configuration"
   cp -pR "${PLTDIR}/${DEVICEBASE}/etc/triggerhappy" "${ROOTFSMNT}/etc"
 
+	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
+	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
+
 }
 
 write_device_bootloader() {
@@ -101,7 +105,9 @@ write_device_bootloader() {
 
 # Will be called by the image builder for any customisation
 device_image_tweaks() {
-  :
+	log "Copying custom initramfs script functions" "cfg"
+	[ -d ${ROOTFSMNT}/root/scripts ] || mkdir ${ROOTFSMNT}/root/scripts
+	cp "${SRC}/scripts/initramfs/custom/non-uuid-devices/custom-functions" ${ROOTFSMNT}/root/scripts
 }
 
 # Will be run in chroot - Pre initramfs
@@ -124,8 +130,8 @@ EOF
   log "Adding default wifi"
   echo "dhd" >>"/etc/modules"
 
-  log "Configuring boot splash"
-  #plymouth-set-default-theme volumio
+  log "Setting plymouth theme to ${PLYMOUTH_THEME}"
+  #plymouth-set-default-theme -R ${PLYMOUTH_THEME}
 
   log "Disabling login prompt"
   systemctl disable getty@tty1.service

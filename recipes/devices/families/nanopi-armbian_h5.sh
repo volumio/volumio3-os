@@ -28,7 +28,7 @@ VOLINITUPDATER=yes
 BOOT_START=1
 BOOT_END=64
 BOOT_TYPE=msdos          # msdos or gpt
-INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3" # init.{x86/nextarm/nextarm_tvbox}
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437" "nls_iso8859_1")
@@ -53,7 +53,9 @@ write_device_bootloader() {
 
 # Will be called by the image builder for any customisation
 device_image_tweaks() {
-  :
+	log "Copying custom initramfs script functions" "cfg"
+	[ -d ${ROOTFSMNT}/root/scripts ] || mkdir ${ROOTFSMNT}/root/scripts
+	cp "${SRC}/scripts/initramfs/custom/non-uuid-devices/custom-functions" ${ROOTFSMNT}/root/scripts
 }
 
 # Will be run in chroot - Pre initramfs

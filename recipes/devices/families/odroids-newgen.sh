@@ -26,7 +26,8 @@ BOOT_START=1
 BOOT_END=64
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
-INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv2" # init{.x86|.nextarm|v2}
+#INIT_TYPE="initv3"
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "squashfs" "nls_cp437")
@@ -44,6 +45,9 @@ write_device_files() {
   cp ${PLTDIR}/${DEVICEBASE}/boot/config-* "${ROOTFSMNT}/boot"
   cp -pdR "${PLTDIR}/${DEVICEBASE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICEBASE}/lib/firmware" "${ROOTFSMNT}/lib"
+
+  log "Add additional firmware (mainly wifi)"
+  cp -dR "${PLTDIR}/${DEVICEBASE}/firmware" "${ROOTFSMNT}/lib"
 
   echo "Copying rc.local for ${DEVICENAME} performance tweaks"
   cp "${PLTDIR}/${DEVICEBASE}/etc/rc.local" "${ROOTFSMNT}/etc"
