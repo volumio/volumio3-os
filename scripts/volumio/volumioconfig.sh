@@ -342,10 +342,6 @@ ln -s /lib/systemd/system/volumiologrotate.service /etc/systemd/system/multi-use
 log "Enable Volumio CPU Tweak Service"
 ln -s /lib/systemd/system/volumio_cpu_tweak.service /etc/systemd/system/multi-user.target.wants/volumio_cpu_tweak.service
 
-log "Enable Volumio Splash"
-mkdir -p /etc/systemd/system/basic.target.wants/
-ln -s /lib/systemd/system/volumiosplash.service /etc/systemd/system/basic.target.wants/volumiosplash.service
-
 log "Disable MPD autostart"
 systemctl disable mpd.service
 
@@ -494,10 +490,17 @@ sed -i 's/RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6/RestrictAd
 #####################
 
 # TODO: FIX the volumio theme. it makes mp1 build fail
-#log "Setting default Volumio Splash Theme"
-#cat <<-EOF >/etc/plymouth/plymouthd.conf
-#[Daemon]
-#Theme=volumio
-#EOF
+log "Setting default Volumio Splash Theme"
+cat <<-EOF >/etc/plymouth/plymouthd.conf
+[Daemon]
+Theme=volumio-player
+EOF
 
-
+cat <<-EOF >/usr/share/plymouth/plymouthd.defaults
+# Volumio distribution defaults. Changes to this file will be overwritten
+# during upgrades.
+[Daemon]
+Theme=volumio-player
+ShowDelay=0
+DeviceTimeout=5
+EOF

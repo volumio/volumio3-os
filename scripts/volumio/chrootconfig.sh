@@ -144,11 +144,9 @@ log "Applying buster specific {n,s}mpd.service PID tweaks"
 sed -i 's|^PIDFile=/var/run/samba/smbd.pid|PIDFile=/run/samba/smbd.pid|' /lib/systemd/system/smbd.service
 sed -i 's|^PIDFile=/var/run/samba/nmbd.pid|PIDFile=/run/samba/nmbd.pid|' /lib/systemd/system/nmbd.service
 
-#First Boot operations
-log "Signalling the init script to re-size the Volumio data partition"
-touch /boot/resize-volumio-datapart
+# First Boot operations
 
-#On The Fly Patch
+# On The Fly Patch
 #TODO Where should this be called?
 PATCH=$(cat /patch)
 if [ "$PATCH" = "volumio" ]; then

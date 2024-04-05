@@ -1,0 +1,37 @@
+#!/bin/sh
+
+PREREQ="udev"
+
+prereqs()
+{
+	echo "${PREREQ}"
+}
+
+case ${1} in
+	prereqs)
+		prereqs
+		exit 0
+		;;
+esac
+
+SPLASH="true"
+
+for ARGUMENT in $(cat /proc/cmdline)
+do
+	case "${ARGUMENT}" in
+		splash*)
+			SPLASH="true"
+			;;
+
+		nosplash*|plymouth.enable=0)
+			SPLASH="false"
+			;;
+	esac
+done
+
+if [ "${SPLASH}" = "true" ]
+then
+	mkdir -m 0755 /run/plymouth
+	/usr/sbin/plymouthd --mode=boot --attach-to-session --pid-file=/run/plymouth/pid
+	/usr/bin/plymouth --show-splash
+fi

@@ -11,6 +11,9 @@ ARCH="armhf"
 BUILD="armv7"
 UINITRD_ARCH="arm64"
 
+### Build image with initramfs debug info?
+DEBUG_IMAGE="no"       # yes/no or empty. Also changes SHOW_SPLASH in cmdline.txt
+
 ### Device information
 DEVICENAME="VMOD-A0"
 # This is useful for multiple devices sharing the same/similar kernel
@@ -30,7 +33,7 @@ BOOT_START=20
 BOOT_END=148
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
-INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3"   # init{v2,v3}
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437"  "fuse")
@@ -74,13 +77,13 @@ device_chroot_tweaks_pre() {
 abi.cp15_barrier=2
 EOF
 
-	log "Creating boot parameters from template"
+	log "Creating boot parameters from template" "cfg"
 	sed -i "s/rootdev=UUID=/rootdev=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
 	sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
 	sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
 	sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/armbianEnv.txt
 
-	log "Adding gpio group and udev rules"
+	log "Adding gpio group and udev rules" "info"
 	groupadd -f --system gpio
 	usermod -aG gpio volumio
 	# Works with newer kernels as well
@@ -104,7 +107,7 @@ device_image_tweaks_post() {
 		rm "${ROOTFSMNT}"/boot/volumio.initrd
 	fi
 	if [[ -f "${ROOTFSMNT}"/boot/boot.cmd ]]; then
-		log "Creating boot.scr"
+		log "Creating boot.scr" "cfg"
 		mkimage -A arm -T script -C none -d "${ROOTFSMNT}"/boot/boot.cmd "${ROOTFSMNT}"/boot/boot.scr
 	fi
 }

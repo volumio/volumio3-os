@@ -174,7 +174,12 @@ sync
 #### Build stage 2 - Device specific chroot config
 log "Preparing to run chroot for more ${DEVICE} configuration" "info"
 start_chroot_final=$(date +%s)
-cp "${SRC}/scripts/initramfs/${INIT_TYPE}" ${ROOTFSMNT}/root/init
+cp -pdR "${SRC}/scripts/initramfs/${INIT_TYPE}" ${ROOTFSMNT}/root/init
+if [ -d ${SRC}/scripts/initramfs/scripts ] && [ "${INIT_TYPE}" == "initv3" ]; then
+  [ -d ${ROOTFSMNT}/root/scripts ] || mkdir ${ROOTFSMNT}/root/scripts
+  cp -pdR "${SRC}"/scripts/initramfs/scripts/* ${ROOTFSMNT}/root/scripts
+fi	
+
 cp "${SRC}"/scripts/initramfs/mkinitramfs-custom.sh ${ROOTFSMNT}/usr/local/sbin
 cp "${SRC}"/scripts/volumio/chrootconfig.sh ${ROOTFSMNT}
 
@@ -223,6 +228,7 @@ UUID_IMG=${UUID_IMG}
 UUID_DATA=${UUID_DATA}
 BOOT_PART=${BOOT_PART}
 LOOP_DEV=${LOOP_DEV}
+PLYMOUTH_THEME=${PLYMOUTH_THEME}
 MODULES=($(printf '\"%s\" ' "${MODULES[@]}"))
 PACKAGES=($(printf '\"%s\" ' "${PACKAGES[@]}"))
 $(declare -f device_chroot_tweaks || true)      # Don't trigger our trap when function is empty
@@ -238,6 +244,9 @@ chroot "$ROOTFSMNT" /chrootconfig.sh
 log "Finished chroot config for ${DEVICE}" "okay"
 # Clean up chroot stuff
 rm ${ROOTFSMNT:?}/*.sh ${ROOTFSMNT}/root/init
+if [ -d ${ROOTFSMNT}/root/scripts ]; then
+  rm -r ${ROOTFSMNT}/root/scripts
+fi
 
 unmount_chroot ${ROOTFSMNT}
 end_chroot_final=$(date +%s)
@@ -278,7 +287,7 @@ log "Creating Kernel archive"
 # It is part of the x86 syslinux bootloader
 # Rewriting it would result in relocation and a broken x86 legacy boot
 
-tar cf "${VOLMNT}/kernel_current.tar" --exclude='resize-volumio-datapart' --exclude='ldlinux.sys' \
+tar cf "${VOLMNT}/kernel_current.tar" --exclude='ldlinux.sys' \
   -C $SQSHMNT/boot/ .
 
 [[ "${CLEAN_IMAGE_FILE:-yes}" != yes ]] && cp -rp "${VOLMNT}"/kernel_current.tar "${OUTPUT_DIR}"/kernel_current.tar

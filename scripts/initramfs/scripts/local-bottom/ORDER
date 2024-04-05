@@ -1,0 +1,4 @@
+/scripts/local-bottom/imager_fixup "$@"
+[ -e /conf/param.conf ] && . /conf/param.conf
+/scripts/local-bottom/ntfs_3g "$@"
+[ -e /conf/param.conf ] && . /conf/param.conf

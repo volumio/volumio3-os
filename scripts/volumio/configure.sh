@@ -29,9 +29,6 @@ if [[ ${BUILD:0:3} == arm ]]; then
   date -u '+%Y-%m-%d %H:%M:%S' >"${ROOTFS}/etc/fake-hwclock.data"
 fi
 
-# Copy splash, that is utilised for devices with a screen
-cp "${SRC}/volumio/splash/volumio.png" "${ROOTFS}/boot"
-
 log "Copying misc config/tweaks to rootfs" "info"
 # TODO: Streamline this!!
 # map files from ${SRC}/volumio => ${ROOTFS}?
@@ -91,7 +88,7 @@ cp "${SRC}/volumio/bin/dynswap.sh" "${ROOTFS}/bin/dynswap.sh"
 cp "${SRC}/volumio/bin/rename_netiface0.sh" "${ROOTFS}/bin/rename_netiface0.sh"
 chmod a+x "${ROOTFS}/bin/rename_netiface0.sh"
 
-#Plymouth & upmpdcli files
+#Libs & upmpdcli files
 cp -rp "${SRC}"/volumio/usr/* "${ROOTFS}/usr/"
 
 #CPU TWEAK

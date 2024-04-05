@@ -31,7 +31,8 @@ KIOSKBROWSER=vivaldi
 BOOT_START=0
 BOOT_END=96
 BOOT_TYPE=msdos  # msdos or gpt
-INIT_TYPE="init" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3" # init.{x86/nextarm/nextarm_tvbox}
+PLYMOUTH_THEME="volumio-player"
 
 # Modules that will be added to intramfs
 MODULES=("overlay" "squashfs")
@@ -53,7 +54,8 @@ PACKAGES=(
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
-	:
+	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
+	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
 }
 
 write_device_bootloader() {
@@ -269,8 +271,8 @@ device_chroot_tweaks_pre() {
 		EOF
 	fi
 
-	log "Starting Raspi platform tweaks" "info"
-	plymouth-set-default-theme volumio
+    log "Setting plymouth theme to ${PLYMOUTH_THEME}" "info"
+    plymouth-set-default-theme -R ${PLYMOUTH_THEME}
 
 	log "Adding gpio & spi group and permissions"
 	groupadd -f --system gpio

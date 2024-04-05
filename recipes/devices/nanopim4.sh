@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034
 
-## Setup for NanoPi Neo2 H5 based devices
+## Setup for NanoPi M4 based devices
 DEVICE_SUPPORT_TYPE="O" # First letter (Community Porting|Supported Officially|OEM)
 DEVICE_STATUS="P"       # First letter (Planned|Test|Maintenance)
 
@@ -11,8 +11,13 @@ ARCH="armhf"
 BUILD="armv7"
 UINITRD_ARCH="arm64"
 
+# Plymouth theme?
+PLYMOUTH_THEME="volumio-player"
+# Debug image?
+DEBUG_IMAGE=no
+
 ### Device information
-DEVICENAME="NanoPi M4"
+DEVICENAME="NanoPi M4B"
 # This is useful for multiple devices sharing the same/similar kernel
 DEVICEFAMILY="rk3399"
 # tarball from DEVICEFAMILY repo to use
@@ -30,7 +35,7 @@ BOOT_START=21
 BOOT_END=378
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
-INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3" 
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437" "fuse")
@@ -42,6 +47,13 @@ PACKAGES=("bluez-firmware" "bluetooth" "bluez" "bluez-tools")
 write_device_files() {
   log "Running write_device_files" "ext"
 
+  if [ ! -z ${PLYMOUTH_THEME} ]; then
+    log "Plymouth selected, adding plymouth-themes to list of packages to install" ""
+    PACKAGES+=("plymouth-themes")
+  	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "cfg"
+    cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
+  fi
+
   log "Copying the platform defaults"
   cp -dR "${PLTDIR}/${DEVICE}/boot" "${ROOTFSMNT}"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
@@ -50,7 +62,7 @@ write_device_files() {
   cp -pdR "${PLTDIR}/${DEVICE}/u-boot" "${ROOTFSMNT}"
 
   log "Mark the boot partition with nanopim4 '${VERSION}'"
-  echo "${VERSION}" > "${ROOTFSMNT}"/boot/nanopim4.version
+  log "${VERSION}" > "${ROOTFSMNT}"/boot/nanopim4.version
   
 }
 
@@ -70,16 +82,33 @@ device_image_tweaks() {
 
 # Will be run in chroot - Pre initramfs
 device_chroot_tweaks_pre() {
+
+
+  log "Creating boot parameters from template"
+  sed -i "s/bootconfig/uuidconfig/" /boot/armbianEnv.txt
+  sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
+  sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
+  sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/armbianEnv.txt
+
+# Configure kernel parameters, overrule $verbosity in order to keep the template (platform files) untouched
+  if [ "${DEBUG_IMAGE}" == "yes" ]; then
+    log "Configuring DEBUG kernel parameters" "cfg"
+    sed -i "s/loglevel=\$verbosity/loglevel=8 nosplash break= use_kmsg=yes/" /boot/boot.cmd
+  else
+    log "Configuring default kernel parameters" "cfg"
+    sed -i "s/loglevel=\$verbosity/quiet loglevel=0/" /boot/boot.cmd
+    if [ ! -z "${PLYMOUTH_THEME}" ]; then
+      log "Adding splash kernel parameters" "cfg"
+      plymouth-set-default-theme -R ${PLYMOUTH_THEME}
+      sed -i "s/loglevel=0/loglevel=0 splash plymouth.ignore-serial-consoles initramfs.clear/" /boot/boot.cmd
+    fi  
+  fi
+
   #log "Performing device_chroot_tweaks_pre" "ext"
   log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
   cat <<-EOF >>/etc/sysctl.conf
 abi.cp15_barrier=2
 EOF
-
-  log "Creating boot parameters from template"
-  sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
-  sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
-  sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/armbianEnv.txt
 
   log "Adding gpio group and udev rules"
   groupadd -f --system gpio
