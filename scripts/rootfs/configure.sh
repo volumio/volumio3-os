@@ -16,7 +16,6 @@ if [[ ${BUILD:0:3} == arm ]]; then
   date -u '+%Y-%m-%d %H:%M:%S' >"${ROOTFS}/etc/fake-hwclock.data"
 fi
 
-
 log "Copying misc config/tweaks to rootfs" "info"
 # TODO: Streamline this!!
 # map files from ${SRC}/volumio => ${ROOTFS}?
@@ -76,8 +75,8 @@ cp "${SRC}/volumio/bin/dynswap.sh" "${ROOTFS}/bin/dynswap.sh"
 cp "${SRC}/volumio/bin/rename_netiface0.sh" "${ROOTFS}/bin/rename_netiface0.sh"
 chmod a+x "${ROOTFS}/bin/rename_netiface0.sh"
 
-#Upmpdcli files
-cp -rp "${SRC}"/volumio/usr/share/upmdcli/* "${ROOTFS}/usr/share/upmdcli/"
+#Libs & upmpdcli files
+cp -rp "${SRC}"/volumio/usr/* "${ROOTFS}/usr/"
 
 #CPU TWEAK
 cp "${SRC}/volumio/bin/volumio_cpu_tweak" "${ROOTFS}/bin/volumio_cpu_tweak"
