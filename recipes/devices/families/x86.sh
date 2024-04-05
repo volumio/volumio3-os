@@ -129,10 +129,7 @@ write_device_files() {
 }
 EOF
 
-	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "cfg"
-  cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
-
-  # Headphone detect currently only for atom z8350 with rt5640 codec
+	# Headphone detect currently only for atom z8350 with rt5640 codec
   # Evaluate additional requirements when they arrive
   log "Copying acpi event handing for headphone jack detect (z8350 with rt5640 only)" "info"
   cp "${pkg_root}"/bytcr-init/jackdetect "${ROOTFSMNT}"/etc/acpi/events
@@ -326,10 +323,6 @@ EOF
   log "Creating fstab template to be used in initrd" "cfg"
   sed "s/^UUID=${UUID_BOOT}/%%BOOTPART%%/g" /etc/fstab >/etc/fstab.tmpl
 
-  log "Setting plymouth theme to ${PLYMOUTH_THEME}" "cfg"
- 
-  plymouth-set-default-theme -R ${PLYMOUTH_THEME}
-  
   log "Notebook-specific: ignore 'cover closed' event" "info"
   sed -i "s/#HandleLidSwitch=suspend/HandleLidSwitch=ignore/g" /etc/systemd/logind.conf
   sed -i "s/#HandleLidSwitchExternalPower=suspend/HandleLidSwitchExternalPower=ignore/g" /etc/systemd/logind.conf

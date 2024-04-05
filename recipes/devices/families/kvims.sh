@@ -50,13 +50,6 @@ write_device_files() {
 
   log "Running write_device_files" "ext"
 
- if [ ! -z ${PLYMOUTH_THEME} ]; then
-    log "Plymouth selected, adding plymouth-themes to list of packages to install" ""
-    PACKAGES+=("plymouth-label")
-  	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "cfg"
-    cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
-  fi
-
   cp -R "${PLTDIR}/${DEVICEBASE}/boot" "${ROOTFSMNT}"
 
   log "AML autoscripts not for Volumio"
@@ -97,10 +90,7 @@ write_device_files() {
 
   log "Copying triggerhappy configuration"
   cp -pR "${PLTDIR}/${DEVICEBASE}/etc/triggerhappy" "${ROOTFSMNT}/etc"
-
-	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
-	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
-
+	
 }
 
 write_device_bootloader() {
@@ -139,9 +129,8 @@ device_chroot_tweaks_pre() {
     sed -i "s/quiet loglevel=0 splash/loglevel=8 nosplash break= use_kmsg=yes/" /boot/env.system.txt
   else
     log "Configuring default kernel parameters" "info"
-    if [ ! -z "${PLYMOUTH_THEME}" ]; then
-      log "Adding splash kernel parameters" "info"
-      plymouth-set-default-theme -R ${PLYMOUTH_THEME}
+    if [[ -n "${PLYMOUTH_THEME}" ]]; then
+      log "Adding splash kernel parameters" "info"      
       sed -i "s/loglevel=0/loglevel=0 splash plymouth.ignore-serial-consoles initramfs.clear/" /boot/env.system.txt
     else
       log "No splash screen, just quiet" "info"

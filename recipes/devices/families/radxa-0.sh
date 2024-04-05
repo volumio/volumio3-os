@@ -40,13 +40,6 @@ PACKAGES=("bluez-firmware" "bluetooth" "bluez" "bluez-tools")
 write_device_files() {
   log "Running write_device_files" "ext"
 
-  if [ ! -z ${PLYMOUTH_THEME} ]; then
-    log "Plymouth selected, adding plymouth-label to list of packages to install" ""
-    PACKAGES+=("plymouth-label")
-    log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "cfg"
-    cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
-  fi
-
   cp -dR "${PLTDIR}/${DEVICE}/boot" "${ROOTFSMNT}"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
@@ -99,9 +92,8 @@ device_chroot_tweaks_pre() {
     log "Configuring default kernel parameters" "cfg"
     sed -i "s/console=both/console=serial/" /boot/armbianEnv.txt
     sed -i "s/loglevel=\${verbosity}/quiet loglevel=0/" /boot/boot.cmd
-    if [ ! -z "${PLYMOUTH_THEME}" ]; then
-      log "Adding splash kernel parameters" "cfg"
-      plymouth-set-default-theme -R ${PLYMOUTH_THEME}
+    if [[ -n "${PLYMOUTH_THEME}" ]]; then
+      log "Adding splash kernel parameters" "cfg"      
       sed -i "s/loglevel=0/loglevel=0 splash plymouth.ignore-serial-consoles initramfs.clear/" /boot/boot.cmd
     fi  
   fi

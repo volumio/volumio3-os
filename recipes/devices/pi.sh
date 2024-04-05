@@ -11,7 +11,7 @@ ARCH="armhf"
 BUILD="arm"
 
 ### Build image with initramfs debug info?
-DEBUG_IMAGE="no"       # yes/no or empty. Also changes SHOW_SPLASH in cmdline.txt
+DEBUG_IMAGE="no" # yes/no or empty. Also changes SHOW_SPLASH in cmdline.txt
 
 ### Device information
 # Used to identify devices (VOLUMIO_HARDWARE) and keep backward compatibility
@@ -20,7 +20,7 @@ DEVICENAME="Raspberry Pi"
 # This is useful for multiple devices sharing the same/similar kernel
 DEVICEFAMILY="raspberry"
 
-# Install to disk tools including PiInstaller 
+# Install to disk tools including PiInstaller
 DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
 
 ### What features do we want to target
@@ -33,23 +33,21 @@ KIOSKMODE=no
 ## Partition info
 BOOT_START=0
 BOOT_END=96
-BOOT_TYPE=msdos      # msdos or gpt
-BOOT_USE_UUID=yes    # Add UUID to fstab
-INIT_TYPE="initv3"   # init{v2,v3}
+BOOT_TYPE=msdos    # msdos or gpt
+BOOT_USE_UUID=yes  # Add UUID to fstab
+INIT_TYPE="initv3" # init{v2,v3}
 PLYMOUTH_THEME="volumio-player"
 
 # Modules that will be added to initramfs
 MODULES=("overlay" "squashfs" "fuse" "nvme" "nvme_core" "uas")
 # Packages that will be installed
-PACKAGES=(# Bluetooth packages
+PACKAGES=( # Bluetooth packages
 	"bluez" "bluez-firmware" "pi-bluetooth"
 	# Foundation stuff
 	"raspberrypi-sys-mods"
 	# "rpi-eeprom"\ Needs raspberrypi-bootloader that we hold back
 	# GPIO stuff
-	"wiringpi"
-	# Boot splash
-	"plymouth" "plymouth-themes"
+	"wiringpi"	
 	# Wireless firmware
 	"firmware-atheros" "firmware-ralink" "firmware-realtek" "firmware-brcm80211"
 	# Install to disk tools
@@ -64,29 +62,27 @@ write_device_files() {
 	pkg_root="${PLTDIR}/utils"
 
 	mkdir -p "${ROOTFSMNT}"/usr/local/bin/
-		declare -A CustomScripts=(
+	declare -A CustomScripts=(
 		[PiInstaller.sh]="/PiInstaller.sh"
 	)
 	log "Adding ${#CustomScripts[@]} custom scripts to /usr/local/bin: " "" "${CustomScripts[@]}" "ext"
-		for script in "${!CustomScripts[@]}"; do
-			cp "${pkg_root}/${CustomScripts[$script]}" "${ROOTFSMNT}"/usr/local/bin/"${script}"
-			chmod +x "${ROOTFSMNT}"/usr/local/bin/"${script}"
-		done
+	for script in "${!CustomScripts[@]}"; do
+		cp "${pkg_root}/${CustomScripts[$script]}" "${ROOTFSMNT}"/usr/local/bin/"${script}"
+		chmod +x "${ROOTFSMNT}"/usr/local/bin/"${script}"
+	done
 
 	log "Copying current partition data for use in runtime fast 'installToDisk'" "ext"
 	cat <<-EOF >"${ROOTFSMNT}/boot/partconfig.json"
-{
-	"params":[
-	{"name":"boot_start","value":"$BOOT_START"},
-	{"name":"boot_end","value":"$BOOT_END"},
-	{"name":"volumio_end","value":"$IMAGE_END"},
-	{"name":"boot_type","value":"$BOOT_TYPE"}
-	]
-}
+		{
+			"params":[
+			{"name":"boot_start","value":"$BOOT_START"},
+			{"name":"boot_end","value":"$BOOT_END"},
+			{"name":"volumio_end","value":"$IMAGE_END"},
+			{"name":"boot_type","value":"$BOOT_TYPE"}
+			]
+		}
 	EOF
 
-	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
-	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
 }
 
 write_device_bootloader() {
@@ -279,7 +275,7 @@ device_chroot_tweaks_pre() {
 
 	### Other Rpi specific stuff
 	log "Installing fake libraspberrypi0 package" "info"
-	wget -nv  https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/libraspberrypi0/libraspberrypi0_1.20230509-buster-1_armhf.deb
+	wget -nv https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/libraspberrypi0/libraspberrypi0_1.20230509-buster-1_armhf.deb
 	dpkg -i libraspberrypi0_1.20230509-buster-1_armhf.deb
 	rm libraspberrypi0_1.20230509-buster-1_armhf.deb
 
@@ -323,9 +319,6 @@ device_chroot_tweaks_pre() {
 		EOF
 	fi
 
-    log "Setting plymouth theme to ${PLYMOUTH_THEME}" "info"
-    plymouth-set-default-theme -R ${PLYMOUTH_THEME}
-
 	log "Adding gpio & spi group and permissions" "info"
 	groupadd -f --system gpio
 	groupadd -f --system spi
@@ -360,14 +353,14 @@ device_chroot_tweaks_pre() {
 		ln -s "/opt/vc/bin/${bin}" "/usr/bin/${bin}"
 	done
 
-	log "Fixing vcgencmd permissions"  "info"
+	log "Fixing vcgencmd permissions" "info"
 	cat <<-EOF >/etc/udev/rules.d/10-vchiq.rules
 		SUBSYSTEM=="vchiq",GROUP="video",MODE="0660"
 	EOF
 
 	# Rename gpiomem in udev rules if kernel is equal or greater than 6.1.54
 	if [ "$MAJOR_VERSION" -gt 6 ] || { [ "$MAJOR_VERSION" -eq 6 ] && { [ "$MINOR_VERSION" -gt 1 ] || [ "$MINOR_VERSION" -eq 1 ] && [ "$PATCH_VERSION" -ge 54 ]; }; }; then
-		log "Rename gpiomem in udev rules"  "info"
+		log "Rename gpiomem in udev rules" "info"
 		sed -i 's/bcm2835-gpiomem/gpiomem/g' /etc/udev/rules.d/99-com.rules
 	fi
 
@@ -441,7 +434,7 @@ device_chroot_tweaks_pre() {
 	kernel_params+=("${SHOW_SPLASH}")
 	kernel_params+=("${KERNEL_QUIET}")
 
-	# Boot screen stuff	
+	# Boot screen stuff
 	kernel_params+=("plymouth.ignore-serial-consoles")
 	# Raspi USB controller params
 	# TODO: Check if still required!

@@ -37,13 +37,6 @@ PACKAGES=("lirc" "fbset")
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
 
-  if [ ! -z ${PLYMOUTH_THEME} ]; then
-    log "Plymouth selected, adding plymouth-label to list of packages to install" ""
-    PACKAGES+=("plymouth-label")
-  	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "cfg"
-    cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
-  fi
-
   log "Running write_device_files" "ext"
 
   cp ${PLTDIR}/${DEVICEBASE}/boot/*.ini "${ROOTFSMNT}/boot"
@@ -92,9 +85,8 @@ device_chroot_tweaks_pre() {
   else
     log "Configuring default kernel parameters" "cfg"
     sed -i "s/loglevel=\$verbosity/quiet loglevel=0/" /boot/boot.ini
-    if [ ! -z "${PLYMOUTH_THEME}" ]; then
-      log "Adding splash kernel parameters" "cfg"
-      plymouth-set-default-theme -R ${PLYMOUTH_THEME}
+    if [[ -n "${PLYMOUTH_THEME}" ]]; then
+      log "Adding splash kernel parameters" "cfg"      
       sed -i "s/loglevel=0/loglevel=0 splash plymouth.ignore-serial-consoles initramfs.clear/" /boot/boot.ini
     fi  
   fi
