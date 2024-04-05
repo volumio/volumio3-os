@@ -95,7 +95,7 @@ log "Copying Volumio rootfs" "info"
 log "Using working tmp dir:" "info" "${VOLMNT}"
 if [[ -d ${VOLMNT} ]]; then
   log "Volumio Temp Directory Exists - Cleaning it"
-  rm -rf "${VOLMNT:?}/*"
+  rm -rf "${VOLMNT:?}"/*
 else
   log "Creating Volumio Temp Directory"
   mkdir -p "${VOLMNT}"

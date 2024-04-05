@@ -84,6 +84,7 @@ fi
 
 # MPD systemd file
 log "Copying MPD custom systemd file"
+[[ -d /usr/lib/systemd/system/  ]] || mkdir -p /usr/lib/systemd/system/
 ## TODO: FIND A MORE ELEGANT SOLUTION
 echo "[Unit]
 Description=Music Player Daemon
