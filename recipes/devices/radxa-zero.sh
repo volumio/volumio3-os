@@ -12,5 +12,9 @@ source "${SRC}"/recipes/devices/families/radxa-0.sh
 DEVICENAME="Radxa Zero"
 DEVICE="radxa-zero"
 
+# Plymouth theme?
+PLYMOUTH_THEME="volumio-player"
+# Debug image?
+DEBUG_IMAGE="no"
 
 

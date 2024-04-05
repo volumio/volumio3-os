@@ -54,7 +54,8 @@ PACKAGES=(
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
-	:
+	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
+	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
 }
 
 write_device_bootloader() {
@@ -269,6 +270,9 @@ device_chroot_tweaks_pre() {
 			Pin-Priority: -1
 		EOF
 	fi
+
+    log "Setting plymouth theme to ${PLYMOUTH_THEME}" "info"
+    plymouth-set-default-theme -R ${PLYMOUTH_THEME}
 
 	log "Adding gpio & spi group and permissions"
 	groupadd -f --system gpio

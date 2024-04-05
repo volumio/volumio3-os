@@ -12,6 +12,7 @@
 |20240117||Documentation in progress
 |20240314|foonerd|Starting on initv3
 |20240329|gkkpch,foonerd|Starting device testing on initv3
+|20240403|gkkpch|x86, mp1, odroidc4, odroidn2, nanopineo2, nanopineo3 and nanopim4 are ready for beta
 
 ## ```##TODO```
 

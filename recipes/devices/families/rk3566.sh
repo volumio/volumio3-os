@@ -23,15 +23,13 @@ DEVICEREPO="https://github.com/gkkpch/platform-${DEVICEFAMILY}.git"
 VOLVARIANT=no # Custom Volumio (Motivo/Primo etc)
 MYVOLUMIO=no
 VOLINITUPDATER=yes
-KIOSKMODE=no
-KIOSKBROWSER=vivaldi
 
 ## Partition info
 BOOT_START=20
 BOOT_END=96
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
-INIT_TYPE="initv3" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3" 
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437"  "fuse")
@@ -42,6 +40,13 @@ PACKAGES=("bluez-firmware" "bluetooth" "bluez" "bluez-tools")
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
   log "Running write_device_files" "ext"
+
+  if [ ! -z ${PLYMOUTH_THEME} ]; then
+    log "Plymouth selected, adding plymouth-label to list of packages to install" ""
+    PACKAGES+=("plymouth-label")
+  	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "cfg"
+    cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
+  fi
 
   cp -dR "${PLTDIR}/${DEVICE}/boot" "${ROOTFSMNT}"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
@@ -65,6 +70,22 @@ device_chroot_tweaks() {
 
 # Will be run in chroot - Pre initramfs
 device_chroot_tweaks_pre() {
+
+
+# Configure kernel parameters, overrule $verbosity in order to keep the template (platform files) untouched
+  if [ "${DEBUG_IMAGE}" == "yes" ]; then
+    log "Configuring DEBUG kernel parameters" "cfg"
+    sed -i "s/loglevel=\$verbosity/loglevel=8 nosplash break= use_kmsg=yes/" /boot/boot.cmd
+  else
+    log "Configuring default kernel parameters" "cfg"
+    sed -i "s/loglevel=\$verbosity/quiet loglevel=0/" /boot/boot.cmd
+    if [ ! -z "${PLYMOUTH_THEME}" ]; then
+      log "Adding splash kernel parameters" "cfg"
+      plymouth-set-default-theme -R ${PLYMOUTH_THEME}
+      sed -i "s/loglevel=0/loglevel=0 splash plymouth.ignore-serial-consoles initramfs.clear/" /boot/boot.cmd
+    fi  
+  fi
+
   log "Performing device_chroot_tweaks_pre" "ext"
   log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
   cat <<-EOF >>/etc/sysctl.conf

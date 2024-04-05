@@ -32,7 +32,7 @@ BOOT_START=20
 BOOT_END=84
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=no         # Add UUID to fstab
-INIT_TYPE="initv3" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3"
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "squashfs" "nls_cp437")
