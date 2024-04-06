@@ -11,6 +11,10 @@ ARCH="armhf"
 BUILD="armv7"
 UINITRD_ARCH="arm"
 
+PLYMOUTH_THEME="volumio-player"
+# Debug image
+DEBUG_IMAGE=no
+
 ### Device information
 DEVICENAME="Asus Tinkerboard"
 # This is useful for multiple devices sharing the same/similar kernel
@@ -32,22 +36,31 @@ BOOT_START=1
 BOOT_END=64
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
-INIT_TYPE="initv3" # init.{x86/nextarm/nextarm_tvbox}
-PLYMOUTH_THEME="volumio-logo"
+INIT_TYPE="initv3" 
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437")
 # Packages that will be installed
-PACKAGES=()
+PACKAGES=("")
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
   log "Running write_device_files" "ext"
 
+  if [ ! -z ${PLYMOUTH_THEME} ]; then
+    log "Plymouth selected, adding plymouth-themes to list of packages to install" ""
+    PACKAGES+=("plymouth-label")
+  	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "cfg"
+    cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
+  fi
+
   cp -dR "${PLTDIR}/${DEVICE}/boot" "${ROOTFSMNT}"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
-  cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"	
+  cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
+
+	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
+	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
 }
 
 write_device_bootloader() {
@@ -68,12 +81,26 @@ device_chroot_tweaks_pre() {
   # Grab latest kernel version
   mapfile -t kernel_versions < <(ls -t /lib/modules | sort)
   log "Creating extlinux.conf for Kernel -- ${kernel_versions[0]}"
+
+  log "Preparing boot configurations" "cfg"
+  if [[ $DEBUG_IMAGE == yes ]]; then
+		log "Debug image: use 'nosplash' in cmdline" "info"
+		SHOW_SPLASH="nosplash" # Debug removed
+		log "Debug image: cmdline without 'quiet', add 'break=' and 'loglevel'" "info"
+		KERNEL_QUIET="loglevel=8 break= use_kmsg=yes" # Default Debug
+  else
+		log "Default image: use splash in cmdline" "info"
+		SHOW_SPLASH="splash plymouth.ignore-serial-consoles initramfs.clear" # Default splash enabled
+		log "Default image: use 'quiet' and 'loglevel=0' in cmdline" "info"
+		KERNEL_QUIET="quiet loglevel=0" # Default quiet enabled, loglevel default to KERN_EMERG
+  fi
+
   cat <<-EOF >/boot/extlinux/extlinux.conf
 	label $(awk -F . '{print "kernel-"$1"."$2}' <<<"${kernel_versions[0]}")
 	  kernel /zImage
 	  fdt /dtb/rk3288-miniarm.dtb
 	  initrd /uInitrd
-	  append  earlyprintk splash quiet plymouth.ignore-serial-consoles console=tty1 console=ttyS3,115200n8 rw init=/sbin/init imgpart=UUID=${UUID_IMG} imgfile=/volumio_current.sqsh bootpart=UUID=${UUID_BOOT} datapart=UUID=${UUID_DATA} bootconfig=/extlinux/extlinux.conf logo.nologo vt.global_cursor_default=0 loglevel=8
+	  append  earlyprintk ${KERNEL_QUIET} ${SHOW_SPLASH} console=tty1 console=ttyS3,115200n8 rw init=/sbin/init imgpart=UUID=${UUID_IMG} imgfile=/volumio_current.sqsh bootpart=UUID=${UUID_BOOT} datapart=UUID=${UUID_DATA} uuidconfig=/extlinux/extlinux.conf vt.global_cursor_default=0
 	EOF
   
   log "Tinkerboard Init"
@@ -132,11 +159,6 @@ device_chroot_tweaks_pre() {
   dpkg -i firmware-realtek_20210818-1_all.deb
   rm firmware-realtek_20210818-1_all.deb
 
-  # echo "Installing Kiosk"
-  # sh /install-kiosk.sh
-
-  # echo "Kiosk installed"
-  # rm /install-kiosk.sh
   # Thsis needs to be MOST for buster
   #log "Changing to 'modules=dep'"
   #sed -i "s/MODULES=most/MODULES=dep/g" /etc/initramfs-tools/initramfs.conf
