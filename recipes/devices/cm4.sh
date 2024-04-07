@@ -51,39 +51,12 @@ PACKAGES=( # Bluetooth packages
 	"wiringpi"	
 	# Wireless firmware
 	"firmware-atheros" "firmware-ralink" "firmware-realtek" "firmware-brcm80211"
-	# Install to disk tools
-	"liblzo2-2" "squashfs-tools"
 )
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
 write_device_files() {
-	log "Running write_device_files" "ext"
-	log "Copying additional utils files" "ext"
-	pkg_root="${PLTDIR}/utils"
-
-	mkdir -p "${ROOTFSMNT}"/usr/local/bin/
-	declare -A CustomScripts=(
-		[PiInstaller.sh]="/PiInstaller.sh"
-	)
-	log "Adding ${#CustomScripts[@]} custom scripts to /usr/local/bin: " "" "${CustomScripts[@]}" "ext"
-	for script in "${!CustomScripts[@]}"; do
-		cp "${pkg_root}/${CustomScripts[$script]}" "${ROOTFSMNT}"/usr/local/bin/"${script}"
-		chmod +x "${ROOTFSMNT}"/usr/local/bin/"${script}"
-	done
-
-	log "Copying current partition data for use in runtime fast 'installToDisk'" "ext"
-	cat <<-EOF >"${ROOTFSMNT}/boot/partconfig.json"
-		{
-			"params":[
-			{"name":"boot_start","value":"$BOOT_START"},
-			{"name":"boot_end","value":"$BOOT_END"},
-			{"name":"volumio_end","value":"$IMAGE_END"},
-			{"name":"boot_type","value":"$BOOT_TYPE"}
-			]
-		}
-	EOF
-
+	:
 }
 
 write_device_bootloader() {
