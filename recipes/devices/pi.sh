@@ -171,17 +171,6 @@ device_chroot_tweaks_pre() {
 	## Define parameters
 	declare -A PI_KERNELS=(
 		#[KERNEL_VERSION]="SHA|Branch|Rev"
-		[4.19.86]="b9ecbe8d0e3177afed08c54fc938938100a0b73f|master|1283"
-		[4.19.97]="993f47507f287f5da56495f718c2d0cd05ccbc19|master|1293"
-		[4.19.118]="e1050e94821a70b2e4c72b318d6c6c968552e9a2|master|1311"
-		[5.4.51]="8382ece2b30be0beb87cac7f3b36824f194d01e9|master|1325"
-		[5.4.59]="caf7070cd6cece7e810e6f2661fc65899c58e297|master|1336"
-		[5.4.79]="0642816ed05d31fb37fc8fbbba9e1774b475113f|master|1373"
-		[5.4.81]="453e49bdd87325369b462b40e809d5f3187df21d|master|1379" # Looks like uname_string wasn't updated here..
-		[5.4.83]="b7c8ef64ea24435519f05c38a2238658908c038e|stable|1379"
-		[5.10.3]="da59cb1161dc7c75727ec5c7636f632c52170961|master|1386"
-		[5.10.73]="1597995e94e7ba3cd8866d249e6df1cf9a790e49|master|1470"
-		[5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
 		[5.10.92]="ea9e10e531a301b3df568dccb3c931d52a469106|stable|1514"
 		[5.10.95]="770ca2c26e9cf341db93786d3f03c89964b1f76f|master|1521"
 		[5.15.84]="a99e144e939bf93bbd03e8066601a8d3eae640f7|stable|1613"
