@@ -454,7 +454,7 @@ device_chroot_tweaks_pre() {
 	DISABLE_PN="net.ifnames=0"
 	kernel_params+=("${DISABLE_PN}")
 	# ALSA tweaks
-	kernel_params+=(""snd-bcm2835.enable_compat_alsa=1")
+	kernel_params+=("snd-bcm2835.enable_compat_alsa=1")
 
 	# Further debug changes
 	if [[ $DEBUG_IMAGE == yes ]]; then
