@@ -464,7 +464,6 @@ device_chroot_tweaks_pre() {
 		cat <<-EOF >/boot/debug.txt
 			# Enable serial console for boot debugging
 			enable_uart=1
-			dtoverlay=pi3-miniuart-bt
 		EOF
 		log "Enabling SSH" "dbg"
 		touch /boot/ssh
