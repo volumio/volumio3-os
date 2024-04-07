@@ -18,10 +18,10 @@ DEBUG_IMAGE="no" # yes/no or empty. Also changes SHOW_SPLASH in cmdline.txt
 #VOL_DEVICE_ID="pi"
 DEVICENAME="CM4"
 # This is useful for multiple devices sharing the same/similar kernel
-DEVICEFAMILY="raspberry"
+#DEVICEFAMILY="raspberry"
 
 # Install to disk tools including PiInstaller
-DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
+#DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
 
 ### What features do we want to target
 # TODO: Not fully implemented
