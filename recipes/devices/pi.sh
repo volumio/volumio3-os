@@ -35,7 +35,7 @@ BOOT_START=0
 BOOT_END=96
 BOOT_TYPE=msdos    # msdos or gpt
 BOOT_USE_UUID=yes  # Add UUID to fstab
-INIT_TYPE="initv3" # init{v2,v3}
+INIT_TYPE="initv3"
 PLYMOUTH_THEME="volumio-player"
 
 # Modules that will be added to initramfs
