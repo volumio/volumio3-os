@@ -32,7 +32,7 @@ BOOT_TYPE=gpt        # msdos or gpt
 BOOT_USE_UUID=yes    # Add UUID to fstab
 
 ## initramfs info
-INIT_TYPE="initv3"   # init{v3|x86}
+INIT_TYPE="initv3"
 PLYMOUTH_THEME="volumio-player"
 
 # Modules that will be added to intramfs
