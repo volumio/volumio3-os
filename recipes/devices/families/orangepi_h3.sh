@@ -29,7 +29,7 @@ PLYMOUTH_THEME="volumio-player"
 BOOT_START=1
 BOOT_END=64
 BOOT_TYPE=msdos          # msdos or gpt
-INIT_TYPE="initv3" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3"
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437")
