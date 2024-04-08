@@ -10,3 +10,4 @@ source "${SRC}"/recipes/devices/families/nanopi-armbian_h5.sh
 
 ### Device information
 DEVICENAME="NanoPi Neo2" # Pretty name
+DISABLE_DISPLAY=yes

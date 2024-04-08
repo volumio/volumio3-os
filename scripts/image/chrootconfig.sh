@@ -71,6 +71,13 @@ else
 fi
 
 # Custom packages for Volumio
+if [[ "${DISABLE_DISPLAY}" == "yes" ]]; then
+  log "Adapting recipe for device with no display capabilities" "cfg"
+  # Remove plymouth-label
+  apt-get remove -y --purge plymouth-label
+  # TODO: Check our kernel parameters has nosplash set.
+fi
+
 #TODO THIS SHALL RUN ONLY FOR SOME DEVICES WHERE WE WANT TO INSTALL KIOSK
 #TODO: This shall happen before configure.sh which substitutes conf files
 [ -f "/install-kiosk.sh" ] && log "Installing kiosk" "info" && bash install-kiosk.sh
@@ -84,7 +91,7 @@ fi
 
 # MPD systemd file
 log "Copying MPD custom systemd file"
-[[ -d /usr/lib/systemd/system/  ]] || mkdir -p /usr/lib/systemd/system/
+[[ -d /usr/lib/systemd/system/ ]] || mkdir -p /usr/lib/systemd/system/
 ## TODO: FIND A MORE ELEGANT SOLUTION
 echo "[Unit]
 Description=Music Player Daemon

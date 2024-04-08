@@ -27,6 +27,7 @@ MYVOLUMIO=no
 VOLINITUPDATER=yes
 KIOSKMODE=yes
 KIOSKBROWSER=vivaldi
+PLYMOUTH_THEME="volumio-player"
 
 ## Partition info
 BOOT_START=16

@@ -189,6 +189,14 @@ fi
 cp "${SRC}"/scripts/initramfs/mkinitramfs-custom.sh "${ROOTFSMNT}"/usr/local/sbin
 cp "${SRC}"/scripts/image/chrootconfig.sh "${ROOTFSMNT}"
 
+if [[ ${DISABLE_DISPLAY:-no} == "yes" ]]; then
+  # Setting some defaults
+  [[ -n ${PLYMOUTH_THEME} ]] && log "Conflicting device requirements of DISABLE_DISPLAY: ${DISABLE_DISPLAY} and PLYMOUTH_THEME: ${PLYMOUTH_THEME}" "err"
+  unset PLYMOUTH_THEME
+  [[ ${KIOSKMODE} == "yes" ]] && log "Conflicting device requirements of DISABLE_DISPLAY: ${DISABLE_DISPLAY} and KIOSKMODE: ${KIOSKMODE}" "err"
+  KIOSKMODE="no"
+fi
+
 if [[ -n "${PLYMOUTH_THEME}" ]]; then
   log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
   cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" "${ROOTFSMNT}"/usr/share/plymouth/themes/"${PLYMOUTH_THEME}"
@@ -239,6 +247,7 @@ UUID_IMG=${UUID_IMG}
 UUID_DATA=${UUID_DATA}
 BOOT_PART=${BOOT_PART}
 LOOP_DEV=${LOOP_DEV}
+DISABLE_DISPLAY="${DISABLE_DISPLAY}"
 PLYMOUTH_THEME=${PLYMOUTH_THEME}
 MODULES=($([[ -n ${MODULES} ]] && printf '\"%s\" ' "${MODULES[@]}"))
 PACKAGES=($([[ -n ${PACKAGES} ]] && printf '\"%s\" ' "${PACKAGES[@]}"))
