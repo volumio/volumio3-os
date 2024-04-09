@@ -118,6 +118,9 @@ device_chroot_tweaks_pre() {
   sed -i "s/#bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/env.system.txt
   sed -i "s/#datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/env.system.txt
 
+  log "Replace 'bootconfig' by 'uuidconfig'" "info"
+  sed -i "s/bootconfig/uuidconfig/" /boot/boot.ini
+  
   log "Remove default plymouth.ignore-serial-consoles " "info"
   sed -i "s/plymouth.ignore-serial-consoles//" /boot/boot.ini
   
