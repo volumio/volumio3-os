@@ -78,7 +78,6 @@ device_chroot_tweaks_pre() {
 
 
   log "Creating boot parameters from template"
-  sed -i "s/bootconfig/uuidconfig/" /boot/armbianEnv.txt
   sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
   sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
   sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/armbianEnv.txt
