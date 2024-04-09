@@ -68,10 +68,10 @@ device_chroot_tweaks_pre() {
 # Configure kernel parameters, overrule $verbosity in order to keep the template (platform files) untouched
   if [ "${DEBUG_IMAGE}" == "yes" ]; then
     log "Configuring DEBUG kernel parameters" "cfg"
-    sed -i "s/loglevel=\$verbosity/loglevel=8 nosplash break= use_kmsg=yes/" /boot/boot.cmd
+    sed -i "s/loglevel=\${verbosity}/loglevel=8 nosplash break= use_kmsg=yes/" /boot/boot.cmd
   else
     log "Configuring default kernel parameters" "cfg"
-    sed -i "s/loglevel=\$verbosity/quiet loglevel=0/" /boot/boot.cmd
+    sed -i "s/loglevel=\${verbosity}/quiet loglevel=0/" /boot/boot.cmd
     if [[ -n "${PLYMOUTH_THEME}" ]]; then
       log "Adding splash kernel parameters" "cfg"      
       sed -i "s/loglevel=0/loglevel=0 splash plymouth.ignore-serial-consoles initramfs.clear/" /boot/boot.cmd
