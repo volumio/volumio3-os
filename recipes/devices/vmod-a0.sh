@@ -11,9 +11,6 @@ ARCH="armhf"
 BUILD="armv7"
 UINITRD_ARCH="arm64"
 
-### Build image with initramfs debug info?
-DEBUG_IMAGE="no"       # yes/no or empty. Also changes SHOW_SPLASH in cmdline.txt
-
 ### Device information
 DEVICENAME="VMOD-A0"
 # This is useful for multiple devices sharing the same/similar kernel
