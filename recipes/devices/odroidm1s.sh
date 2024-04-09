@@ -32,7 +32,6 @@ write_device_bootloader() {
 # Will be run in chroot (before other things)
 device_chroot_tweaks() {
   log "Creating boot parameters from template"
-  sed -i "s/bootconfig/uuidconfig/" /boot/bootparams.ini
   sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/bootparams.ini
   sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/bootparams.ini
   sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/bootparams.ini

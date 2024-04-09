@@ -120,10 +120,6 @@ device_chroot_tweaks_pre() {
 
   log "Remove default plymouth.ignore-serial-consoles " "info"
   sed -i "s/plymouth.ignore-serial-consoles//" /boot/boot.ini
-
-  log "Replace 'bootconfig' by 'uuidconfig'" "info"
-  sed -i "s/bootconfig/uuidconfig/" /boot/boot.ini
-
   
   if [ "${DEBUG_IMAGE}" == "yes" ]; then
     log "Configuring DEBUG image" "info"

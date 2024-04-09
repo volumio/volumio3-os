@@ -75,7 +75,6 @@ device_chroot_tweaks_pre() {
   log "Performing device_chroot_tweaks_pre" "ext"
 
   log "Creating UUIDs in boot.ini" "cfg"
-  sed -i "s/bootconfig/uuidconfig/" /boot/boot.ini
   sed -i "s/%%VOLUMIO-PARAMS%%/imgpart=UUID=${UUID_IMG} bootpart=UUID=${UUID_BOOT} datapart=UUID=${UUID_DATA}/" /boot/boot.ini
 
   # Configure kernel parameters, overrule $verbosity in order to keep the template (platform files) untouched
