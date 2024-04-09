@@ -1,19 +1,21 @@
 
 # Current compatible
 
-|Board name/ recipe|initv3|plymouth|
-|---|---|---|
-x86| yes| yes
-RPi| yes| yes
-mp1| yes| yes
-odroidn2| yes| yes 
-odroidc4| yes| yes 
-odroidm1s| yes| yes
-nanopineo2| yes|no (no video-out)
-nanopineo3| yes|no (no video-out)
-nanopim4| yes| yes
-rockpi-4b| yes| yes
-|||Add new boards as we proceed testing
+|Board name/ recipe|initv3|plymouth|UUID done|OTA working
+|---|---|---|---|---|
+x86| yes| yes|yes|?
+RPi| yes| yes|yes|?
+mp1| yes| yes|yes|?
+odroidn2| yes| yes|yes|?
+odroidc4| yes| yes|yes|?
+odroidm1s| yes| yes|yes|?
+nanopineo2| yes|no (no video-out)|yes|?
+nanopineo3| yes|no (no video-out)|yes|?
+nanopim4| yes| yes|yes|?
+radxa-zero| yes| yes|yes|?
+radxa-zero2| yes |yes|yes|?
+rockpi-4b| yes| yes|yes|?
+|||||Add new boards as we proceed testing
 
 # Recipes modifications
 
