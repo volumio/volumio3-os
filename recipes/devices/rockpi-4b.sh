@@ -87,8 +87,6 @@ abi.cp15_barrier=2
 EOF
 
   log "Configure kernel cmdline parameters" "cfg"
-  log "Replace 'bootconfig' parameter and configure UUID data" "info"
-  sed -i "s/bootconfig/uuidconfig/" /boot/armbianEnv.txt
 
   sed -i "s/rootdev=UUID=/rootdev=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
   sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
