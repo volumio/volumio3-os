@@ -26,7 +26,11 @@ MYVOLUMIO=no
 VOLINITUPDATER=yes
 KIOSKMODE=yes
 KIOSKBROWSER=vivaldi
+
+# Plymouth theme
 PLYMOUTH_THEME="volumio-player"
+# Debug image
+DEBUG_IMAGE=no
 
 ## Partition info
 BOOT_START=20
@@ -76,11 +80,29 @@ device_chroot_tweaks_pre() {
 abi.cp15_barrier=2
 EOF
 
-  log "Creating boot parameters from template"
+  log "Configure kernel cmdline parameters" "cfg"
+
   sed -i "s/rootdev=UUID=/rootdev=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
   sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
   sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
   sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/armbianEnv.txt
+
+  log "Deactivate Armbian bootlogo and consolearg settings" "info"
+  sed -i "s/splash=verbose//" /boot/boot.cmd
+  sed -i "s/splash plymouth.ignore-serial-consoles//" /boot/boot.cmd
+
+  log "Configure debug or default kernel parameters" "cfg"
+  if [ "${DEBUG_IMAGE}" == "yes" ]; then
+    log "Configuring DEBUG kernel parameters" "info"
+    sed -i "s/loglevel=\${verbosity}/loglevel=8 nosplash break= use_kmsg=yes/" /boot/boot.cmd
+  else
+    log "Configuring default kernel parameters" "info"
+    sed -i "s/loglevel=\${verbosity}/quiet loglevel=0/" /boot/boot.cmd
+     if [[ -n "${PLYMOUTH_THEME}" ]]; then
+      log "Adding splash kernel parameters" "cfg"
+      sed -i "s/loglevel=0/loglevel=0 splash plymouth.ignore-serial-consoles initramfs.clear/" /boot/boot.cmd
+    fi
+  fi
 
   log "Adding gpio group and udev rules"
   groupadd -f --system gpio
