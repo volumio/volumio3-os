@@ -169,7 +169,7 @@ cat <<-EOF >${SUDOERS_FILE}
 volumio ALL=(ALL) ALL
 volumio ALL=(ALL) NOPASSWD: /bin/chmod, /bin/dd, /bin/hostname, /bin/ip, /bin/journalctl, /bin/kill, /bin/ln, /bin/mount, /bin/mv, /bin/rm, /bin/systemctl, /bin/tar, /bin/umount
 volumio ALL=(ALL) NOPASSWD: /sbin/dhclient, /sbin/dhcpcd, /sbin/ethtool, /sbin/halt, /sbin/ifconfig, /sbin/iw, /sbin/iwconfig, /sbin/iwgetid, /sbin/iwlist, /sbin/modprobe, /sbin/poweroff, /sbin/reboot, /sbin/shutdown
-volumio ALL=(ALL) NOPASSWD: /usr/bin/alsactl, /usr/bin/apt-get, /usr/bin/dcfldd, /usr/bin/dtoverlay, /usr/bin/gpio, /usr/bin/killall, /usr/bin/renice, /usr/bin/smbtree, /usr/bin/timedateclt, /usr/bin/unlink
+volumio ALL=(ALL) NOPASSWD: /usr/bin/alsactl, /usr/bin/apt-get, /usr/bin/dcfldd, /usr/bin/dtoverlay, /usr/bin/gpio, /usr/bin/killall, /usr/bin/renice, /usr/bin/smbtree, /usr/bin/timedatectl, /usr/bin/unlink
 volumio ALL=(ALL) NOPASSWD: /usr/sbin/alsactl, /usr/sbin/i2cdetect, /usr/sbin/i2cset, /usr/sbin/service, /usr/sbin/update-rc.d
 volumio ALL=(ALL) NOPASSWD: /usr/local/bin/x86Installer.sh
 volumio ALL=(ALL) NOPASSWD: /opt/vc/bin/tvservice, /opt/vc/bin/vcgencmd
