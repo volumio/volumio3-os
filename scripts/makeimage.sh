@@ -205,10 +205,10 @@ fi
 if [[ "${KIOSKMODE}" == yes ]]; then
   if [[ "${KIOSKBROWSER}" == vivaldi ]]; then
     log "Copying Vivaldi kiosk scripts to rootfs"
-    cp "${SRC}/scripts/volumio/install-kiosk-vivaldi.sh" "${ROOTFSMNT}"/install-kiosk.sh
+    cp "${SRC}/scripts/components/install-kiosk-vivaldi.sh" "${ROOTFSMNT}"/install-kiosk.sh
   else
     log "Copying Chromium kiosk scripts to rootfs"
-    cp "${SRC}/scripts/volumio/install-kiosk.sh" "${ROOTFSMNT}"/install-kiosk.sh
+    cp "${SRC}/scripts/components/install-kiosk.sh" "${ROOTFSMNT}"/install-kiosk.sh
   fi
 fi
 
