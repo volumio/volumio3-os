@@ -32,7 +32,7 @@ BOOT_TYPE=msdos  # msdos or gpt
 INIT_TYPE="init" # init.{x86/nextarm/nextarm_tvbox}
 
 # Modules that will be added to intramfs
-MODULES=("overlay" "squashfs" "fuse" "uas")
+MODULES=("overlay" "squashfs" "fuse" "uas" "nls_cp437" "nls_iso8859_1")
 # Packages that will be installed
 PACKAGES=(# Bluetooth packages
 	"bluez" "bluez-firmware" "pi-bluetooth"
