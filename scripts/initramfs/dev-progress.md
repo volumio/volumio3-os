@@ -31,7 +31,7 @@ rockpie | yes | no (no video-out) | yes | yes
 rockpis | yes | no (no video-out) | yes | yes
 tinkerboard | yes | yes | yes | ?
 vmod-a0 | yes | no (no video-out) | yes | yes
-x86 | yes | yes | yes | ?
+x86 | yes | yes | yes | yes
 |||||Add new boards as we proceed testing
 
 # Recipes modifications

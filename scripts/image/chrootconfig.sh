@@ -168,10 +168,6 @@ buster)
   ;;
 esac
 
-#First Boot operations
-log "Signalling the init script to re-size the Volumio data partition"
-touch /boot/resize-volumio-datapart
-
 #On The Fly Patch
 #TODO Where should this be called?
 PATCH=$(cat /patch)
