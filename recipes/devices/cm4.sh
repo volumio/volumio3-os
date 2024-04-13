@@ -436,7 +436,7 @@ device_chroot_tweaks_pre() {
 		depmod "${KERNEL_VERSION}-v7l+" # CM4 with 32bit kernel
 	fi
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
-		log "Finalising drivers installation with depmod on ${KERNEL_VERSION}-v7l+"
+		log "Finalising drivers installation with depmod on ${KERNEL_VERSION}-v8+"
 		depmod "${KERNEL_VERSION}-v8+" # CM4 with 64bit kernel
 	fi
 	log "CM4 Kernel and Modules installed" "okay"

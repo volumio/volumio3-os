@@ -474,12 +474,12 @@ device_chroot_tweaks_pre() {
 	EOF
 
 	# Rerun depmod for new drivers
-	log "Finalising drivers installation with depmod on ${KERNEL_VERSION}+,-v7+ and -v7l+" "info"
+	log "Finalising drivers installation with depmod on ${KERNEL_VERSION}+,-v7+, v7l+ and v8+" "info"
 	depmod "${KERNEL_VERSION}+"     # Pi 1, Zero, Compute Module
 	depmod "${KERNEL_VERSION}-v7+"  # Pi 2,3 CM3
 	depmod "${KERNEL_VERSION}-v7l+" # Pi 4 CM4
 	depmod "${KERNEL_VERSION}-v8+"  # Pi 4,5 CM4 64bit
-	#depmod "${KERNEL_VERSION}-v8_16k+"  # Pi 4,5 CM4 64bit
+	#depmod "${KERNEL_VERSION}-v8-16k+"  # Pi 4,5 CM4 64bit
 
 	log "Raspi Kernel and Modules installed" "okay"
 
