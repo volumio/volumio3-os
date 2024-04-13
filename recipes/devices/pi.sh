@@ -39,7 +39,7 @@ INIT_TYPE="initv3"
 PLYMOUTH_THEME="volumio-player"
 
 # Modules that will be added to initramfs
-MODULES=("overlay" "squashfs" "fuse" "nvme" "nvme_core" "uas")
+MODULES=("overlay" "squashfs" "fuse" "nvme" "nvme_core" "uas" "nls_cp437" "nls_iso8859_1")
 # Packages that will be installed
 PACKAGES=( # Bluetooth packages
 	"bluez" "bluez-firmware" "pi-bluetooth"
