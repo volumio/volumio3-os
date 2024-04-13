@@ -350,6 +350,7 @@ device_chroot_tweaks_pre() {
 		dtparam=uart0=on
 		dtparam=uart1=off
 		dtoverlay=dwc2,dr_mode=host
+		otg_mode=1
 		dtoverlay=vc4-kms-v3d,cma-384,audio=off,noaudio=on
 	EOF
 
