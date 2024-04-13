@@ -363,6 +363,7 @@ device_chroot_tweaks_pre() {
 		### APPLY CUSTOM PARAMETERS TO userconfig.txt ###
 		[cm4]
 		dtoverlay=dwc2,dr_mode=host
+		otg_mode=1
 		[pi5]
 		dtoverlay=vc4-kms-v3d-pi5
 		[all]
