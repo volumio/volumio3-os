@@ -347,6 +347,7 @@ device_chroot_tweaks_pre() {
 		### APPLY CUSTOM PARAMETERS TO userconfig.txt ###
 		display_auto_detect=1
 		enable_uart=1
+		arm_64bit=0
 		dtparam=uart0=on
 		dtparam=uart1=off
 		dtoverlay=dwc2,dr_mode=host
