@@ -343,6 +343,7 @@ search_for_factory_reset() {
       if [ -e ${USBMNT}/factory_reset ]; then
         echo " " >${BOOTMNT}/user_data
         log_success_msg "Factory reset initiated"
+        rm -f ${USBMNT}/factory_reset
         umount ${USBMNT} >/dev/null 2>&1
         break
       fi
