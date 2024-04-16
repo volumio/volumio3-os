@@ -159,6 +159,7 @@ device_chroot_tweaks_pre() {
 		[6.1.64]="01145f0eb166cbc68dd2fe63740fac04d682133e|master|1702"
 		[6.1.69]="ec8e8136d773de83e313aaf983e664079cce2815|master|1710"
 		[6.1.70]="fc9319fda550a86dc6c23c12adda54a0f8163f22|master|1712"
+		[6.1.77]="5fc4f643d2e9c5aa972828705a902d184527ae3f|master|1730"
 	)
 	# Version we want
 	KERNEL_VERSION="5.10.95"
