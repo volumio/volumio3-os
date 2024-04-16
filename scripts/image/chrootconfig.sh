@@ -149,6 +149,14 @@ if [[ -n "${PLYMOUTH_THEME}" ]]; then
   plymouth-set-default-theme -R "${PLYMOUTH_THEME}"
 fi
 
+if [[ -n "${PLYMOUTH_THEME}" ]]; then
+log "Setting plymouthd.defaults theme to ${PLYMOUTH_THEME}" "info"
+echo "[Daemon]
+Theme=${PLYMOUTH_THEME}
+ShowDelay=0
+DeviceTimeout=5">/usr/share/plymouth/plymouthd.defaults
+fi
+
 # Fix services for tmpfs logs
 log "Ensuring /var/log has right folders and permissions"
 sed -i '/^ExecStart=.*/i ExecStartPre=mkdir -m 700 -p /var/log/samba/cores' /lib/systemd/system/nmbd.service
