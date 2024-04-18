@@ -202,6 +202,13 @@ if [[ -n "${PLYMOUTH_THEME}" ]]; then
   cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" "${ROOTFSMNT}"/usr/share/plymouth/themes/"${PLYMOUTH_THEME}"
 fi
 
+if [[ -n "${OEM_EXT}" ]]; then
+  log "Copying selected Volumio OEM changes" "info"
+  cp -dR "${SRC}/volumio/oem/${OEM_EXT}/scripts/*" "${ROOTFSMNT}/root/scripts"
+  cp -dR "${SRC}/volumio/oem/${OEM_EXT}/systemd/*" "${ROOTFSMNT}/lib/systemd"
+fi
+
+
 if [[ "${KIOSKMODE}" == yes ]]; then
   if [[ "${KIOSKBROWSER}" == vivaldi ]]; then
     log "Copying Vivaldi kiosk scripts to rootfs"
@@ -249,6 +256,7 @@ BOOT_PART=${BOOT_PART}
 LOOP_DEV=${LOOP_DEV}
 DISABLE_DISPLAY="${DISABLE_DISPLAY}"
 PLYMOUTH_THEME=${PLYMOUTH_THEME}
+OEM_EXT="${OEM_EXT}"
 MODULES=($([[ -n ${MODULES} ]] && printf '\"%s\" ' "${MODULES[@]}"))
 PACKAGES=($([[ -n ${PACKAGES} ]] && printf '\"%s\" ' "${PACKAGES[@]}"))
 $(declare -f device_chroot_tweaks || true)      # Don't trigger our trap when function is empty

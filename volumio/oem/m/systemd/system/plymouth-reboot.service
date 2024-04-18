@@ -1,0 +1,13 @@
+[Unit]
+Description=Show Plymouth Reboot Screen
+After=getty@tty1.service display-manager.service plymouth-start.service
+Before=systemd-reboot.service
+DefaultDependencies=no
+ConditionKernelCommandLine=!plymouth.enable=0
+ConditionKernelCommandLine=!nosplash
+ConditionVirtualization=!container
+
+[Service]
+ExecStart=/sbin/plymouthd --mode=shutdown --attach-to-session
+ExecStartPost=-/bin/plymouth show-splash
+Type=forking
