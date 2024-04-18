@@ -30,7 +30,6 @@ MYVOLUMIO=no
 VOLINITUPDATER=yes
 KIOSKMODE=yes
 KIOSKBROWSER=vivaldi
-OEM_EXT=m     # m=First letter of the OEM product or empty if none
 
 ## Partition info
 BOOT_START=0
