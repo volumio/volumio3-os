@@ -36,7 +36,10 @@ BOOT_END=96
 BOOT_TYPE=msdos    # msdos or gpt
 BOOT_USE_UUID=yes  # Add UUID to fstab
 INIT_TYPE="initv3"
-PLYMOUTH_THEME="volumio-player"
+
+## Plymouth theme management
+PLYMOUTH_THEME="volumio-player"	# Choices are: {volumio,volumio-logo,volumio-player}
+INIT_PLYMOUTH_DISABLE=no		# yes/no or empty. Removes plymouth initialization in init if "yes" is selected 
 
 # Modules that will be added to initramfs
 MODULES=("fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas")
