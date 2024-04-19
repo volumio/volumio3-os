@@ -202,7 +202,7 @@ if [[ -n "${PLYMOUTH_THEME}" ]]; then
   cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" "${ROOTFSMNT}"/usr/share/plymouth/themes/"${PLYMOUTH_THEME}"
 fi
 
-if [[ -n "${INIT_PLYMOUTH_DIABLE}" == yes ]]; then
+if [[ -n "${INIT_PLYMOUTH_DISABLE}" == yes ]]; then
   log "Disable plymouth in init with ORDER metadata changes" "info"
   cp -dR "${SRC}"/volumio/framebuffer/init/scripts/* "${ROOTFSMNT}"/root/scripts
 fi
@@ -254,7 +254,7 @@ BOOT_PART=${BOOT_PART}
 LOOP_DEV=${LOOP_DEV}
 DISABLE_DISPLAY="${DISABLE_DISPLAY}"
 PLYMOUTH_THEME=${PLYMOUTH_THEME}
-OEM_EXT="${OEM_EXT}"
+INIT_PLYMOUTH_DISABLE="${INIT_PLYMOUTH_DISABLE}"
 MODULES=($([[ -n ${MODULES} ]] && printf '\"%s\" ' "${MODULES[@]}"))
 PACKAGES=($([[ -n ${PACKAGES} ]] && printf '\"%s\" ' "${PACKAGES[@]}"))
 $(declare -f device_chroot_tweaks || true)      # Don't trigger our trap when function is empty
