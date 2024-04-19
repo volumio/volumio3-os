@@ -1,0 +1,13 @@
+[Unit]
+Description=Plymouth switch root service
+DefaultDependencies=no
+ConditionPathExists=/etc/initrd-release
+Before=initrd-switch-root.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=-/bin/plymouth update-root-fs --new-root-dir=/sysroot
+StandardInput=null
+StandardOutput=null
+StandardError=null
