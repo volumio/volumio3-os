@@ -45,6 +45,8 @@ PACKAGES=( # Bluetooth packages
 	"bluez" "bluez-firmware" "pi-bluetooth"
 	# Foundation stuff
 	"raspberrypi-sys-mods"
+	# Framebuffer stuff
+	"fbset"	
 	# "rpi-eeprom"\ Needs raspberrypi-bootloader that we hold back
 	# GPIO stuff
 	"wiringpi"	
