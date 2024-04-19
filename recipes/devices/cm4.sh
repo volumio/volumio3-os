@@ -458,6 +458,9 @@ device_chroot_tweaks_post() {
 
 # Will be called by the image builder post the chroot, before finalisation
 device_image_tweaks_post() {
-	# log "Running device_image_tweaks_post" "ext"
-	:
+	log "Running device_image_tweaks_post" "ext"
+    # Plymouth systemd services OVERWRITE
+	if [[ -n $UPDATE_PLYMOUTH_SERVICES == yes ]]; then
+        log "Updating plymouth systemd services" "info"
+        cp -dR "${SRC}"/volumio/framebuffer/systemd/* "${ROOTFSMNT}"/lib/systemd
 }
