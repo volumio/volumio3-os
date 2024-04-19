@@ -202,7 +202,7 @@ if [[ -n "${PLYMOUTH_THEME}" ]]; then
   cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" "${ROOTFSMNT}"/usr/share/plymouth/themes/"${PLYMOUTH_THEME}"
 fi
 
-if [[ -n "${INIT_PLYMOUTH_DISABLE}" == yes ]]; then
+if [[ "${INIT_PLYMOUTH_DISABLE}" == yes ]]; then
   log "Disable plymouth in init with ORDER metadata changes" "info"
   cp -dR "${SRC}"/volumio/framebuffer/init/scripts/* "${ROOTFSMNT}"/root/scripts
 fi
