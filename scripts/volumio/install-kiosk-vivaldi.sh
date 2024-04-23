@@ -18,6 +18,8 @@ CMP_PACKAGES=(
   "fonts-liberation" "libatk-bridge2.0-0" "libatk1.0-0" "libatspi2.0-0" "libgtk-3-0" "libnspr4" "libnss3" "xdg-utils"
   # Fonts
   "fonts-arphic-ukai" "fonts-arphic-gbsn00lp" "fonts-unfonts-core"
+  # Fonts for Japanese and Thai languages
+  "fonts-ipafont" "fonts-vlgothic" "fonts-thai-tlwg-ttf"
 )
 
 log "Installing ${#CMP_PACKAGES[@]} ${CMP_NAME} packages:" "" "${CMP_PACKAGES[*]}"

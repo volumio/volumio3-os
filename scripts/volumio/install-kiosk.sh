@@ -19,6 +19,8 @@ CMP_PACKAGES=(
   "chromium" "chromium-l10n"
   # Fonts
   "fonts-arphic-ukai" "fonts-arphic-gbsn00lp" "fonts-unfonts-core"
+  # Fonts for Japanese and Thai languages
+  "fonts-ipafont" "fonts-vlgothic" "fonts-thai-tlwg-ttf"
 )
 
 log "Installing ${#CMP_PACKAGES[@]} ${CMP_NAME} packages:" "" "${CMP_PACKAGES[*]}"
