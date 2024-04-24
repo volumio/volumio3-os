@@ -1,6 +1,6 @@
 [Plymouth Theme]
 Name=Volumio3
-Description=This is a plymouth theme which simply displays aa sequence of images
+Description=This is a plymouth theme which displays a sequence of images
 ModuleName=script
 
 [script]
