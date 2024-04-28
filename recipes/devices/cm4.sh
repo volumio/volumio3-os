@@ -389,8 +389,6 @@ device_chroot_tweaks_pre() {
 	fi
 	kernel_params+=("${SHOW_SPLASH}")
 	# Boot screen stuff
-	kernel_params+=("video=DSI-1:800x1280M@60e" "fbcon=map:0" "fbcon=rotate:3")
-	# Boot screen stuff
 	kernel_params+=("plymouth.ignore-serial-consoles")
 	# Raspi USB controller params
 	# TODO: Check if still required!
