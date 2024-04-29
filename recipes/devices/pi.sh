@@ -36,15 +36,21 @@ BOOT_END=96
 BOOT_TYPE=msdos    # msdos or gpt
 BOOT_USE_UUID=yes  # Add UUID to fstab
 INIT_TYPE="initv3"
-PLYMOUTH_THEME="volumio-player"
+
+## Plymouth theme management
+PLYMOUTH_THEME="volumio-player"	# Choices are: {volumio,volumio-logo,volumio-player}
+INIT_PLYMOUTH_DISABLE="no"		# yes/no or empty. Removes plymouth initialization in init if "yes" is selected 
+UPDATE_PLYMOUTH_SERVICES="no"	# yes/no or empty. Replaces default plymouth systemd services if "yes" is selected
 
 # Modules that will be added to initramfs
-MODULES=("fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas")
+MODULES=("drm" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas")
 # Packages that will be installed
 PACKAGES=( # Bluetooth packages
 	"bluez" "bluez-firmware" "pi-bluetooth"
 	# Foundation stuff
 	"raspberrypi-sys-mods"
+	# Framebuffer stuff
+	"fbset"	
 	# "rpi-eeprom"\ Needs raspberrypi-bootloader that we hold back
 	# GPIO stuff
 	"wiringpi"	
@@ -499,6 +505,10 @@ device_chroot_tweaks_post() {
 
 # Will be called by the image builder post the chroot, before finalisation
 device_image_tweaks_post() {
-	# log "Running device_image_tweaks_post" "ext"
-	:
+	log "Running device_image_tweaks_post" "ext"
+    # Plymouth systemd services OVERWRITE
+	if [[ "${UPDATE_PLYMOUTH_SERVICES}" == yes ]]; then
+        log "Updating plymouth systemd services" "info"
+        cp -dR "${SRC}"/volumio/framebuffer/systemd/* "${ROOTFSMNT}"/lib/systemd
+	fi
 }

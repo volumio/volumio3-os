@@ -154,7 +154,7 @@ log "Setting plymouthd.defaults theme to ${PLYMOUTH_THEME}" "info"
 echo "[Daemon]
 Theme=${PLYMOUTH_THEME}
 ShowDelay=0
-DeviceTimeout=5">/usr/share/plymouth/plymouthd.defaults
+DeviceTimeout=10">/usr/share/plymouth/plymouthd.defaults
 fi
 
 # Fix services for tmpfs logs
