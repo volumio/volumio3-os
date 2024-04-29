@@ -34,7 +34,7 @@ BOOT_TYPE=msdos  # msdos or gpt
 INIT_TYPE="init" # init.{x86/nextarm/nextarm_tvbox}
 
 # Modules that will be added to intramfs
-MODULES=("overlay" "squashfs" "fuse" "uas" "nls_cp437" "nls_iso8859_1")
+MODULES=("drm" "drm_panel_orientation_quirks" "fuse" "nls_cp437" "nls_iso8859_1" "overlay" "panel-ilitek-ili9881c" "panel-waveshare-dsi" "squashfs"  "uas")
 # Packages that will be installed
 PACKAGES=(
 	# Bluetooth packages
