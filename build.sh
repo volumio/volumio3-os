@@ -206,11 +206,11 @@ function patch_multistrap_conf() {
   local type="$1"
   case "$type" in
   raspbian)
-    log "Patching multistrap config to point to Raspbian sources" "info"
+    log "Patching multistrap config to point to Raspbian sources" "info" "${APTSOURCE[Raspbian]}"
     BASECONF=recipes/base/VolumioBase.conf
     export RASPBIANCONF=recipes/base/arm-raspbian.conf
     debian_source=http://deb.debian.org/debian
-    rapsbian_source=http://mirrordirector.raspbian.org/raspbian
+    rapsbian_source="${APTSOURCE[Raspbian]}"
 
     cat <<-EOF >"${SRC}/${RASPBIANCONF}"
 		# Auto generated multistrap configuration for Raspberry Pi

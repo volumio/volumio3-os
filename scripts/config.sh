@@ -13,7 +13,8 @@ declare -A SecureApt=(
 # Repo locations that are utilised to create source.list in the rootfs
 declare -A APTSOURCE=(
   [Debian]="http://deb.debian.org/debian"
-  [Raspbian]="http://raspbian.raspberrypi.org/raspbian/"
+  [Raspbian]="http://mirror.transip.net/raspbian/raspbian"
+  # [Raspbian]="http://raspbian.raspberrypi.org/raspbian/"
 )
 
 ## Path to the volumio repo
