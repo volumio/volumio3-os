@@ -177,6 +177,7 @@ device_chroot_tweaks_pre() {
 	# List of custom firmware -
 	# github archives that can be extracted directly
 	declare -A CustomFirmware=(
+		[PiCustom]="https://raw.githubusercontent.com/Darmur/volumio-rpi-custom/main/output/modules-rpi-${KERNEL_VERSION}-custom.tar.gz"
 		[MotivoCustom]="https://github.com/volumio/motivo-drivers/raw/main/output/modules-rpi-${KERNEL_VERSION}-motivo.tar.gz"
 	)
 
