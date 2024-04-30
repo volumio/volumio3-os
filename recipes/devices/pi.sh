@@ -162,7 +162,7 @@ device_chroot_tweaks_pre() {
 		[6.1.77]="5fc4f643d2e9c5aa972828705a902d184527ae3f|master|1730"
 	)
 	# Version we want
-	KERNEL_VERSION="6.1.69"
+	KERNEL_VERSION="6.1.77"
 
 	MAJOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 1)
 	MINOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 2)
