@@ -387,6 +387,7 @@ device_chroot_tweaks_pre() {
 		log "Default image: change loglevel to value: 0, nodebug, no break  and no kmsg in cmdline.txt" "cfg"
 		KERNEL_LOGLEVEL="loglevel=0 nodebug use_kmsg=no" # Default to KERN_EMERG
 	fi
+	# Show splash
 	kernel_params+=("${SHOW_SPLASH}")
 	# Boot screen stuff
 	kernel_params+=("plymouth.ignore-serial-consoles")
@@ -394,6 +395,7 @@ device_chroot_tweaks_pre() {
 	# TODO: Check if still required!
 	# Prevent Preempt-RT lock up
 	kernel_params+=("dwc_otg.fiq_enable=1" "dwc_otg.fiq_fsm_enable=1" "dwc_otg.fiq_fsm_mask=0xF" "dwc_otg.nak_holdoff=1")
+	# Hide kernel's stdio
 	kernel_params+=("${KERNEL_QUIET}")
 	# Output console device and options.
 	kernel_params+=("console=serial0,115200" "console=tty1")
