@@ -29,7 +29,7 @@ log "${CMP_NAME} Dependencies installed!"
 
 log "Download Vivaldi"
 cd /home/volumio/
-wget https://github.com/volumio/volumio3-os-static-assets/raw/master/browsers/vivaldi/vivaldi-stable_6.1.3035.302-1_armhf.deb
+wget https://github.com/volumio/volumio3-os-static-assets/raw/master/browsers/vivaldi/vivaldi-stable_6.7.3329.21-1_armhf.deb
 
 log "Install  Vivaldi"
 sudo dpkg -i /home/volumio/vivaldi-*.deb
