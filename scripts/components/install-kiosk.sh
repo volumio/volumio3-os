@@ -111,6 +111,13 @@ if [ -L /data/volumiokiosk/SingletonCookie ]; then
   rm -rf /data/volumiokiosk/Singleton*
 fi
 
+if [ ! -f /data/volumiokiosk/firststartdone ]; then
+  echo "Volumio Kiosk Starting for the first time, giving time for Volumio To start"
+  sleep 15
+  touch /data/volumiokiosk/firststartdone
+fi
+
+
 # Wait for Volumio webUI to be available
 while true; do timeout 5 bash -c "</dev/tcp/127.0.0.1/3000" >/dev/null 2>&1 && break; done
 echo "Waited \$((\$(date +%s) - start)) sec for Volumio UI"
