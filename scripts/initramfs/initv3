@@ -357,6 +357,16 @@ log_end_msg
 #
 # As a result, bootdev ($BOOT_DEVICE), bootpart (BOOT_PARTITION, imgpart (IMAGE_PARTITION
 # and datapart ($DATA_PARTITION) will be parsed and validated.
+
+# Some of the USB devices are taking time to report ready status, USB boot Pi devices may not get
+# /dev/sd[a-z] in time
+
+if [ ! -z "${BOOT_DELAY}" ]; then
+	log_begin_msg "Doing a ${BOOT_DELAY} second delay here to give kernel load a headstart"
+	sleep ${BOOT_DELAY}
+	log_end_msg
+fi
+
 plymouth_msg "Player preparing startup"
 
 # Process UUID - is conversion from genpnames complete?
@@ -399,12 +409,6 @@ move_backup_gpt_table
 maybe_volumio_break krnl-archive "init: $LINENO"
 
 create_kernel_archive
-
-if [ ! -z "${BOOT_DELAY}" ]; then
-	log_begin_msg "Doing a ${BOOT_DELAY} second delay here to give kernel load a headstart"
-	sleep ${BOOT_DELAY}
-	log_end_msg
-fi
 
 # ROOTFS update on usb disk?
 #
