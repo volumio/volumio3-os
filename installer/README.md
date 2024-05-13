@@ -21,7 +21,7 @@ With more than one, the installer will not work!
 
 ## How it works
 
-Basically, the installer creates the 3 standard partitions on the target devices, as specified in the build recipe, for the data partition it takes the rest of the disk. does.  TGhen it copies the bootpartition and the image partition files. 
+Basically, the installer creates the 3 standard partitions on the target devices, as specified in the build recipe, for the data partition it takes the rest of the disk. does.  Then it copies the bootpartition and the image partition files. 
 
 The installer is made up of 5 components:
 

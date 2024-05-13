@@ -10,3 +10,4 @@ source "${SRC}"/recipes/devices/families/nanopi-armbian_rk3328.sh
 
 ### Device information
 DEVICENAME="NanoPi Neo3" # Pretty name
+DISABLE_DISPLAY=yes

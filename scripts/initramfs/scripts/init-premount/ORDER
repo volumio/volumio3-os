@@ -1,0 +1,2 @@
+/scripts/init-premount/plymouth "$@"
+[ -e /conf/param.conf ] && . /conf/param.conf

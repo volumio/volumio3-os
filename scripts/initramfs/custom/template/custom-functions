@@ -1,0 +1,24 @@
+#!/bin/sh
+
+
+# Use this template to override any function in "volumio-functions" to make it device-specific.
+
+# Keep your custom-functions script in a separate device folder in "scripts/initramfs".
+# The foldername should reflect the DEVICENAME or DEVICEFAMILY for transparency.
+
+# Refer to the x86 platform build script for the location of placement of the "customs-functions"
+# It should be done in function "device-image-tweaks()".
+
+# Just copy the original function source here and adapt the code.
+# Following is an example from the x86 build.
+# You can overwrite the whole template, except for the she-bang.
+
+validate_imgfile_imgpart() {
+  log_begin_msg "Squash image" $SQUASH_FILE && log_end_msg
+  log_begin_msg "Boot partition" $BOOT_PARTITION && log_end_msg
+  log_begin_msg "Image partition" $IMAGE_PARTITION && log_end_msg
+  log_begin_msg "Data partition" $DATA_PARTITION && log_end_msg
+  
+  BOOT_DEVICE=/dev/$(lsblk -no PKNAME "${BOOT_PARTITION}")
+  log_begin_msg "Boot device" $BOOT_DEVICE && log_end_msg
+}

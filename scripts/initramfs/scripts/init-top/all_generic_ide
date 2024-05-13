@@ -1,0 +1,28 @@
+#!/bin/sh
+
+PREREQ=""
+prereqs()
+{
+	echo "$PREREQ"
+}
+case $1 in
+# get pre-requisites
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+# shellcheck disable=SC2013
+for x in $(cat /proc/cmdline); do
+	case ${x} in
+	all_generic_ide)
+		/sbin/modprobe ata_generic all_generic_ide=1
+		;;
+	all_generic_ide=*)
+		if [ -n "${x#all_generic_ide=}" ]; then
+			/sbin/modprobe ata_generic all_generic_ide=1
+		fi
+		;;
+	esac
+done

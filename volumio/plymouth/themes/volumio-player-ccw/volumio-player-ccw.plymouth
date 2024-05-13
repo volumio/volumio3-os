@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Volumio3
+Description=This is a plymouth theme which displays a sequence of images rotated counter clockwise
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/volumio-player-ccw/sequence
+ScriptFile=/usr/share/plymouth/themes/volumio-player-ccw/volumio-player-ccw.script

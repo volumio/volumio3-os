@@ -1,0 +1,17 @@
+#!/bin/sh
+
+PREREQ="udev"
+
+prereqs()
+{
+	echo "${PREREQ}"
+}
+
+case ${1} in
+	prereqs)
+		prereqs
+		exit 0
+		;;
+esac
+
+/usr/bin/plymouth --newroot=${rootmnt}

@@ -14,6 +14,11 @@ DEVICENAME="Odroid M1S"
 KIOSKMODE=no
 KIOSKBROWSER=vivaldi
 
+# Plymouth theme?
+PLYMOUTH_THEME="volumio-player"
+# Debug image?
+DEBUG_IMAGE="no"
+
 ## Partition info
 BOOT_END=84
 
@@ -30,5 +35,6 @@ device_chroot_tweaks() {
   sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/bootparams.ini
   sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/bootparams.ini
   sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/bootparams.ini
+
 }
 

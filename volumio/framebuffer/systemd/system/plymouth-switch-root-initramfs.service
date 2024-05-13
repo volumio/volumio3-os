@@ -1,0 +1,15 @@
+[Unit]
+Description=Tell Plymouth To Jump To initramfs
+DefaultDependencies=no
+# dracut-shutdown.service restores the initramfs when it is _stopped_
+# use Conflicts to make sure its ExecStop has run before we do
+Conflicts=dracut-shutdown.service
+After=plymouth-halt.service plymouth-reboot.service plymouth-poweroff.service plymouth-kexec.service dracut-shutdown.service
+ConditionPathExists=/run/initramfs/bin/sh
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=-/bin/plymouth update-root-fs --new-root-dir=/run/initramfs
+Type=oneshot
+RemainAfterExit=yes

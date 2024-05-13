@@ -1,0 +1,9 @@
+[Unit]
+Description=Hold until boot process finishes up
+After=rc-local.service plymouth-start.service systemd-user-sessions.service
+
+[Service]
+ExecStart=-/bin/plymouth --wait
+Type=oneshot
+RemainAfterExit=yes
+TimeoutSec=0

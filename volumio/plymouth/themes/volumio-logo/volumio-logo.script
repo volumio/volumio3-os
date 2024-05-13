@@ -1,0 +1,106 @@
+#  volumio.script - boot splash plugin
+#
+#  Copyright (C) 2024 Volumio Srl
+#  
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2, or (at your option)
+#  any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+#  02111-1307, USA.
+#
+#  Written by: Gé Koerkamp 
+#
+#  References:
+#    Freedesktop.org:
+#      https://www.freedesktop.org/wiki/Software/Plymouth/Scripts/
+#
+#    Plymouth theming by Charlie Brej <cbrej@cs.man.ac.uk>:
+#      http://brej.org/blog/?p=158
+#      http://brej.org/blog/?p=174
+#      http://brej.org/blog/?p=197 
+#      http://brej.org/blog/?p=238
+#
+#    Splash screen with scrolling messages:
+#      http://joekuan.wordpress.com/2010/08/05/plymouth-create-your-own-splash-screen-with-scrolling-boot-messages/
+#
+
+num_scroll_lines = 4;
+line_width = 80;
+
+logo.image = Image ("volumio-logo.png");
+logo.sprite = Sprite ();
+logo.sprite.SetImage (logo.image);
+
+#logo.x = 10;
+logo.x = Window.GetWidth()/2 - logo.image.GetWidth()/2;
+logo.y = Window.GetHeight()/2 - logo.image.GetHeight()/2;
+logo.z = 1000;
+
+logo.sprite.SetX (logo.x);
+logo.sprite.SetY (logo.y);
+logo.sprite.SetZ (logo.z);
+logo.sprite.SetOpacity (1);
+
+for (index = 0; index < num_scroll_lines; index++) {
+  lines[index] = Image.Text ("", 1, 1 , 1);
+  message[index] = Sprite ();
+  message[index].SetX (logo.x);
+  message[index].SetY (logo.y + 400 + (index * 20));
+  message[index].SetZ (10000); 
+  message[index].SetImage (lines[index]);
+}
+
+# Call this when updating the screen
+fun draw_logo () {
+  logo.sprite.SetX (logo.x);
+  logo.sprite.SetY (logo.y);
+  logo.sprite.SetZ (logo.z);
+  logo.sprite.SetOpacity (1);
+}
+
+fun StringLength(string) {
+  pos = 0;
+  str = String (string);
+  while(str.CharAt(pos)) pos++;
+  return pos;
+}
+
+fun refresh_callback () {
+  draw_logo ();
+}
+  
+Plymouth.SetRefreshFunction (refresh_callback);
+
+fun message_callback(text) {
+
+  if (StringLength(text) > line_width) {
+    text = text.SubString(0, line_width - 3);
+    text += "...";
+  }
+
+  for (index = 0; index < num_scroll_lines - 1; index++) {
+    lines[index] = lines[index + 1];
+  }
+  
+  lines[index] = Image.Text (text, 0, 1, 0.7, 1, "Sans 11");
+  
+  for (index = 0; index < num_scroll_lines; index++) {
+    message[index].SetImage (lines[index]);
+    # Re-position image
+    index_pos_x = Window.GetWidth()/2 - lines[index].GetWidth()/2;
+    message[index].SetX (index_pos_x);
+    message[index].SetY (logo.y + 400 + (index * 20));
+    message[index].SetZ (10000);
+  }  
+}
+
+Plymouth.SetMessageFunction (message_callback);

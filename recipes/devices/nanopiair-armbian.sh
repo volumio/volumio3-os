@@ -10,3 +10,4 @@ source "${SRC}"/recipes/devices/families/nanopi-armbian_h3.sh
 
 ### Device information
 DEVICENAME="NanoPi Neo Air" # Pretty name
+DISABLE_DISPLAY=yes

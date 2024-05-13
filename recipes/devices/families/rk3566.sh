@@ -23,15 +23,13 @@ DEVICEREPO="https://github.com/gkkpch/platform-${DEVICEFAMILY}.git"
 VOLVARIANT=no # Custom Volumio (Motivo/Primo etc)
 MYVOLUMIO=no
 VOLINITUPDATER=yes
-KIOSKMODE=no
-KIOSKBROWSER=vivaldi
 
 ## Partition info
 BOOT_START=20
 BOOT_END=96
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
-INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3" 
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437"  "fuse")
@@ -65,6 +63,21 @@ device_chroot_tweaks() {
 
 # Will be run in chroot - Pre initramfs
 device_chroot_tweaks_pre() {
+
+
+# Configure kernel parameters, overrule $verbosity in order to keep the template (platform files) untouched
+  if [ "${DEBUG_IMAGE}" == "yes" ]; then
+    log "Configuring DEBUG kernel parameters" "cfg"
+    sed -i "s/loglevel=\${verbosity}/loglevel=8 nosplash break= use_kmsg=yes/" /boot/boot.cmd
+  else
+    log "Configuring default kernel parameters" "cfg"
+    sed -i "s/loglevel=\${verbosity}/quiet loglevel=0/" /boot/boot.cmd
+    if [[ -n "${PLYMOUTH_THEME}" ]]; then
+      log "Adding splash kernel parameters" "cfg"      
+      sed -i "s/loglevel=0/loglevel=0 splash plymouth.ignore-serial-consoles initramfs.clear/" /boot/boot.cmd
+    fi  
+  fi
+
   log "Performing device_chroot_tweaks_pre" "ext"
   log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
   cat <<-EOF >>/etc/sysctl.conf

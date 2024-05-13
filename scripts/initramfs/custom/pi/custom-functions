@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+#
+custom_init_partition_params() { 
+# After upgrade from block device UUID will not be active yet. Use genpnames:
+log_begin_msg "Checking if device is booted from SD card" && log_end_msg
+
+for devlink in /dev/mmcblk[0-9]; do
+  if [ "${devlink}" == "/dev/mmcblk[0-9]" ]; then
+  # no MMC block devices present
+    break
+  fi
+  export BOOT_DEVICE="mmcblk0"
+  export DO_GEN="yes"
+  export DPS="p"
+done
+  BOOT_CONFIG="cmdline.txt"
+}
+
+custom_update_UUID() {
+# This should normally only affect configurations change from block device to "disk/by-UUID"
+# or when BOOT_PARTITION device argument was changed with a new release (seldom)
+UUIDFMT=`cat /proc/cmdline | grep "UUID=" -o`
+if [ ! -z "${UUIDFMT}" ]; then
+  UUID_BOOT_PARTITION=$(blkid -s UUID -o value ${BOOT_PARTITION})
+  UUID_BOOT_CONFIG=`cat "${BOOTMNT}/${BOOT_CONFIG}" | grep -E "[0-9A-F]{4}-[0-9A-F]{4}" -o`
+  if [ ! $UUID_BOOT_PARTITION == $UUID_BOOT_CONFIG ]; then
+
+    plymouth_msg "Player internal paremeters update from successful system upgrade"
+
+    log_begin_msg "Updating UUIDs in ${BOOT_CONFIG}" && log_end_msg
+    update_UUID "bootpart" ${BOOT_PARTITION} ${BOOT_CONFIG}
+    update_UUID "imgpart" ${IMAGE_PARTITION} ${BOOT_CONFIG}
+    update_UUID "datapart" ${DATA_PARTITION} ${BOOT_CONFIG}
+    log_end_msg
+  fi
+fi
+}

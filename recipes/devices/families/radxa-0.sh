@@ -11,8 +11,6 @@ ARCH="armhf"
 BUILD="armv7"
 UINITRD_ARCH="arm64"
 
-### Device information
-DEVICENAME="Radxa Zero"
 # This is useful for multiple devices sharing the same/similar kernel
 DEVICEFAMILY="radxazero"
 # tarball from DEVICEFAMILY repo to use
@@ -30,7 +28,7 @@ BOOT_START=20
 BOOT_END=84
 BOOT_TYPE=msdos          # msdos or gpt
 BOOT_USE_UUID=yes        # Add UUID to fstab
-INIT_TYPE="init.nextarm" # init.{x86/nextarm/nextarm_tvbox}
+INIT_TYPE="initv3" 
 
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437"  "fuse")
@@ -49,7 +47,7 @@ write_device_files() {
   cp -pdR "${PLTDIR}/${DEVICE}/volumio" "${ROOTFSMNT}"
   
   log "Mark the boot partition with radxa-zero version "${VERSION}""
-  echo "${VERSION}" > "${ROOTFSMNT}"/boot/radxa-zero.version
+  log "${VERSION}" > "${ROOTFSMNT}"/boot/radxa-zero.version
   
 }
 
@@ -75,17 +73,38 @@ device_chroot_tweaks() {
 # Will be run in chroot - Pre initramfs
 device_chroot_tweaks_pre() {
   log "Performing device_chroot_tweaks_pre" "ext"
+
+  log "Creating boot parameters from template"
+  sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
+  sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
+  sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/armbianEnv.txt
+
+# Configure kernel parameters, overrule $verbosity in order to keep the template (platform files) untouched
+# Deactivate Armbian bootlogo settings
+  sed -i "s/splash=verbose//" /boot/boot.cmd 
+  sed -i "s/splash plymouth.ignore-serial-consoles//" /boot/boot.cmd
+
+  if [ "${DEBUG_IMAGE}" == "yes" ]; then
+    log "Configuring DEBUG kernel parameters" "cfg"
+    sed -i "s/loglevel=\${verbosity}/loglevel=8 nosplash break= use_kmsg=yes/" /boot/boot.cmd
+  else
+    log "Configuring default kernel parameters" "cfg"
+    sed -i "s/console=both/console=serial/" /boot/armbianEnv.txt
+    sed -i "s/loglevel=\${verbosity}/quiet loglevel=0/" /boot/boot.cmd
+    if [[ -n "${PLYMOUTH_THEME}" ]]; then
+      log "Adding splash kernel parameters" "cfg"      
+      sed -i "s/loglevel=0/loglevel=0 splash plymouth.ignore-serial-consoles initramfs.clear/" /boot/boot.cmd
+    fi  
+  fi
+
   log "Fixing armv8 deprecated instruction emulation with armv7 rootfs"
   cat <<-EOF >/etc/sysctl.conf
 abi.cp15_barrier=2
 EOF
 
-  log "Creating boot parameters from template"
-  sed -i "s/rootdev=UUID=/rootdev=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
-  sed -i "s/imgpart=UUID=/imgpart=UUID=${UUID_IMG}/g" /boot/armbianEnv.txt
-  sed -i "s/bootpart=UUID=/bootpart=UUID=${UUID_BOOT}/g" /boot/armbianEnv.txt
-  sed -i "s/datapart=UUID=/datapart=UUID=${UUID_DATA}/g" /boot/armbianEnv.txt
-
+  log "Changing initramfs module config to 'modules=list' to limit volumio.initrd size" "cfg"
+  sed -i "s/MODULES=most/MODULES=list/g" /etc/initramfs-tools/initramfs.conf
+	
   log "Adding gpio group and udev rules"
   groupadd -f --system gpio
   usermod -aG gpio volumio
@@ -105,9 +124,10 @@ device_chroot_tweaks_post() {
 device_image_tweaks_post() {
   log "Running device_image_tweaks_post" "ext"
   log "Creating uInitrd from 'volumio.initrd'" "info"
-  if [[ -f "${ROOTFSMNT}"/boot/volumio.initrd ]]; then
-    mkimage -v -A "${UINITRD_ARCH}" -O linux -T ramdisk -C none -a 0 -e 0 -n uInitrd -d "${ROOTFSMNT}"/boot/volumio.initrd "${ROOTFSMNT}"/boot/uInitrd
-    rm "${ROOTFSMNT}"/boot/volumio.initrd
+  if [[ -f "${ROOTFSMNT}/boot/volumio.initrd" ]]; then
+    mv "${ROOTFSMNT}/boot/volumio.initrd" ${SRC}
+    mkimage -v -A "${UINITRD_ARCH}" -O linux -T ramdisk -C none -a 0 -e 0 -n uInitrd -d "${SRC}/volumio.initrd" "${ROOTFSMNT}/boot/uInitrd"
+    rm "${SRC}/volumio.initrd"
   fi
   if [[ -f "${ROOTFSMNT}"/boot/boot.cmd ]]; then
     log "Creating boot.scr"

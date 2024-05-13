@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Volumio3
+Description=This is a plymouth theme which simply displays an image and a text array (scrolling)
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/volumio-logo
+ScriptFile=/usr/share/plymouth/themes/volumio-logo/volumio-logo.script

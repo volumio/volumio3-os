@@ -1,0 +1,22 @@
+
+#mandatory function
+write_device_bootloader()
+{
+   :
+}
+
+led_show_init_signal()
+{
+   :
+}
+
+led_show_start_signal()
+{
+   :
+}
+
+led_show_finish_signal()
+{
+   :
+}
+
