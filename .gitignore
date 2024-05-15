@@ -1,8 +1,10 @@
 # Build system specific
-build
+Build_*
+build*
 logs
 platform-*
 myVolumioSDK
+VolumioSDK*
 
 # We don't need logs and image artifacts
 *.log
