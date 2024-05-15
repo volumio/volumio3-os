@@ -588,6 +588,7 @@ update_UUID() {
       sed -i "s/${uuidkey}=UUID=[a-fA-F0-9]\{4\}-[a-fA-F0-9]\{4\}/${uuidkey}=UUID=${uuid}/g" ${BOOTMNT}/$3
       if [ ! -z $4 ]; then
         sed -i "s/${uuidkey}=UUID=[a-fA-F0-9]\{4\}-[a-fA-F0-9]\{4\}/${uuidkey}=UUID=${uuid}/g" ${BOOTMNT}/$4
+        sed -i "s/--set=root [a-fA-F0-9]\{4\}-[a-fA-F0-9]\{4\}/--set=root ${uuid}/g" ${BOOTMNT}/$4
       fi
       ;;
   esac
