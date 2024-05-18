@@ -280,8 +280,10 @@ create_kernel_archive() {
     cp -pR ${BOOTMNT}/* ${IMAGEMNT}/boot
     [ -e "${IMAGEMNT}/boot/ldlinux.sys" ] && rm ${IMAGEMNT}/boot/ldlinux.sys
     tar cf ${IMAGEMNT}/kernel_current.tar -C ${IMAGEMNT}/boot .
+    sync
     rm -r ${IMAGEMNT}/boot
     rm ${IMAGEMNT}/current_kernel_creation
+    sync
     log_end_msg
   fi
 }
@@ -307,6 +309,7 @@ search_for_firmware_update_rootfs() {
         # assume data on "/mnt/boot"
         volumio-init-updater >/dev/null 2>&1
         [ -e ${USBMNT}/*.fir ] && rm -f ${USBMNT}/*.fir
+        sync
         log_success_msg "Success, update from USB applied" && log_end_msg
 
         plymouth_msg "Player update from USB completed"
@@ -344,6 +347,7 @@ search_for_factory_reset() {
         echo " " >${BOOTMNT}/user_data
         log_success_msg "Factory reset initiated"
         rm -f ${USBMNT}/factory_reset
+        sync
         umount ${USBMNT} >/dev/null 2>&1
         break
       fi
@@ -363,6 +367,7 @@ search_for_factory_reset() {
       update_UUID "datapart" ${DATA_PARTITION} ${BOOT_CONFIG}
     fi
     rm ${BOOTMNT}/user_data
+    sync
     log_end_msg
   fi
   rmdir ${USBMNT}
@@ -375,10 +380,12 @@ search_for_kernel_rollback() {
     log_begin_msg "Previous update attempt failed, restoring fallbacks"
     cp ${IMAGEMNT}/kernel_fallback.tar ${IMAGEMNT}/kernel_current.tar
     cp ${IMAGEMNT}/volumio_fallback.tar ${IMAGEMNT}/volumio_current.tar
+    sync
     if [ -e "/boot/kernel_update" ]; then
       rm ${BOOTMNT}/kernel_update
     fi
     rm ${BOOTMNT}/update_process
+    sync
   fi
   log_end_msg
 }
@@ -398,6 +405,7 @@ process_kernel_update() {
   
     # remove all previous kernel config files
     rm ${BOOTMNT}/config-* >/dev/null 2>&1
+    sync
     
     # Note: this can be overruled by a custom function (eg. custom function for Raspberry Pi)
     unpack_kernel
@@ -414,6 +422,8 @@ process_kernel_update() {
     post_kernel_update
     
     rm ${BOOTMNT}/kernel_update
+    sync
+
     plymouth_msg "Success, player restarts after 5 seconds"
     sleep 5
     do_reboot
@@ -599,6 +609,7 @@ unpack_kernel() {
 # Default function to unpack a new kernel tar
     log_begin_msg "Processing a kernel update, unpack kernel archive"
     tar xf ${IMAGEMNT}/kernel_current.tar -C ${BOOTMNT}
+    sync
     log_end_msg
 }
 
