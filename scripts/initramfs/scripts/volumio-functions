@@ -379,6 +379,7 @@ search_for_kernel_rollback() {
   if [ -e "${BOOTMNT}/update_process" ]; then
     log_begin_msg "Previous update attempt failed, restoring fallbacks"
     cp ${IMAGEMNT}/kernel_fallback.tar ${IMAGEMNT}/kernel_current.tar
+    sync
     cp ${IMAGEMNT}/volumio_fallback.tar ${IMAGEMNT}/volumio_current.tar
     sync
     if [ -e "/boot/kernel_update" ]; then
