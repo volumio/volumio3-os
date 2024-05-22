@@ -23,7 +23,7 @@ custom_update_UUID() {
 UUIDFMT=`cat /proc/cmdline | grep "UUID=" -o`
 if [ ! -z "${UUIDFMT}" ]; then
   UUID_BOOT_PARTITION=$(blkid -s UUID -o value ${BOOT_PARTITION})
-  UUID_BOOT_CONFIG=`cat "${BOOTMNT}/${BOOT_CONFIG}" | grep -E "[0-9A-F]{4}-[0-9A-F]{4}" -o`
+  UUID_BOOT_CONFIG=`cat "${BOOTMNT}/${BOOT_CONFIG}" | grep -E "=[0-9A-F]{4}-[0-9A-F]{4}" -o | cut -c 2-`
   if [ ! $UUID_BOOT_PARTITION == $UUID_BOOT_CONFIG ]; then
 
     plymouth_msg "Player internal paremeters update from successful system upgrade"
