@@ -369,6 +369,12 @@ fi
 
 plymouth_msg "Player preparing startup"
 
+# Slow USB devices will need extra time on init
+#
+maybe_volumio_break udev-slumber "init: $LINENO"
+
+udev_slumber
+
 # Process UUID - is conversion from genpnames complete?
 #
 maybe_volumio_break cust-init-part "init: $LINENO"
