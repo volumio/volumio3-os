@@ -287,6 +287,7 @@ create_kernel_archive() {
     log_end_msg
   fi
 }
+
 search_for_firmware_update_rootfs() {
 
   log_begin_msg "Checking for a volumio rootfs update on a USB device"
@@ -614,7 +615,20 @@ unpack_kernel() {
     log_end_msg
 }
 
-# These function should normally only affect configurations change from block device to "disk/by-UUID"
+udev_slumber() {
+# Various USB storage attached devices are taking their time to report ready state to the kernel
+# Add extra time for the device controller
+
+  log_begin_msg "Checking for lazy USB devices"
+    # check if the attachment is a usb device
+    if [ $(lsblk --list -no tran) == usb ]; then
+    plymouth_msg "Waiting for USB devices, this should not take long"
+    wait_for_udev 15
+    fi
+  log_end_msg
+}
+
+# These functions should normally only affect configurations change from block device to "disk/by-UUID"
 # and should be managed by device's custom-functions
 
 custom_init_partition_params() {
