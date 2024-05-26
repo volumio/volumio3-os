@@ -175,6 +175,7 @@ volumio ALL=(ALL) NOPASSWD: /usr/bin/xset, /usr/bin/xinput, /usr/bin/tee
 volumio ALL=(ALL) NOPASSWD: /opt/vc/bin/tvservice, /opt/vc/bin/vcgencmd
 volumio ALL=(ALL) NOPASSWD: /bin/sh /volumio/app/plugins/system_controller/volumio_command_line_client/commands/kernelsource.sh, /bin/sh /volumio/app/plugins/system_controller/volumio_command_line_client/commands/pull.sh
 volumio ALL=(ALL) NOPASSWD: /usr/local/bin/x86Installer.sh,/usr/local/bin/PiInstaller.sh
+volumio ALL=(ALL) NOPASSWD: /bin/mpd-wrapper.sh
 EOF
 chmod 0440 ${SUDOERS_FILE}
 
