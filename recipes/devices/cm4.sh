@@ -405,7 +405,7 @@ device_chroot_tweaks_pre() {
 	# A quirk of Linux on ARM that may result in suboptimal performance
 	kernel_params+=("pcie_aspm=off" "pci=pcie_bus_safe")
 	# Wait for root device
-	kernel_params+=("rootwait" "bootdelay=5")
+	kernel_params+=("rootwait" "bootdelay=7")
 	# Disable linux logo during boot
 	kernel_params+=("logo.nologo")
 	# Disable cursor
