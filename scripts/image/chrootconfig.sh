@@ -134,6 +134,23 @@ Also=mpd.socket" >/usr/lib/systemd/system/mpd.service
 log "Disabling MPD Service"
 systemctl disable mpd.service
 
+log "Copying MPD custom socket systemd file"
+[[ -d /usr/lib/systemd/system/ ]] || mkdir -p /usr/lib/systemd/system/
+## TODO: FIND A MORE ELEGANT SOLUTION
+echo "[Socket]
+ListenStream=%t/mpd/socket
+ListenStream=6600
+Backlog=5
+KeepAlive=true
+PassCredentials=true
+SocketMode=776
+
+[Install]
+WantedBy=sockets.target" >/usr/lib/systemd/system/mpd.socket
+
+log "Disabling MPD Socket Service"
+systemctl disable mpd.socket
+
 log "Entering device_chroot_tweaks_pre" "cfg"
 device_chroot_tweaks_pre
 
