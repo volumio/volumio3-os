@@ -621,10 +621,18 @@ udev_slumber() {
 
   log_begin_msg "Checking for lazy USB devices"
     # check if the attachment is a usb device
-    if [ $(lsblk --list -no tran) == usb ]; then
-    plymouth_msg "Waiting for USB devices, this should not take long"
-    wait_for_udev 15
+
+  for devlink in /dev/sd[a-z]; do
+    if [ "${devlink}" == "/dev/sd[a-z]" ]; then
+    # no usb devices present
+      break
     fi
+    # The first partition of a usb device, must be removable and not the boot device!
+    if [ $(lsblk ${devlink} --list -no tran) == usb ]; then
+      echo "Waiting for USB devices, this should not take long"
+      wait_for_udev 15
+    fi
+  done
   log_end_msg
 }
 
