@@ -629,7 +629,7 @@ udev_slumber() {
     fi
     # The first partition of a usb device, must be removable and not the boot device!
     if [ $(lsblk ${devlink} --list -no tran) == usb ]; then
-      echo "Waiting for USB devices, this should not take long"
+      plymouth_msg "Waiting for USB devices, this should not take long"
       wait_for_udev 15
     fi
   done
