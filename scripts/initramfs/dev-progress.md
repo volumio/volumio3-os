@@ -18,7 +18,7 @@ odroidn2 | yes | yes | yes | yes
 orangepilite | yes | yes | bootdev | skipped
 orangepione | yes | yes | bootdev | ?
 orangepipc | yes | yes | bootdev | skipped
-Rpi | yes | yes | yes | ?
+Rpi | yes | yes | yes | yes
 radxa-zero2 | yes | yes | yes | yes
 radxa-zero | yes | yes | yes | yes
 rkbox_h96max | yes | yes | yes | yes
@@ -29,7 +29,7 @@ rock-3a | yes | yes | yes | yes
 rockpi-4b | yes | yes | yes | yes
 rockpie | yes | no (no video-out) | yes | yes
 rockpis | yes | no (no video-out) | yes | yes
-tinkerboard | yes | yes | yes | ?
+tinkerboard | yes | yes | yes | yes
 vmod-a0 | yes | no (no video-out) | yes | yes
 x86 | yes | yes | yes | yes
 |||||Add new boards as we proceed testing
