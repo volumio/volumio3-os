@@ -50,27 +50,27 @@ where flags are :
 
    Options for the target architecture are:<br>
        **arm** (Raspbian armhf 32bit), **armv7** (Debian armhf 32bit), **armv8** (Debian arm64 64bit) <br>
-       **x86** (Debian i386 32bit) or **x64** (Debian amd64 64bit).
+       **x64** (Debian amd64 64bit).
  * -d `<dev>`  Create Image for Specific Devices.
 
    Example supported device names:<br>
-       **mp1**, **nanopineo2**, **odroidn2**, **orangepilite**, **pi**, **rockpis**, **tinkerboard**, **x86_amd64**, **x86_i386**
+       **mp1**, **nanopineo2**, **odroidn2**, **orangepilite**, **pi**, **rockpis**, **tinkerboard**, **x64**
 
    Run ```./build.sh -h``` for a definitive list; new devices are being added as time allows.
  * -v `<vers>` Version
 
-Example: Build a Raspberry PI image from scratch, version 2.0 :
+Example: Build a Raspberry PI image from scratch, version 3.0 :
 ```
-./build.sh -b arm -d pi -v 2.0
+./build.sh -b arm -d pi -v 3.0
 ```
 
 You do not have to build the base and the image at the same time.
 
-Example: Build the base for x86 first and the image version `2.123` in a second step:
+Example: Build the base for x64 first and the image version `3.123` in a second step:
 
 ```
-./build.sh -b x86
-./build.sh -d x86_i386 -v 2.123
+./build.sh -b x64
+./build.sh -d x64 -v 3.123
 ```
 
 #### Sources
