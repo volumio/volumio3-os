@@ -137,7 +137,11 @@ systemctl disable mpd.service
 log "Copying MPD custom socket systemd file"
 [[ -d /usr/lib/systemd/system/ ]] || mkdir -p /usr/lib/systemd/system/
 ## TODO: FIND A MORE ELEGANT SOLUTION
-echo "[Socket]
+echo "[Unit]
+Description=Music Player Daemon Socket
+PartOf=mpd.service
+
+[Socket]
 ListenStream=%t/mpd/socket
 ListenStream=6600
 Backlog=5
