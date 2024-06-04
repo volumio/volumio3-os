@@ -103,6 +103,8 @@ Wants=mpd.socket
 Type=notify
 ExecStart=/usr/bin/mpd --systemd
 ExecStartPre=-/usr/bin/sudo /bin/chown mpd:audio /var/log/mpd.log
+StartLimitBurst=15
+
 # Enable this setting to ask systemd to watch over MPD, see
 # systemd.service(5).  This is disabled by default because it causes
 # periodic wakeups which are unnecessary if MPD is not playing.
@@ -140,6 +142,7 @@ log "Copying MPD custom socket systemd file"
 echo "[Unit]
 Description=Music Player Daemon Socket
 PartOf=mpd.service
+StartLimitBurst=15
 
 [Socket]
 ListenStream=%t/mpd/socket
