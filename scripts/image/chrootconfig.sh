@@ -133,6 +133,9 @@ RestrictNamespaces=yes
 WantedBy=multi-user.target
 Also=mpd.socket" >/usr/lib/systemd/system/mpd.service
 
+log "Copying MPD custom systemd file to /lib "
+cp -rfp /usr/lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
+
 log "Disabling MPD Service"
 systemctl disable mpd.service
 
@@ -154,6 +157,9 @@ SocketMode=776
 
 [Install]
 WantedBy=sockets.target" >/usr/lib/systemd/system/mpd.socket
+
+log "Copying MPD custom socket systemd file to /lib"
+cp -rfp /usr/lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
 
 log "Disabling MPD Socket Service"
 systemctl disable mpd.socket
