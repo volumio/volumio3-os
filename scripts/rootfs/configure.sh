@@ -91,5 +91,4 @@ cp "${SRC}/volumio/etc/triggerhappy/triggers.d/audio.conf" "${ROOTFS}/etc/trigge
 #VOLUMIO LOG ROTATE
 cp -rp "${SRC}/volumio/bin/volumiologrotate" "${ROOTFS}/bin/volumiologrotate"
 
-
 log 'Done Copying Custom Volumio System Files' "okay"

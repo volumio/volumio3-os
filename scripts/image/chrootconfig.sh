@@ -103,6 +103,8 @@ Wants=mpd.socket
 Type=notify
 ExecStart=/usr/bin/mpd --systemd
 ExecStartPre=-/usr/bin/sudo /bin/chown mpd:audio /var/log/mpd.log
+StartLimitBurst=15
+
 # Enable this setting to ask systemd to watch over MPD, see
 # systemd.service(5).  This is disabled by default because it causes
 # periodic wakeups which are unnecessary if MPD is not playing.
@@ -131,8 +133,36 @@ RestrictNamespaces=yes
 WantedBy=multi-user.target
 Also=mpd.socket" >/usr/lib/systemd/system/mpd.service
 
+log "Copying MPD custom systemd file to /lib "
+cp -rfp /usr/lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
+
 log "Disabling MPD Service"
 systemctl disable mpd.service
+
+log "Copying MPD custom socket systemd file"
+[[ -d /usr/lib/systemd/system/ ]] || mkdir -p /usr/lib/systemd/system/
+## TODO: FIND A MORE ELEGANT SOLUTION
+echo "[Unit]
+Description=Music Player Daemon Socket
+PartOf=mpd.service
+StartLimitBurst=15
+
+[Socket]
+ListenStream=%t/mpd/socket
+ListenStream=6600
+Backlog=5
+KeepAlive=true
+PassCredentials=true
+SocketMode=776
+
+[Install]
+WantedBy=sockets.target" >/usr/lib/systemd/system/mpd.socket
+
+log "Copying MPD custom socket systemd file to /lib"
+cp -rfp /usr/lib/systemd/system/mpd.service /lib/systemd/system/mpd.service
+
+log "Disabling MPD Socket Service"
+systemctl disable mpd.socket
 
 log "Entering device_chroot_tweaks_pre" "cfg"
 device_chroot_tweaks_pre

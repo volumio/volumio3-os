@@ -100,7 +100,7 @@ device_chroot_tweaks_pre() {
 	  kernel /zImage
 	  fdt /dtb/rk3288-miniarm.dtb
 	  initrd /uInitrd
-	  append  earlyprintk ${KERNEL_QUIET} ${SHOW_SPLASH} console=tty1 console=ttyS3,115200n8 rw init=/sbin/init imgpart=UUID=${UUID_IMG} imgfile=/volumio_current.sqsh bootpart=UUID=${UUID_BOOT} datapart=UUID=${UUID_DATA} uuidconfig=/extlinux/extlinux.conf vt.global_cursor_default=0
+	  append  earlyprintk ${KERNEL_QUIET} ${SHOW_SPLASH} console=tty1 console=ttyS3,115200n8 rw init=/sbin/init imgpart=UUID=${UUID_IMG} imgfile=/volumio_current.sqsh bootpart=UUID=${UUID_BOOT} datapart=UUID=${UUID_DATA} uuidconfig=/extlinux/extlinux.conf vt.global_cursor_default=0 bootdelay=5
 	EOF
   
   log "Tinkerboard Init"

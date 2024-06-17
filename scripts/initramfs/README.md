@@ -13,6 +13,9 @@
 |20240314|foonerd|Starting on initv3
 |20240329|gkkpch,foonerd|Starting device testing on initv3
 |20240403|gkkpch|x86, mp1, odroidc4, odroidn2, nanopineo2, nanopineo3 and nanopim4 are ready for beta
+|20240411|foonerd|Devices move to beta
+|20240422|foonerd|OEM device handling move to beta
+|20240508|foonerd|Beta testing start across all builds
 
 ## ```##TODO```
 
@@ -25,12 +28,12 @@
 |Verify RPi USB boot|done
 |Pick up the plymouth issue, as a default (debian futureprototype) seems to startup and hold until booted|done
 |Plymouth can't do early display (only after systemd start, shutdown mode was/is ok), kernel module missing in initrd?|done
-|Initrd modules to be investigated|open
-|Backport Plymouth in case successful|open
+|Initrd modules to be investigated|ongoing
+|Backport Plymouth in case successful|done
 |init.nextarm test/ adaptions|done
 |PI additions, incl. block device info to UUID|done
-|OTA tests|open
-|initv3 test/ adaptions|open
+|OTA tests|done
+|initv3 test/ adaptions|done
 
 # **Volumio initramfs implementation**
 
@@ -70,8 +73,6 @@ This is basically an unmodified copy from ```/usr/share/initramfs-tools/scripts/
 Only a few of them are used.  
 (Based on Debian 10 from spring 2020, after the release of Volumio 3, still valid). 
  
-Known issue: Still missing is plymouth preparation, as there were crash difficulties with plymouth at that particular time.
-
 ## **scripts/volumio-functions**
 Standard Volumio functions, used with all boards.
 
@@ -100,7 +101,7 @@ Use ```maybe_volumio_break <break name> "init: $LINENO"``` for that and remove t
 
 ### Valid breakpoints are:
 ```
-top, modules, premount, mount, cust-init-part, init-part-pars, progress, backup_gpt, krnl-archive, search-for-firmw, search-fact-reset, search-fact-reset, krnl-rollbck,krnl-upd, resize-data, mnt-overlayfs, cust-upd-uuid, updfstab, bottom, init
+top, modules, premount, mount, udev-slumber, cust-init-part, init-part-pars, progress, backup_gpt, krnl-archive, search-for-firmw, search-fact-reset, search-fact-reset, krnl-rollbck,krnl-upd, resize-data, mnt-overlayfs, cust-upd-uuid, updfstab, bottom, init
 ```
 
 ### Configuring a breakpoint
