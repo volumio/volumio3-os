@@ -1,6 +1,6 @@
 [Unit]
 Description=Show Plymouth Power Off Screen
-After=getty@tty1.service display-manager.service plymouth-start.service
+After=getty@tty1.service display-manager.service plymouth-start.service multi-user.target networking.service
 Before=systemd-poweroff.service
 DefaultDependencies=no
 ConditionKernelCommandLine=!plymouth.enable=0

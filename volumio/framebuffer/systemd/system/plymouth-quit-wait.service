@@ -1,6 +1,6 @@
 [Unit]
 Description=Hold until boot process finishes up
-After=rc-local.service plymouth-start.service systemd-user-sessions.service
+After=rc-local.service plymouth-start.service systemd-user-sessions.service volumio-kiosk.service
 
 [Service]
 ExecStart=-/bin/plymouth --wait

@@ -39,12 +39,12 @@ BOOT_USE_UUID=yes  # Add UUID to fstab
 INIT_TYPE="initv3"
 
 ## Plymouth theme management
-PLYMOUTH_THEME="volumio-player-ccw"	# Choices are: {volumio,volumio-logo,volumio-player}
+PLYMOUTH_THEME="volumio-player"	# Choices are: {volumio,volumio-logo,volumio-player}
 INIT_PLYMOUTH_DISABLE="yes"		# yes/no or empty. Removes plymouth initialization in init if "yes" is selected 
 UPDATE_PLYMOUTH_SERVICES="no"	# yes/no or empty. Replaces default plymouth systemd services if "yes" is selected
 
 # Modules that will be added to initramfs
-MODULES=("drm" "drm_panel_orientation_quirks" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "panel-ilitek-ili9881c" "panel-waveshare-dsi" "squashfs" "uas")
+MODULES=("drm" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "panel-dsi-mt" "panel-waveshare-dsi" "squashfs" "uas")
 # Packages that will be installed
 PACKAGES=( # Bluetooth packages
 	"bluez" "bluez-firmware" "pi-bluetooth"
