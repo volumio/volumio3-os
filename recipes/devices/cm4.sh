@@ -44,7 +44,7 @@ INIT_PLYMOUTH_DISABLE="yes"		# yes/no or empty. Removes plymouth initialization 
 
 ## TODO: for any KMS DRM panel mudule, which does not create frambuffer bridge, set this variable to yes, otherwise no
 ## Implement an if/else statement to handle this properly
-UPDATE_PLYMOUTH_SERVICES="yes"	# yes/no or empty. Replaces default plymouth systemd services if "yes" is selected
+UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM="yes"	# yes/no or empty. Replaces default plymouth systemd services if "yes" is selected
 
 # Modules that will be added to initramfs
 MODULES=("drm" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "panel-dsi-mt" "panel-waveshare-dsi" "squashfs" "uas")
@@ -467,7 +467,7 @@ device_chroot_tweaks_post() {
 device_image_tweaks_post() {
 	log "Running device_image_tweaks_post" "ext"
     # Plymouth systemd services OVERWRITE
-	if [[ "${UPDATE_PLYMOUTH_SERVICES}" == yes ]]; then
+	if [[ "${UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM}" == yes ]]; then
         log "Updating plymouth systemd services" "info"
         cp -dR "${SRC}"/volumio/framebuffer/systemd/* "${ROOTFSMNT}"/lib/systemd
 	fi
