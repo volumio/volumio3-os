@@ -255,7 +255,7 @@ LOOP_DEV=${LOOP_DEV}
 DISABLE_DISPLAY="${DISABLE_DISPLAY}"
 PLYMOUTH_THEME=${PLYMOUTH_THEME}
 INIT_PLYMOUTH_DISABLE="${INIT_PLYMOUTH_DISABLE}"
-UPDATE_PLYMOUTH_SERVICES="${UPDATE_PLYMOUTH_SERVICES}"
+UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM="${UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM}"
 MODULES=($([[ -n ${MODULES} ]] && printf '\"%s\" ' "${MODULES[@]}"))
 PACKAGES=($([[ -n ${PACKAGES} ]] && printf '\"%s\" ' "${PACKAGES[@]}"))
 $(declare -f device_chroot_tweaks || true)      # Don't trigger our trap when function is empty
