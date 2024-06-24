@@ -40,12 +40,12 @@ declare -A CUSTOM_PKGS=(
   [alsacap]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/alsacap/alsacap_1.0-1"
   [libcurl]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/curl/00libcurl4_7.74.0-1.2~bpo10%2B1"
   [curl]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/curl/curl_7.74.0-1.2~bpo10%2B1"
-  [libplymouth5]="https://github.com/foonerd/volumio3-plymouth/raw/main/packages/static/01libplymouth5_0.9.5-4"
-  [plymouth]="https://github.com/foonerd/volumio3-plymouth/raw/main/packages/static/02plymouth_0.9.5-4"
-  [libplymouth-dev]="https://github.com/foonerd/volumio3-plymouth/raw/main/packages/static/libplymouth-dev_0.9.5-4"
-  [plymouth-label]="https://github.com/foonerd/volumio3-plymouth/raw/main/packages/static/plymouth-label_0.9.5-4"
-  [plymouth-themes]="https://github.com/foonerd/volumio3-plymouth/raw/main/packages/static/plymouth-themes_0.9.5-4"
-  [plymouth-x11]="https://github.com/foonerd/volumio3-plymouth/raw/main/packages/static/plymouth-x11_0.9.5-4"
+  [libplymouth5]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/01libplymouth5_0.9.5-4"
+  [plymouth]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/02plymouth_0.9.5-4"
+  [libplymouth-dev]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/libplymouth-dev_0.9.5-4"
+  [plymouth-label]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/plymouth-label_0.9.5-4"
+  [plymouth-themes]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/plymouth-themes_0.9.5-4"
+  [plymouth-x11]="https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/plymouth-x11_0.9.5-4"
 )
 
 ## Backend and Frontend Repository details
