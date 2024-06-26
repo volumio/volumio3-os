@@ -41,9 +41,11 @@ INIT_TYPE="initv3"
 ## Plymouth theme management
 PLYMOUTH_THEME="volumio-player"	# Choices are: {volumio,volumio-logo,volumio-player}
 
+log "VARIANT is ${VARIANT}." "info"
+log "VOLVARIANT is ${VOLVARIANT}." "info"
 ## INIT_PLYMOUTH_DISABLE removes plymouth initialization in init if "yes" is selected
-if [[ "${VOLVARIANT}" == motivo ]]; then
-	log "Building ${VOLVARIANT}: Removing plymouth from init." "info"
+if [[ "${VARIANT}" == motivo ]]; then
+	log "Building ${VARIANT}: Removing plymouth from init." "info"
 	INIT_PLYMOUTH_DISABLE="yes"
 else
 	log "Using default plymouth initialization in init." "info"
@@ -52,8 +54,8 @@ fi
 
 ## For any KMS DRM panel mudule, which does not create frambuffer bridge, set this variable to yes, otherwise no
 ## UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM replaces default plymouth systemd services if "yes" is selected
-if [[ "${VOLVARIANT}" == motivo ]]; then
-	log "Building ${VOLVARIANT}: Replacing default plymouth systemd services" "info"
+if [[ "${VARIANT}" == motivo ]]; then
+	log "Building ${VARIANT}: Replacing default plymouth systemd services" "info"
 	UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM="yes"
 else
 	log "Using packager default plymouth systemd services" "info"
