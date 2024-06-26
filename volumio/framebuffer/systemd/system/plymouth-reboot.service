@@ -1,6 +1,6 @@
 [Unit]
 Description=Show Plymouth Reboot Screen
-After=getty@tty1.service display-manager.service plymouth-start.service
+After=getty.service display-manager.service plymouth-start.service multi-user.target networking.service
 Before=systemd-reboot.service
 DefaultDependencies=no
 ConditionKernelCommandLine=!plymouth.enable=0

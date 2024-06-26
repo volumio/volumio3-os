@@ -7,12 +7,11 @@ Before=systemd-ask-password-plymouth.service
 ConditionKernelCommandLine=!plymouth.enable=0
 ConditionKernelCommandLine=!nosplash
 ConditionVirtualization=!container
-IgnoreOnIsolate=true
 
 [Service]
 ExecStart=/sbin/plymouthd --mode=boot --pid-file=/run/plymouth/pid --attach-to-session
 ExecStartPost=-/bin/plymouth show-splash
 Type=forking
 RemainAfterExit=yes
-KillMode=mixed
+KillMode=none
 SendSIGKILL=no

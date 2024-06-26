@@ -39,12 +39,29 @@ BOOT_USE_UUID=yes  # Add UUID to fstab
 INIT_TYPE="initv3"
 
 ## Plymouth theme management
-PLYMOUTH_THEME="volumio-player-ccw"	# Choices are: {volumio,volumio-logo,volumio-player}
-INIT_PLYMOUTH_DISABLE="yes"		# yes/no or empty. Removes plymouth initialization in init if "yes" is selected 
-UPDATE_PLYMOUTH_SERVICES="no"	# yes/no or empty. Replaces default plymouth systemd services if "yes" is selected
+PLYMOUTH_THEME="volumio-player"	# Choices are: {volumio,volumio-logo,volumio-player}
+
+## INIT_PLYMOUTH_DISABLE removes plymouth initialization in init if "yes" is selected
+if [[ "${VOLVARIANT}" == motivo ]]; then
+	log "Building ${VOLVARIANT}: Removing plymouth from init." "info"
+	INIT_PLYMOUTH_DISABLE="yes"
+else
+	log "Using default plymouth initialization in init." "info"
+	INIT_PLYMOUTH_DISABLE="no"
+fi
+
+## For any KMS DRM panel mudule, which does not create frambuffer bridge, set this variable to yes, otherwise no
+## UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM replaces default plymouth systemd services if "yes" is selected
+if [[ "${VOLVARIANT}" == motivo ]]; then
+	log "Building ${VOLVARIANT}: Replacing default plymouth systemd services" "info"
+	UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM="yes"
+else
+	log "Using packager default plymouth systemd services" "info"
+	UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM="no"
+fi
 
 # Modules that will be added to initramfs
-MODULES=("drm" "drm_panel_orientation_quirks" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "panel-ilitek-ili9881c" "panel-waveshare-dsi" "squashfs" "uas")
+MODULES=("drm" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "panel-dsi-mt" "panel-waveshare-dsi" "squashfs" "uas")
 # Packages that will be installed
 PACKAGES=( # Bluetooth packages
 	"bluez" "bluez-firmware" "pi-bluetooth"
@@ -123,7 +140,7 @@ device_image_tweaks() {
 	EOF
 
 	log "Fetching rpi-update" "info"
-	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/volumioteam/rpi-update/master/rpi-update &&
+	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/raspberrypi/rpi-update/master/rpi-update &&
 		chmod +x "${ROOTFSMNT}/usr/bin/rpi-update"
 	#TODO: Look into moving kernel stuff outside chroot using ROOT/BOOT_PATH to speed things up
 	# ROOT_PATH=${ROOTFSMNT}
@@ -166,9 +183,10 @@ device_chroot_tweaks_pre() {
 		[6.1.69]="ec8e8136d773de83e313aaf983e664079cce2815|master|1710"
 		[6.1.70]="fc9319fda550a86dc6c23c12adda54a0f8163f22|master|1712"
 		[6.1.77]="5fc4f643d2e9c5aa972828705a902d184527ae3f|master|1730"
+		[6.6.30]="3b768c3f4d2b9a275fafdb53978f126d7ad72a1a|master|1763"
 	)
 	# Version we want
-	KERNEL_VERSION="5.10.95"
+	KERNEL_VERSION="6.6.30"
 
 	MAJOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 1)
 	MINOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 2)
@@ -179,6 +197,7 @@ device_chroot_tweaks_pre() {
 	declare -A CustomFirmware=(
 		[PiCustom]="https://raw.githubusercontent.com/Darmur/volumio-rpi-custom/main/output/modules-rpi-${KERNEL_VERSION}-custom.tar.gz"
 		[MotivoCustom]="https://github.com/volumio/motivo-drivers/raw/main/output/modules-rpi-${KERNEL_VERSION}-motivo.tar.gz"
+		[RPiUserlandTools]="https://github.com/volumio/volumio3-os-static-assets/raw/master/tools/rpi-softfp-vc.tar.gz"
 	)
 
 	### Kernel installation
@@ -188,7 +207,7 @@ device_chroot_tweaks_pre() {
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}" "info"
-	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=0 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
+	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=0 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 /usr/bin/rpi-update "${KERNEL_COMMIT}"
 
 	log "Adding Custom firmware from github" "info"
 	for key in "${!CustomFirmware[@]}"; do
@@ -462,7 +481,7 @@ device_chroot_tweaks_post() {
 device_image_tweaks_post() {
 	log "Running device_image_tweaks_post" "ext"
     # Plymouth systemd services OVERWRITE
-	if [[ "${UPDATE_PLYMOUTH_SERVICES}" == yes ]]; then
+	if [[ "${UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM}" == yes ]]; then
         log "Updating plymouth systemd services" "info"
         cp -dR "${SRC}"/volumio/framebuffer/systemd/* "${ROOTFSMNT}"/lib/systemd
 	fi

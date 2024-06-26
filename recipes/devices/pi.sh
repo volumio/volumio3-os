@@ -39,8 +39,11 @@ INIT_TYPE="initv3"
 
 ## Plymouth theme management
 PLYMOUTH_THEME="volumio-player"	# Choices are: {volumio,volumio-logo,volumio-player}
-INIT_PLYMOUTH_DISABLE="no"		# yes/no or empty. Removes plymouth initialization in init if "yes" is selected 
-UPDATE_PLYMOUTH_SERVICES="no"	# yes/no or empty. Replaces default plymouth systemd services if "yes" is selected
+INIT_PLYMOUTH_DISABLE="no"		# yes/no or empty. Removes plymouth initialization in init if "yes" is selected
+
+## TODO: for any KMS DRM panel mudule, which does not create frambuffer bridge, set this variable to yes, otherwise no
+## Implement an if/else statement to handle this properly
+UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM="no"	# yes/no or empty. Replaces default plymouth systemd services if "yes" is selected
 
 # Modules that will be added to initramfs
 MODULES=("drm" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas")
