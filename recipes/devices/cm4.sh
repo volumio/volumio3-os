@@ -42,7 +42,6 @@ INIT_TYPE="initv3"
 PLYMOUTH_THEME="volumio-player"	# Choices are: {volumio,volumio-logo,volumio-player}
 
 log "VARIANT is ${VARIANT}." "info"
-log "VOLVARIANT is ${VOLVARIANT}." "info"
 ## INIT_PLYMOUTH_DISABLE removes plymouth initialization in init if "yes" is selected
 if [[ "${VARIANT}" == motivo ]]; then
 	log "Building ${VARIANT}: Removing plymouth from init." "info"
@@ -266,7 +265,7 @@ device_chroot_tweaks_pre() {
 	rm libraspberrypi0_1.20230509-buster-1_armhf.deb
 	### Plymouth backport
 	# TODO: Temporary only, backport for drm DSI rotation
-	if [[ "${VARIANT}" == motivo || "${VOLVARIANT}" == motivo ]]; then
+	if [[ "${VARIANT}" == motivo ]]; then
 		log "Installing custom backport plymouth packages" "info"
 		wget -nv https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/01libplymouth5_0.9.5-4_arm.deb
 		wget -nv https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/02plymouth_0.9.5-4_arm.deb
