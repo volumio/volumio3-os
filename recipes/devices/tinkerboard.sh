@@ -51,7 +51,7 @@ write_device_files() {
   if [ ! -z ${PLYMOUTH_THEME} ]; then
     log "Plymouth selected, adding plymouth-themes to list of packages to install" ""
     PACKAGES+=("plymouth-label")
-  	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "cfg"
+  	log "Copying selected plymouth ${PLYMOUTH_THEME} theme" "cfg"
     cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
   fi
 
@@ -59,8 +59,6 @@ write_device_files() {
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
 
-	log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
-	cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" ${ROOTFSMNT}/usr/share/plymouth/themes/${PLYMOUTH_THEME}
 }
 
 write_device_bootloader() {

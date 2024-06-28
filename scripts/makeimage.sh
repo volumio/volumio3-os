@@ -198,7 +198,7 @@ if [[ ${DISABLE_DISPLAY:-no} == "yes" ]]; then
 fi
 
 if [[ -n "${PLYMOUTH_THEME}" ]]; then
-  log "Copying selected Volumio ${PLYMOUTH_THEME} theme" "info"
+  log "Copying selected plymouth ${PLYMOUTH_THEME} theme" "info"
   cp -dR "${SRC}/volumio/plymouth/themes/${PLYMOUTH_THEME}" "${ROOTFSMNT}"/usr/share/plymouth/themes/"${PLYMOUTH_THEME}"
 fi
 
@@ -245,6 +245,7 @@ DEBUG_IMAGE="${DEBUG_IMAGE:-no}"
 KIOSKMODE="${KIOSKMODE:-no}"
 KIOSKBROWSER="${KIOSKBROWSER:-chromium}"
 KIOSKINSTALL="${KIOSKMODE:-install-kiosk.sh}"
+VARIANT=${VARIANT}
 VOLVARIANT="${VOLVARIANT:-volumio}"
 BOOT_FS_SPEC=${BOOT_FS_SPEC}
 UUID_BOOT=${UUID_BOOT}
