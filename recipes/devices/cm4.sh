@@ -264,6 +264,23 @@ device_chroot_tweaks_pre() {
 	wget -nv https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/libraspberrypi0/libraspberrypi0_1.20230509-buster-1_armhf.deb
 	dpkg -i libraspberrypi0_1.20230509-buster-1_armhf.deb
 	rm libraspberrypi0_1.20230509-buster-1_armhf.deb
+	### Plymouth backport
+	# TODO: Temporary only, backport for drm DSI rotation
+	if [[ "${VARIANT}" == motivo || "${VOLVARIANT}" == motivo ]]; then
+		log "Installing custom backport plymouth packages" "info"
+		wget -nv https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/01libplymouth5_0.9.5-4_arm.deb
+		wget -nv https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/02plymouth_0.9.5-4_arm.deb
+		wget -nv https://github.com/volumio/volumio3-os-static-assets/raw/master/custom-packages/plymouth/plymouth-label_0.9.5-4_arm.deb
+		dpkg -i *plymouth*_0.9.5-4_arm.deb
+		rm *plymouth*_0.9.5-4_arm.deb
+		# Block upgrade of libplymouth from raspi repos
+		log "Blocking libplymouth upgrades from raspi repos" "info"
+		cat <<-EOF >"${ROOTFSMNT}/etc/apt/preferences.d/libplymouth"
+			Package: libplymouth4
+			Pin: release *
+			Pin-Priority: -1
+		EOF
+	fi
 
 	## Lets update some packages from raspbian repos now
 	apt-get update && apt-get -y upgrade
