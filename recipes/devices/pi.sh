@@ -382,6 +382,7 @@ device_chroot_tweaks_pre() {
 		gpu_mem_512=32
 		gpu_mem_1024=128
 		max_usb_current=1
+                dtparam=i2c_arm=on
 		[pi5]
 		usb_max_current_enable=1
 		[all]
@@ -405,7 +406,6 @@ device_chroot_tweaks_pre() {
 		arm_64bit=0
 		dtparam=audio=on
 		audio_pwm_mode=2
-		dtparam=i2c_arm=on
 		disable_splash=1
 		hdmi_force_hotplug=1
 		force_eeprom_read=0
