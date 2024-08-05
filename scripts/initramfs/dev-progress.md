@@ -15,9 +15,9 @@ nanopineo3 | yes | no (no video-out) | bootdev | yes
 odroidc4 | yes | yes | yes | yes
 odroidm1s | yes | yes | yes | yes
 odroidn2 | yes | yes | yes | yes
-orangepilite | yes | yes | bootdev | skipped
-orangepione | yes | yes | bootdev | ?
-orangepipc | yes | yes | bootdev | skipped
+orangepilite | yes | yes | bootdev | yes
+orangepione | yes | yes | bootdev | yes
+orangepipc | yes | yes | bootdev | yes
 Rpi | yes | yes | yes | yes
 radxa-zero2 | yes | yes | yes | yes
 radxa-zero | yes | yes | yes | yes
@@ -37,10 +37,17 @@ x86 | yes | yes | yes | yes
 # Recipes modifications
 
 ## Environment variables
-INIT_TYPE=initv3  
+INIT_TYPE=initv3
 Selection of plymouth themes:
 PLYMOUTH_THEME="volumio-logo"
 PLYMOUTH_THEME="volumio-player" (default)
+
+## Environment overrides
+Some devices using KMS MIPI screens will not have user framebuffer present in the init. As the result of it,
+plymouth will fall back to "grey three dots" text theme. Remove plymouth initialization in init:
+INIT_PLYMOUTH_DISABLE="yes"
+For any KMS DRM panel module, which does not create frambuffer bridge, set this variable to yes:
+UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM="yes"
 
 ## Add initv3 custom functions
 Some devices use initv3 custom functions, eg. x86 and pi (more could follow).

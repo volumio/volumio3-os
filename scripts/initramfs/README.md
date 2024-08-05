@@ -16,6 +16,7 @@
 |20240411|foonerd|Devices move to beta
 |20240422|foonerd|OEM device handling move to beta
 |20240508|foonerd|Beta testing start across all builds
+|20240528|foonerd|Release across all builds
 
 ## ```##TODO```
 
@@ -122,14 +123,14 @@ Boot and just let it run. After boot, login (```ctrl-F1```) and check file ```/v
 
 
 # Integrating the new INITRAMFS (initv3)
-## WIP WIP WIP
+## WIP
 
 This documentation is still work in progress and will be completed soon with a comprehensive description of the components involved.  
 The initramfs script collection has been thoroughly tested with x86 and arvm7 (Odroid N2).  
-It has not been verified with an RPi or Primo, but this *should* be just verification, as there *should* be no more functional differences.  
+It has thoroughly tested and verified with an RPi or Primo, for all other boards this *should* be just verification, as there *should* be no more functional differences.  
 (Most of the original differences are now obsolete as support has stopped for old armv7 boards).  
 
-MP1 was added to Volumio later and has also not been verified.
+MP1 was added to Volumio later and has also been verified.
 This is relevant, because some work needs to be done for mp1, it is the only device which received very specific ```init``` updates because of necessary modifications with preparing kernel 6.1y: it needs u-boot to be updated as well..  
 
 ## Build recipe implementation details
