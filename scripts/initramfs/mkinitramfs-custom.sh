@@ -493,7 +493,7 @@ build_volumio_initramfs() {
   # Pick how many kernels we want to add
   # (Future proofing for Rpi 5,6,7 etc..) ¯\_(ツ)_/¯
 
-  num_ker_max=3
+  num_ker_max=4
 
   log "Found ${#versions[@]} kernel version(s)" "${versions[@]}" "info"
   for ver in "${!versions[@]}"; do
