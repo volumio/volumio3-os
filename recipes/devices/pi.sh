@@ -246,7 +246,7 @@ device_chroot_tweaks_pre() {
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}" "info"
-	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=0 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 /usr/bin/rpi-update "${KERNEL_COMMIT}"
+	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 /usr/bin/rpi-update "${KERNEL_COMMIT}"
 
 	log "Adding Custom firmware from github" "info"
 	for key in "${!CustomFirmware[@]}"; do
@@ -276,6 +276,12 @@ device_chroot_tweaks_pre() {
 		log "Removing v8_16k+ (Pi5 16k) Kernel and modules" "info"
 		rm -rf /boot/kernel_2712.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8-16k+"
+	fi
+
+	if [ -e "/boot/overlays/i2s-dac.dtbo" ]
+	then
+		log "Make a copy of i2s-dac overlay, using the old name rpi-dac" "info"
+		cp /boot/overlays/i2s-dac.dtbo /boot/overlays/rpi-dac.dtbo
 	fi
 
 	log "Finished Kernel installation" "okay"
