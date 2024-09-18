@@ -278,6 +278,12 @@ device_chroot_tweaks_pre() {
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8-16k+"
 	fi
 
+	if [ -e "/boot/overlays/i2s-dac.dtbo" ]
+	then
+		log "Make a copy of i2s-dac overlay, using the old name rpi-dac" "info"
+		cp /boot/overlays/i2s-dac.dtbo /boot/overlays/rpi-dac.dtbo
+	fi
+
 	log "Finished Kernel installation" "okay"
 
 	### Other Rpi specific stuff
