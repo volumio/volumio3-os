@@ -272,7 +272,11 @@ device_chroot_tweaks_pre() {
 		rm -rf /boot/kernel_2712.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
 	fi
-
+	if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
+		log "Removing v8_16k+ (Pi5 16k) Kernel and modules" "info"
+		rm -rf /boot/kernel_2712.img
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v8_16k+"
+	fi
 	log "Finished Kernel installation" "okay"
 
 	### Other Rpi specific stuff
