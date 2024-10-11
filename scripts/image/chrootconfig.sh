@@ -101,7 +101,7 @@ Wants=mpd.socket
 
 [Service]
 Type=notify
-ExecStart=/usr/bin/mpd --systemd
+ExecStart=/usr/bin/mpd --no-daemon
 ExecStartPre=-/usr/bin/sudo /bin/chown mpd:audio /var/log/mpd.log
 StartLimitBurst=15
 
