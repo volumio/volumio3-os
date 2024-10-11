@@ -446,7 +446,6 @@ device_chroot_tweaks_pre() {
 		dtparam=nvme
 		dtparam=pciex1_gen=2
 		[all]
-		dtoverlay=vc4-kms-v3d
 		arm_64bit=0
 		dtparam=audio=on
 		audio_pwm_mode=2
