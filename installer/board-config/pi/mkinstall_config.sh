@@ -31,7 +31,7 @@ UUIDFMT="yes"			# yes|no (actually, anything non-blank)
 FACTORYCOPY="yes"
 
 # Modules to load (as a blank separated string array)
-MODULES=""drm" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas""
+MODULES=("fuse" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas")
 
 # Additional packages to install (as a blank separated string)
 #PACKAGES=""
