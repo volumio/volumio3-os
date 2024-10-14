@@ -272,6 +272,8 @@ chroot "${ROOTFSMNT}" /chrootconfig.sh
 log "Finished chroot config for ${DEVICE}" "okay"
 # Clean up chroot stuff
 rm "${ROOTFSMNT:?}"/*.sh "${ROOTFSMNT}"/root/init
+log "Cleaning user mpd.service" "okay"
+rm "${ROOTFSMNT}"/etc/systemd/user/default.target.wants/mpd.service "${ROOTFSMNT}"/usr/lib/systemd/user/mpd.service
 
 unmount_chroot "${ROOTFSMNT}"
 end_chroot_final=$(date +%s)
