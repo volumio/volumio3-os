@@ -59,16 +59,17 @@ log "Using DEBUG_IMAGE: ${DEBUG_IMAGE:-no}"
 VOLMNT=${MOUNT_DIR:-'/mnt/volumio'}
 IMAGE_END=${IMAGE_END:-2800}
 dd if=/dev/zero of="${IMG_FILE}" bs=1M count=$((IMAGE_END + 10))
-LOOP_DEV=$(losetup -f --show "${IMG_FILE}")
 
 # Note: leave the first 20Mb free for the firmware
-parted -s "${LOOP_DEV}" mklabel "${BOOT_TYPE}"
-parted -s "${LOOP_DEV}" mkpart primary fat32 "${BOOT_START:-0}" "${BOOT_END}"
-parted -s "${LOOP_DEV}" mkpart primary ext4 "${BOOT_END}" "${IMAGE_END}"
-parted -s "${LOOP_DEV}" mkpart primary ext4 "${IMAGE_END}" 100%
-parted -s "${LOOP_DEV}" set 1 boot on
-[[ "${BOOT_TYPE}" == gpt ]] && parted -s "${LOOP_DEV}" set 1 legacy_boot on # for non UEFI systems
-parted -s "${LOOP_DEV}" print
+parted -s "${IMG_FILE}" mklabel "${BOOT_TYPE}"
+parted -s "${IMG_FILE}" mkpart primary fat32 "${BOOT_START:-0}" "${BOOT_END}"
+parted -s "${IMG_FILE}" mkpart primary ext4 "${BOOT_END}" "${IMAGE_END}"
+parted -s "${IMG_FILE}" mkpart primary ext4 "${IMAGE_END}" 100%
+parted -s "${IMG_FILE}" set 1 boot on
+[[ "${BOOT_TYPE}" == gpt ]] && parted -s "${IMG_FILE}" set 1 legacy_boot on # for non UEFI systems
+parted -s "${IMG_FILE}" print
+
+LOOP_DEV=$(losetup -P -f --show "${IMG_FILE}")
 partprobe "${LOOP_DEV}"
 kpartx -a "${LOOP_DEV}" -s
 
