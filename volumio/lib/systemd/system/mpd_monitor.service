@@ -1,0 +1,12 @@
+[Unit]
+Description=MPD Monitor Service
+After=mpd.service
+
+[Service]
+ExecStart=/bin/mpd_monitor.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
