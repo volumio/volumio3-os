@@ -82,6 +82,10 @@ cp -rp "${SRC}"/volumio/usr/* "${ROOTFS}/usr/"
 cp "${SRC}/volumio/bin/volumio_cpu_tweak" "${ROOTFS}/bin/volumio_cpu_tweak"
 chmod a+x "${ROOTFS}/bin/volumio_cpu_tweak"
 
+#MPD Monitor
+cp "${SRC}/volumio/bin/mpd_monitor.sh" "${ROOTFS}/bin/mpd_monitor.sh"
+chmod a+x "${ROOTFS}/bin/mpd_monitor.sh"
+
 #LAN HOTPLUG
 cp "${SRC}/volumio/etc/default/ifplugd" "${ROOTFS}/etc/default/ifplugd"
 
