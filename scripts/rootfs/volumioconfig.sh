@@ -348,6 +348,9 @@ ln -s /lib/systemd/system/volumio_cpu_tweak.service /etc/systemd/system/multi-us
 log "Enable Volumio MPD Monitor Service"
 ln -s /lib/systemd/system/mpd_monitor.service /etc/systemd/system/multi-user.target.wants/mpd_monitor.service
 
+log "Enable Volumio Time Update Service"
+ln -s /lib/systemd/system/volumio-time-update.service /etc/systemd/system/multi-user.target.wants/volumio-time-update.service
+
 log "Disable MPD autostart"
 systemctl disable mpd.service
 
