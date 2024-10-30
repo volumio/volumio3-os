@@ -1,0 +1,14 @@
+[Unit]
+Description=Volumio Time Update Utility
+
+[Service]
+ExecStart=/bin/volumio-time-update
+Type=oneshot
+RemainAfterExit=true
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=volumio-time-update
+
+[Install]
+WantedBy=default.target
+
