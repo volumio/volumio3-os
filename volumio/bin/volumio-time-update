@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Function to fetch and set time
+update_time() {
+  echo "volumio-time-update-util: Fetching time from Volumio..."
+
+  # Fetch the date from Volumio's HTTP headers
+  date_from_volumio=$(wget -qSO- --max-redirect=0 volumio.com 2>&1 | grep "Date:" | cut -d' ' -f5-8)
+
+  if [ -z "$date_from_volumio" ]; then
+    echo "volumio-time-update-util: Date not found in response"
+    return 1
+  fi
+
+  # Convert the fetched date to the format YYYY-MM-DD HH:MM:SS
+  formatted_date=$(date -d "$date_from_volumio UTC" "+%Y-%m-%d %H:%M:%S")
+
+  echo "volumio-time-update-util: Setting system time to: $formatted_date"
+
+  # Attempt to set the system time using timedatectl
+  if sudo timedatectl set-time "$formatted_date"; then
+    echo "volumio-time-update-util: System time updated successfully."
+    return 0
+  else
+    echo "volumio-time-update-util: Error setting time."
+    return 1
+  fi
+}
+
+# Retry loop
+while true; do
+  if update_time; then
+    break
+  else
+    echo "volumio-time-update-util: Retrying in 5 seconds..."
+    sleep 5
+  fi
+done
+

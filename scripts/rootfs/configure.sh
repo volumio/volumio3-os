@@ -86,6 +86,10 @@ chmod a+x "${ROOTFS}/bin/volumio_cpu_tweak"
 cp "${SRC}/volumio/bin/mpd_monitor.sh" "${ROOTFS}/bin/mpd_monitor.sh"
 chmod a+x "${ROOTFS}/bin/mpd_monitor.sh"
 
+#Time Update Service
+cp "${SRC}/volumio/bin/volumio-time-update" "${ROOTFS}/bin/volumio-time-update"
+chmod a+x "${ROOTFS}/bin/volumio-time-update"
+
 #LAN HOTPLUG
 cp "${SRC}/volumio/etc/default/ifplugd" "${ROOTFS}/etc/default/ifplugd"
 
