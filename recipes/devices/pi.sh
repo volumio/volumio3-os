@@ -29,6 +29,7 @@ VOLVARIANT=no # Custom Volumio (Motivo/Primo etc)
 MYVOLUMIO=no
 VOLINITUPDATER=yes
 KIOSKMODE=no
+# KIOSKBROWSER=vivaldi
 
 ## Partition info
 BOOT_START=0
@@ -36,6 +37,8 @@ BOOT_END=96
 BOOT_TYPE=msdos    # msdos or gpt
 BOOT_USE_UUID=yes  # Add UUID to fstab
 INIT_TYPE="initv3"
+INIT_UUID_TYPE="pi" # Use block device GPEN if dynamic UUIDs are not handled.
+
 
 ## Plymouth theme management
 PLYMOUTH_THEME="volumio-player"	# Choices are: {volumio,volumio-logo,volumio-player}
@@ -46,7 +49,8 @@ INIT_PLYMOUTH_DISABLE="no"		# yes/no or empty. Removes plymouth initialization i
 UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM="no"	# yes/no or empty. Replaces default plymouth systemd services if "yes" is selected
 
 # Modules that will be added to initramfs
-MODULES=("drm" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas")
+# MODULES=("drm" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas")
+MODULES=("fuse" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas")
 # Packages that will be installed
 PACKAGES=( # Bluetooth packages
 	"bluez" "bluez-firmware" "pi-bluetooth"
@@ -152,7 +156,7 @@ device_image_tweaks() {
 	EOF
 
 	log "Fetching rpi-update" "info"
-	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/volumioteam/rpi-update/master/rpi-update &&
+	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/raspberrypi/rpi-update/master/rpi-update &&
 		chmod +x "${ROOTFSMNT}/usr/bin/rpi-update"
 	#TODO: Look into moving kernel stuff outside chroot using ROOT/BOOT_PATH to speed things up
 	# ROOT_PATH=${ROOTFSMNT}
@@ -175,7 +179,7 @@ device_chroot_tweaks() {
 # TODO Try and streamline this!
 device_chroot_tweaks_pre() {
 	log "Changing initramfs module config to 'modules=list' to limit volumio.initrd size" "cfg"
-	sed -i "s/MODULES=most/MODULES=list/g" /etc/initramfs-tools/initramfs.conf
+	# sed -i "s/MODULES=most/MODULES=list/g" /etc/initramfs-tools/initramfs.conf
 
 	## Define parameters
 	declare -A PI_KERNELS=(
@@ -194,9 +198,13 @@ device_chroot_tweaks_pre() {
 		[6.1.69]="ec8e8136d773de83e313aaf983e664079cce2815|master|1710"
 		[6.1.70]="fc9319fda550a86dc6c23c12adda54a0f8163f22|master|1712"
 		[6.1.77]="5fc4f643d2e9c5aa972828705a902d184527ae3f|master|1730"
+		[6.6.30]="3b768c3f4d2b9a275fafdb53978f126d7ad72a1a|master|1763"
+		[6.6.47]="a0d314ac077cda7cbacee1850e84a57af9919f94|master|1792"
+		[6.6.51]="d5a7dbe77b71974b9abb133a4b5210a8070c9284|master|1796"
+		[6.6.56]="a5efb544aeb14338b481c3bdc27f709e8ee3cf8c|master|1803"
 	)
 	# Version we want
-	KERNEL_VERSION="6.1.69"
+	KERNEL_VERSION="6.6.56"
 
 	MAJOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 1)
 	MINOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 2)
@@ -234,6 +242,7 @@ device_chroot_tweaks_pre() {
 		[wm8960]="https://raw.githubusercontent.com/hftsai256/wm8960-rpi-modules/main/wm8960-modules-rpi-${KERNEL_VERSION}.tar.gz"
 		[brcmfmac43430b0]="https://raw.githubusercontent.com/volumio/volumio3-os-static-assets/master/firmwares/brcmfmac43430b0/brcmfmac43430b0.tar.gz"
 		[PiCustom]="https://raw.githubusercontent.com/Darmur/volumio-rpi-custom/main/output/modules-rpi-${KERNEL_VERSION}-custom.tar.gz"
+		[RPiUserlandTools]="https://github.com/volumio/volumio3-os-static-assets/raw/master/tools/rpi-softfp-vc.tar.gz"
 	)
 
 	### Kernel installation
@@ -243,7 +252,7 @@ device_chroot_tweaks_pre() {
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}" "info"
-	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=0 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 BRANCH=${KERNEL_BRANCH} /usr/bin/rpi-update "${KERNEL_COMMIT}"
+	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 /usr/bin/rpi-update "${KERNEL_COMMIT}"
 
 	log "Adding Custom firmware from github" "info"
 	for key in "${!CustomFirmware[@]}"; do
@@ -273,6 +282,12 @@ device_chroot_tweaks_pre() {
 		log "Removing v8_16k+ (Pi5 16k) Kernel and modules" "info"
 		rm -rf /boot/kernel_2712.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8-16k+"
+	fi
+
+	if [ -e "/boot/overlays/i2s-dac.dtbo" ]
+	then
+		log "Make a copy of i2s-dac overlay, using the old name rpi-dac" "info"
+		cp /boot/overlays/i2s-dac.dtbo /boot/overlays/rpi-dac.dtbo
 	fi
 
 	log "Finished Kernel installation" "okay"
@@ -511,9 +526,9 @@ device_chroot_tweaks_post() {
 # Will be called by the image builder post the chroot, before finalisation
 device_image_tweaks_post() {
 	log "Running device_image_tweaks_post" "ext"
-    # Plymouth systemd services OVERWRITE
-	if [[ "${UPDATE_PLYMOUTH_SERVICES}" == yes ]]; then
-        log "Updating plymouth systemd services" "info"
-        cp -dR "${SRC}"/volumio/framebuffer/systemd/* "${ROOTFSMNT}"/lib/systemd
+	# Plymouth systemd services OVERWRITE
+	if [[ "${UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM}" == yes ]]; then
+		log "Updating plymouth systemd services" "info"
+		cp -dR "${SRC}"/volumio/framebuffer/systemd/* "${ROOTFSMNT}"/lib/systemd
 	fi
 }

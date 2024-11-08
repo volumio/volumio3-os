@@ -6,12 +6,14 @@ After=systemd-udev-trigger.service systemd-udevd.service keyboard-setup.service
 Before=systemd-ask-password-plymouth.service
 ConditionKernelCommandLine=!plymouth.enable=0
 ConditionKernelCommandLine=!nosplash
+ConditionKernelCommandLine=splash
 ConditionVirtualization=!container
+IgnoreOnIsolate=true
 
 [Service]
 ExecStart=/sbin/plymouthd --mode=boot --pid-file=/run/plymouth/pid --attach-to-session
 ExecStartPost=-/bin/plymouth show-splash
 Type=forking
 RemainAfterExit=yes
-KillMode=none
+KillMode=mixed
 SendSIGKILL=no

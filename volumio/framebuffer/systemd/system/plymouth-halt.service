@@ -5,6 +5,7 @@ Before=systemd-halt.service
 DefaultDependencies=no
 ConditionKernelCommandLine=!plymouth.enable=0
 ConditionKernelCommandLine=!nosplash
+ConditionKernelCommandLine=splash
 ConditionVirtualization=!container
 
 [Service]

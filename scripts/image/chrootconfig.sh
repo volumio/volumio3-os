@@ -101,7 +101,7 @@ Wants=mpd.socket
 
 [Service]
 Type=notify
-ExecStart=/usr/bin/mpd --systemd
+ExecStart=/usr/bin/mpd --no-daemon
 ExecStartPre=-/usr/bin/sudo /bin/chown mpd:audio /var/log/mpd.log
 StartLimitBurst=15
 
@@ -184,7 +184,7 @@ log "Setting plymouthd.defaults theme to ${PLYMOUTH_THEME}" "info"
 echo "[Daemon]
 Theme=${PLYMOUTH_THEME}
 ShowDelay=0
-DeviceTimeout=10">/usr/share/plymouth/plymouthd.defaults
+DeviceTimeout=6" >/usr/share/plymouth/plymouthd.defaults
 fi
 
 # Fix services for tmpfs logs
