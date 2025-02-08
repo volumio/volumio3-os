@@ -15,6 +15,7 @@ git
 jq
 kpartx
 libssl-dev
+lsb-release
 lz4
 lzop
 md5deep
