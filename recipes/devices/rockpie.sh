@@ -108,4 +108,7 @@ device_image_tweaks_post() {
     log "Creating boot.scr"
     mkimage -A arm -T script -C none -d "${ROOTFSMNT}"/boot/boot.cmd "${ROOTFSMNT}"/boot/boot.scr
   fi
+  
+  log "Fix for Volumio Remote updater" "info"
+  sed -i '10i\RestartSec=5' /lib/systemd/system/volumio-remote-updater.service
 }
