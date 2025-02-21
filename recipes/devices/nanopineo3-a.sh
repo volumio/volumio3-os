@@ -88,6 +88,9 @@ EOF
   cat <<-EOF >/etc/udev/rules.d/99-gpio.rules
 	SUBSYSTEM=="gpio*", PROGRAM="/bin/sh -c 'find -L /sys/class/gpio/ -maxdepth 2 -exec chown root:gpio {} \; -exec chmod 770 {} \; || true'"
 	EOF
+
+  log "Fix for Volumio Remote updater"
+  sed -i '10i\RestartSec=5' /lib/systemd/system/volumio-remote-updater.service
 }
 
 # Will be run in chroot - Post initramfs
