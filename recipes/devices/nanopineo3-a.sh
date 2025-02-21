@@ -17,7 +17,7 @@ DEVICENAME="NanoPi NEO3"
 DEVICEFAMILY="neo3-armbian"
 # tarball from DEVICEFAMILY repo to use
 #DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
-DEVICEREPO="https://github.com/darmur/platform-${DEVICEFAMILY}.git"
+DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
 
 ### What features do we want to target
 # TODO: Not fully implement
