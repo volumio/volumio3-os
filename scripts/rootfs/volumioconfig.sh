@@ -204,6 +204,7 @@ chown -R volumio:volumio /imgpart
 log "Changing os-release permissions"
 chown volumio:volumio /etc/os-release
 chmod 777 /etc/os-release
+cat /etc/os-release
 
 log "Setting proper permissions for ping"
 chmod u+s /bin/ping

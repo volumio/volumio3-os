@@ -7,6 +7,7 @@ log "Installing $CMP_NAME" "ext"
 
 #shellcheck source=/dev/null
 source /etc/os-release
+cat /etc/os-release
 export DEBIAN_FRONTEND=noninteractive
 
 CMP_PACKAGES=(
