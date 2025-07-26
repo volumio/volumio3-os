@@ -155,8 +155,12 @@ device_image_tweaks() {
 		Pin-Priority: -1
 	EOF
 
-	log "Fetching rpi-update" "info"
-	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" https://raw.githubusercontent.com/raspberrypi/rpi-update/master/rpi-update &&
+	RpiUpdateRepo="raspberrypi/rpi-update"
+	RpiUpdateBranch="master"
+	# RpiUpdateBranch="1dd909e2c8c2bae7adb3eff3aed73c3a6062e8c8"
+
+	log "Fetching rpi-update from repo ${RpiUpdateRepo} and branch ${RpiUpdateBranch}" "info"
+	curl -L --output "${ROOTFSMNT}/usr/bin/rpi-update" "https://raw.githubusercontent.com/${RpiUpdateRepo}/${RpiUpdateBranch}/rpi-update" &&
 		chmod +x "${ROOTFSMNT}/usr/bin/rpi-update"
 	#TODO: Look into moving kernel stuff outside chroot using ROOT/BOOT_PATH to speed things up
 	# ROOT_PATH=${ROOTFSMNT}
@@ -253,7 +257,12 @@ device_chroot_tweaks_pre() {
 	# using rpi-update to fetch and install kernel and firmware
 	log "Adding kernel ${KERNEL_VERSION} using rpi-update" "info"
 	log "Fetching SHA: ${KERNEL_COMMIT} from branch: ${KERNEL_BRANCH}" "info"
-	echo y | SKIP_BACKUP=1 WANT_32BIT=1 WANT_64BIT=1 WANT_PI4=1 WANT_PI5=1 SKIP_CHECK_PARTITION=1 UPDATE_SELF=0 /usr/bin/rpi-update "${KERNEL_COMMIT}"
+	RpiUpdate_args=("UPDATE_SELF=0" "ROOT_PATH=${ROOTFSMNT}" "BOOT_PATH=${ROOTFSMNT}/boot"
+		"SKIP_WARNING=1" "SKIP_BACKUP=1" "SKIP_CHECK_PARTITION=1"
+		"WANT_32BIT=1" "WANT_64BIT=1" "WANT_PI2=1" "WANT_PI4=1"
+		"WANT_PI5=1" "WANT_16K=0" "WANT_64BIT_RT=0"
+	)
+	env "${RpiUpdate_args[@]}" "${ROOTFSMNT}"/usr/bin/rpi-update "${KERNEL_COMMIT}"
 
 	log "Adding Custom firmware from github" "info"
 	for key in "${!CustomFirmware[@]}"; do
@@ -266,14 +275,7 @@ device_chroot_tweaks_pre() {
 		rm "$key.tar.gz"
 	done
 
-	## Comment to keep RPi4/RPi5 64bit kernel
-	#if [ -d "/lib/modules/${KERNEL_VERSION}-v8+" ]; then
-	#	log "Removing v8+ (Pi4/5) Kernel and modules" "info"
-	#	rm -rf /boot/kernel8.img
-	#	rm -rf "/lib/modules/${KERNEL_VERSION}-v8+"
-	#fi
-
-	## Comment to keep RPi5 64bit 16k page size kernel
+	# Remove Pi5 16K kernel
 	if [ -d "/lib/modules/${KERNEL_VERSION}-v8_16k+" ]; then
 		log "Removing v8_16k+ (Pi5 16k) Kernel and modules" "info"
 		rm -rf /boot/kernel_2712.img
@@ -284,6 +286,31 @@ device_chroot_tweaks_pre() {
 		rm -rf /boot/kernel_2712.img
 		rm -rf "/lib/modules/${KERNEL_VERSION}-v8-16k+"
 	fi
+
+	# Remove 64-bit realtime kernel
+	if [[ -d "/lib/modules/${KERNEL_VERSION}-v8-rt+" ]]; then
+		log "Removing v8-rt+ (64bit RT) Kernel and modules" "info"
+		rm -f /boot/kernel_2712_rt.img
+		rm -rf "/lib/modules/${KERNEL_VERSION}-v8-rt+"
+	fi
+
+	# Remove all unintended +rpt-rpi-* variants
+	for kdir in /lib/modules/*; do
+		kbase=$(basename "$kdir")
+		if [[ "$kbase" == *+rpt-rpi-* ]]; then
+			log "Removing stray kernel module folder: $kbase" "info"
+			rm -rf "/lib/modules/$kbase"
+		fi
+	done
+
+	# Remove any empty module folders
+	for kdir in /lib/modules/${KERNEL_VERSION}*; do
+		if [[ -d "$kdir" && ! -f "$kdir/modules.builtin" ]]; then
+			kbase=$(basename "$kdir")
+			log "Removing empty kernel module folder: $kbase" "info"
+			rm -rf "$kdir"
+		fi
+	done
 
 	if [ -e "/boot/overlays/i2s-dac.dtbo" ]
 	then
