@@ -72,7 +72,7 @@ device_chroot_tweaks_pre() {
   log "Performing device_chroot_tweaks_pre" "ext"
 
   echo "Install device tree compiler with overlays support"
-  wget -P /tmp http://ftp.debian.org/debian/pool/main/d/device-tree-compiler/device-tree-compiler_1.4.7-4_armhf.deb
+  wget -P /tmp http://archive.debian.org/debian/pool/main/d/device-tree-compiler/device-tree-compiler_1.4.7-4_armhf.deb
   dpkg -i /tmp/device-tree-compiler_1.4.7-4_armhf.deb
   rm /tmp/device-tree-compiler_1.4.7-4_armhf.deb
 
