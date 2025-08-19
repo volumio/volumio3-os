@@ -53,7 +53,7 @@ UPDATE_PLYMOUTH_SERVICES_FOR_KMS_DRM="no"	# yes/no or empty. Replaces default pl
 MODULES=("fuse" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "squashfs" "uas")
 # Packages that will be installed
 PACKAGES=( # Bluetooth packages
-	"bluez" "bluez-firmware" "pi-bluetooth"
+	"bluez-firmware" "pi-bluetooth"
 	# Foundation stuff
 	"raspberrypi-sys-mods"
 	# Framebuffer stuff

@@ -35,7 +35,7 @@ INIT_TYPE="initv3" # init.{x86/nextarm/nextarm_tvbox}
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437" "fuse" "nls_iso8859_1")
 # Packages that will be installed
-PACKAGES=("bluez-firmware" "bluetooth" "bluez" "bluez-tools")
+PACKAGES=("bluez-firmware")
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)

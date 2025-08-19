@@ -65,7 +65,7 @@ fi
 MODULES=("drm" "fuse" "nls_cp437" "nls_iso8859_1" "nvme" "nvme_core" "overlay" "panel-dsi-mt" "panel-waveshare-dsi" "squashfs" "uas")
 # Packages that will be installed
 PACKAGES=( # Bluetooth packages
-	"bluez" "bluez-firmware" "pi-bluetooth"
+	"bluez-firmware" "pi-bluetooth"
 	# Foundation stuff
 	"raspberrypi-sys-mods"
 	# Framebuffer stuff

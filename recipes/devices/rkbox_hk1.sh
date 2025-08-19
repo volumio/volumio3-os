@@ -42,7 +42,7 @@ INIT_TYPE="initv3"
 # Modules that will be added to intramsfs
 MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437"  "fuse")
 # Packages that will be installed
-PACKAGES=("lirc" "fbset" "mc" "abootimg" "bluez-firmware" "bluetooth" "bluez" "bluez-tools" "linux-base" "triggerhappy")
+PACKAGES=("lirc" "fbset" "mc" "abootimg" "bluez-firmware" "linux-base" "triggerhappy")
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
