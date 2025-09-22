@@ -6,9 +6,11 @@
 var debug = false;
 
 var settleTime = 3000;
+var wiredCheckInterval = 5000;
 var fs = require('fs-extra')
 var thus = require('child_process');
 var wlan = "wlan0";
+var eth = "eth0";
 // var dhcpd = "dhcpd";
 var dhclient = "/usr/bin/sudo /sbin/dhcpcd";
 var justdhclient = "/usr/bin/sudo /sbin/dhcpcd";
@@ -22,6 +24,13 @@ var exec = require('child_process').exec;
 var ifconfig = require('/volumio/app/plugins/system_controller/network/lib/ifconfig.js');
 var wirelessEstablishedOnceFlagFile = '/data/flagfiles/wirelessEstablishedOnce';
 var wirelessWPADriver = getWirelessWPADriverString();
+// If true, only one network device can be active at a time between ethernet and wireless
+var singleNetworkMode = true;
+var networkMonitorInterval;
+var isWiredNetworkActive = false;
+
+startWiredNetworkingMonitor();
+
 if (debug) {
     var wpasupp = "wpa_supplicant -d -s -B -D" + wirelessWPADriver + " -c/etc/wpa_supplicant/wpa_supplicant.conf -i" + wlan;
 } else {
@@ -164,7 +173,7 @@ function startFlow() {
     if (hotspotForce) {
         console.log('Wireless networking forced to hotspot mode');
         startHotspotForce(function () {});
-    } else if (isWirelessDisabled()) {
+    } else if (isWirelessDisabled() || (singleNetworkMode && isWiredNetworkActive)) {
         console.log('Wireless Networking DISABLED, not starting wireless flow');
     } else if (directhotspot){
         startHotspot(function () {});
@@ -254,15 +263,7 @@ if (process.argv.length < 2) {
 
     switch (args) {
         case "start":
-            console.log("Cleaning previous...");
-            stopHotspot(function () {
-                stopAP(function() {
-                    console.log("Stopped aP");
-                    // Here we set the regdomain if not set
-                    detectAndApplyRegdomain(function() {
-                        startFlow();
-                    });
-                })});
+            initializeWirelessFlow();
             break;
         case "stop":
             stopAP(function() {});
@@ -271,6 +272,19 @@ if (process.argv.length < 2) {
             wstatus("test");
             break;
     }
+}
+
+function initializeWirelessFlow() {
+    console.log("Wireless.js initializing wireless flow");
+    console.log("Cleaning previous...");
+    stopHotspot(function () {
+        stopAP(function() {
+            console.log("Stopped aP");
+            // Here we set the regdomain if not set
+            detectAndApplyRegdomain(function() {
+                startFlow();
+            });
+        })});
 }
 
 function wstatus(nstatus) {
@@ -423,4 +437,51 @@ function determineMostAppropriateRegdomain(arr) {
             return acc;
         }, {})
        return mostFreq;
+}
+
+function startWiredNetworkingMonitor() {
+
+    if (networkMonitorInterval !== undefined) {
+        clearInterval(networkMonitorInterval);
+    }
+    checkWiredStatus();
+    networkMonitorInterval = setInterval(() => {
+        checkWiredStatus();
+    }, wiredCheckInterval);
+}
+
+function checkWiredStatus(callback) {
+    isWiredConnected(function(wiredActive) {
+        if (wiredActive !== isWiredNetworkActive) {
+            isWiredNetworkActive = wiredActive;
+            if (wiredActive) {
+                logger('ETHERNET: Wired network active, stopping wireless');
+            } else {
+                logger('ETHERNET: Wired network not active, starting wireless flow');
+            }
+            initializeWirelessFlow();
+        }
+    });
+}
+
+function isWiredConnected(callback) {
+    if (!fs.existsSync("/sys/class/net/" + eth + "/operstate")) {
+        logger("ETHERNET: No ethernet interface found");
+        return callback(false);
+    }
+    // TODO: Find a less spammy way to read the IP address
+    ifconfig.status(eth, function (err, ifstatus) {
+        if (err) {
+            logger("ETHERNET: Error checking ethernet status: " + err);
+            return callback(false);
+        }
+        var hasIP = false;
+        if (ifstatus && (ifstatus.ipv4_address && ifstatus.ipv4_address.length > "0.0.0.0".length)) {
+            hasIP = true;
+            logger("ETHERNET: Connected with IP - IPv4: " + ifstatus.ipv4_address);
+        } else {
+            logger("ETHERNET: Interface exists but no IP address assigned");
+        }
+        return callback(hasIP);
+    });
 }
