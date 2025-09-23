@@ -22,8 +22,8 @@ var execSync = require('child_process').execSync;
 var exec = require('child_process').exec;
 var ifconfig = require('/volumio/app/plugins/system_controller/network/lib/ifconfig.js');
 var wirelessEstablishedOnceFlagFile = '/data/flagfiles/wirelessEstablishedOnce';
-var wpasupp = "wpa_supplicant -s -B -D" + wirelessWPADriver + " -c/etc/wpa_supplicant/wpa_supplicant.conf -i" + wlan;
 var wirelessWPADriver = getWirelessWPADriverString();
+var wpasupp = "wpa_supplicant -s -B -D" + wirelessWPADriver + " -c/etc/wpa_supplicant/wpa_supplicant.conf -i" + wlan;
 var singleNetworkMode = false;
 var isWiredNetworkActive = false;
 var currentEthStatus = 'disconnected';
@@ -235,7 +235,7 @@ function startFlow() {
                     var SSID = undefined;
                     loggerInfo("trying...");
                     try {
-                        var SSID = execSync("/usr/bin/sudo /sbin/iwgetid -r", { uid: 1000, gid: 1000, encoding: 'utf8'});
+                        var SSID = execSync("/usr/bin/sudo /sbin/iwgetid -r", { uid: 1000, gid: 1000, encoding: 'utf8'}).replace('\n','');
                         loggerInfo('Connected to: ----'+SSID+'----');
                     } catch(e) {
                         //loggerInfo('ERROR: '+e)
@@ -465,7 +465,7 @@ function checkWiredNetworkStatus(isFirstStart) {
             } else {
                 isWiredNetworkActive = false;
             }
-            if (!isFirstStart) {
+            if (!isFirstStart && singleNetworkMode) {
                 initializeWirelessFlow();
             }
         }
