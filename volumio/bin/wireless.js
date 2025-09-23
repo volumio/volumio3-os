@@ -6,7 +6,6 @@
 var debug = false;
 
 var settleTime = 3000;
-var wiredCheckInterval = 5000;
 var fs = require('fs-extra')
 var thus = require('child_process');
 var wlan = "wlan0";
