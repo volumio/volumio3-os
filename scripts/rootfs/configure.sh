@@ -95,7 +95,7 @@ cp "${SRC}/volumio/etc/default/ifplugd" "${ROOTFS}/etc/default/ifplugd"
 
 #LAN HOTPLUG IFUPD SCRIPT
 cp "${SRC}/volumio/etc/ifplugd/action.d/eth0-status" "${ROOTFS}/etc/ifplugd/action.d/eth0-status"
-
+chmod a+x "${ROOTFS}/etc/ifplugd/action.d/eth0-status"
 
 #TRIGGERHAPPY
 cp "${SRC}/volumio/etc/triggerhappy/triggers.d/audio.conf" "${ROOTFS}/etc/triggerhappy/triggers.d/audio.conf"
