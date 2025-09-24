@@ -8,6 +8,7 @@ var debug = false;
 var settleTime = 3000;
 var fs = require('fs-extra')
 var thus = require('child_process');
+var process = require('node:process');
 var wlan = "wlan0";
 var eth = "eth0";
 // var dhcpd = "dhcpd";
@@ -194,13 +195,19 @@ function startFlow() {
     }
     if (hotspotForce) {
         loggerInfo('Wireless networking forced to hotspot mode');
-        startHotspotForce(function () {});
+        startHotspotForce(function () {
+            notifyWirelessReady();
+        });
     } else if (isWirelessDisabled()) {
         loggerInfo('Wireless Networking DISABLED, not starting wireless flow');
+        notifyWirelessReady();
     } else if (singleNetworkMode && isWiredNetworkActive) {
         loggerInfo('Single Network Mode: Wired network active, not starting wireless flow');
+        notifyWirelessReady();
     } else if (directhotspot){
-        startHotspot(function () {});
+        startHotspot(function () {
+            notifyWirelessReady();
+        });
     } else {
         loggerInfo("Start wireless flow");
         startAP(function () {
@@ -223,6 +230,7 @@ function startFlow() {
                                     if(err) {
                                         loggerInfo('Could not start Hotspot Fallback: ' + err);
                                     }
+                                    notifyWirelessReady();
                                 });
                             }, settleTime);
                         });
@@ -256,6 +264,7 @@ function startFlow() {
                                     clearTimeout(lesstimer);
                                     restartAvahi();
                                     saveWirelessConnectionEstablished();
+                                    notifyWirelessReady();
                                 }
                             }
                         });
@@ -483,4 +492,14 @@ function retrieveEnvParameters() {
     } catch(e) {
         loggerDebug('Could not read /volumio/.env file: ' + e);
     }
+}
+
+function notifyWirelessReady() {
+    exec('systemd-notify --ready', { stdio: 'inherit', shell: '/bin/bash', uid: process.getgid(), gid: process.geteuid(), encoding: 'utf8'}, function(error) {
+        if (error) {
+            loggerInfo('Could not notify systemd about wireless ready: ' + error);
+        } else {
+            loggerInfo('Notified systemd about wireless ready');
+        }
+    });
 }
