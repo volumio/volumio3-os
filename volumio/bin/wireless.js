@@ -25,6 +25,7 @@ var ifconfig = require('/volumio/app/plugins/system_controller/network/lib/ifcon
 var wirelessEstablishedOnceFlagFile = '/data/flagfiles/wirelessEstablishedOnce';
 var wirelessWPADriver = getWirelessWPADriverString();
 var wpasupp = "wpa_supplicant -s -B -D" + wirelessWPADriver + " -c/etc/wpa_supplicant/wpa_supplicant.conf -i" + wlan;
+var ethernetStatusFile = '/data/eth0status';
 var singleNetworkMode = false;
 var isWiredNetworkActive = false;
 var currentEthStatus = 'disconnected';
@@ -457,15 +458,20 @@ function determineMostAppropriateRegdomain(arr) {
 }
 
 function startWiredNetworkingMonitor() {
+    try {
+        fs.accessSync(ethernetStatusFile);
+    } catch (error) {
+        fs.writeFileSync(ethernetStatusFile, 'disconnected', 'utf8');
+    }
     checkWiredNetworkStatus(true);
-    fs.watch('/data/eth0status', () => {
+    fs.watch(ethernetStatusFile, () => {
         checkWiredNetworkStatus();
     });
 }
 
 function checkWiredNetworkStatus(isFirstStart) {
     try {
-        var ethstatus = fs.readFileSync('/data/eth0status', 'utf8').replace('\n','');
+        var ethstatus = fs.readFileSync(ethernetStatusFile, 'utf8').replace('\n','');
         if (ethstatus !== currentEthStatus) {
             currentEthStatus = ethstatus
             loggerInfo('Wired network status changed to: ---' + ethstatus + '---');
