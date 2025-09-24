@@ -3,7 +3,7 @@ Description=Wireless Services
 Before=volumio.service
 
 [Service]
-Type=forking
+Type=notify
 ExecStartPost=-/sbin/iw dev wlan0 set power_save off
 ExecStartPost=-/sbin/iwconfig wlan0 power off
 ExecStart=/volumio/app/plugins/system_controller/network/wireless.js start
