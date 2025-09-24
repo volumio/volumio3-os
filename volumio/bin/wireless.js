@@ -8,7 +8,9 @@ var debug = false;
 var settleTime = 3000;
 var fs = require('fs-extra')
 var thus = require('child_process');
+var process = require('node:process');
 var wlan = "wlan0";
+var eth = "eth0";
 // var dhcpd = "dhcpd";
 var dhclient = "/usr/bin/sudo /sbin/dhcpcd";
 var justdhclient = "/usr/bin/sudo /sbin/dhcpcd";
@@ -22,17 +24,45 @@ var exec = require('child_process').exec;
 var ifconfig = require('/volumio/app/plugins/system_controller/network/lib/ifconfig.js');
 var wirelessEstablishedOnceFlagFile = '/data/flagfiles/wirelessEstablishedOnce';
 var wirelessWPADriver = getWirelessWPADriverString();
-if (debug) {
-    var wpasupp = "wpa_supplicant -d -s -B -D" + wirelessWPADriver + " -c/etc/wpa_supplicant/wpa_supplicant.conf -i" + wlan;
+var wpasupp = "wpa_supplicant -s -B -D" + wirelessWPADriver + " -c/etc/wpa_supplicant/wpa_supplicant.conf -i" + wlan;
+var ethernetStatusFile = '/data/eth0status';
+var singleNetworkMode = false;
+var isWiredNetworkActive = false;
+var currentEthStatus = 'disconnected';
+
+
+if (process.argv.length < 2) {
+    loggerInfo("Volumio Wireless Daemon. Use: start|stop");
 } else {
-    var wpasupp = "wpa_supplicant -s -B -D" + wirelessWPADriver + " -c/etc/wpa_supplicant/wpa_supplicant.conf -i" + wlan;
+    var args = process.argv[2];
+    loggerDebug('WIRELESS DAEMON: ' + args);
+    initializeWirelessDaemon();
+    switch (args) {
+    case "start":
+        initializeWirelessFlow();
+        break;
+    case "stop":
+        stopAP(function() {});
+        break;
+    case "test":
+        wstatus("test");
+        break;
+    }
+}
+
+function initializeWirelessDaemon() {
+    retrieveEnvParameters();
+    startWiredNetworkingMonitor();
+    if (debug) {
+        var wpasupp = "wpa_supplicant -d -s -B -D" + wirelessWPADriver + " -c/etc/wpa_supplicant/wpa_supplicant.conf -i" + wlan;
+    }
 }
 
 function kill(process, callback) {
     var all = process.split(" ");
     var process = all[0];
     var command = 'kill `pgrep -f "^' + process + '"` || true';
-    logger("killing: " + command);
+    loggerDebug("killing: " + command);
     return thus.exec(command, callback);
 }
 
@@ -42,15 +72,15 @@ function launch(fullprocess, name, sync, callback) {
     if (sync) {
         var child = thus.exec(fullprocess, {}, callback);
         child.stdout.on('data', function(data) {
-            logger(name + 'stdout: ' + data);
+            loggerDebug(name + 'stdout: ' + data);
         });
 
         child.stderr.on('data', function(data) {
-            logger(name + 'stderr: ' + data);
+            loggerDebug(name + 'stderr: ' + data);
         });
 
         child.on('close', function(code) {
-            logger(name + 'child process exited with code ' + code);
+            loggerDebug(name + 'child process exited with code ' + code);
         });
     } else {
         var all = fullprocess.split(" ");
@@ -58,19 +88,19 @@ function launch(fullprocess, name, sync, callback) {
         if (all.length > 0) {
             all.splice(0, 1);
         }
-        logger("launching " + process + " args: ");
-        logger(all);
+        loggerDebug("launching " + process + " args: ");
+        loggerDebug(all);
         var child = thus.spawn(process, all, {});
         child.stdout.on('data', function(data) {
-            logger(name + 'stdout: ' + data);
+            loggerDebug(name + 'stdout: ' + data);
         });
 
         child.stderr.on('data', function(data) {
-            logger(name + 'stderr: ' + data);
+            loggerDebug(name + 'stderr: ' + data);
         });
 
         child.on('close', function(code) {
-            logger(name + 'child process exited with code ' + code);
+            loggerDebug(name + 'child process exited with code ' + code);
         });
         callback();
     }
@@ -82,13 +112,13 @@ function launch(fullprocess, name, sync, callback) {
 function startHotspot() {
     stopHotspot(function(err) {
         if (isHotspotDisabled()) {
-            console.log('Hotspot is disabled, not starting it');
+            loggerInfo('Hotspot is disabled, not starting it');
             launch(ifconfigWlan, "configwlanup", true, function(err) {
-                logger("ifconfig " + err);
+                loggerDebug("ifconfig " + err);
             });
         } else {
             launch(ifconfigHotspot, "confighotspot", true, function(err) {
-                logger("ifconfig " + err);
+                loggerDebug("ifconfig " + err);
                 launch(starthostapd,"hotspot" , false, function() {
                     wstatus("hotspot");
                 });
@@ -99,9 +129,9 @@ function startHotspot() {
 
 function startHotspotForce() {
     stopHotspot(function(err) {
-        console.log('Starting Force Hotspot')
+        loggerInfo('Starting Force Hotspot')
         launch(ifconfigHotspot, "confighotspot", true, function(err) {
-            logger("ifconfig " + err);
+            loggerDebug("ifconfig " + err);
             launch(starthostapd,"hotspot" , false, function() {
                 wstatus("hotspot");
             });
@@ -116,17 +146,17 @@ function stopHotspot(callback) {
 }
 
 function startAP(callback) {
-    console.log("Stopped hotspot (if there)..");
+    loggerInfo("Stopped hotspot (if there)..");
     launch(ifdeconfig, "ifdeconfig", true,  function(err) {
-        logger("Conf " + ifdeconfig);
+        loggerDebug("Conf " + ifdeconfig);
         launch(wpasupp, "wpa supplicant", false, function(err) {
-            logger("wpasupp " + err);
+            loggerDebug("wpasupp " + err);
             wpaerr = err;
             try {
                 dhclient = fs.readFileSync('/data/configuration/wlanstatic', 'utf8');
-                console.log("FIXED IP");
+                loggerInfo("FIXED IP");
             } catch (e) {
-                console.log("DHCP IP ");
+                loggerInfo("DHCP IP ");
             }
             launch(dhclient,"dhclient", false, callback);
         });
@@ -148,6 +178,9 @@ var actualTime = 0;
 var apstopped = 0
 
 function startFlow() {
+    if (lesstimer) {
+        clearTimeout(lesstimer);
+    }
     try {
         var netconfigured = fs.statSync('/data/configuration/netconfigured');
     } catch (e) {
@@ -162,16 +195,24 @@ function startFlow() {
         var hotspotForce = false;
     }
     if (hotspotForce) {
-        console.log('Wireless networking forced to hotspot mode');
-        startHotspotForce(function () {});
+        loggerInfo('Wireless networking forced to hotspot mode');
+        startHotspotForce(function () {
+            notifyWirelessReady();
+        });
     } else if (isWirelessDisabled()) {
-        console.log('Wireless Networking DISABLED, not starting wireless flow');
+        loggerInfo('Wireless Networking DISABLED, not starting wireless flow');
+        notifyWirelessReady();
+    } else if (singleNetworkMode && isWiredNetworkActive) {
+        loggerInfo('Single Network Mode: Wired network active, not starting wireless flow');
+        notifyWirelessReady();
     } else if (directhotspot){
-        startHotspot(function () {});
+        startHotspot(function () {
+            notifyWirelessReady();
+        });
     } else {
-        console.log("Start wireless flow");
+        loggerInfo("Start wireless flow");
         startAP(function () {
-            console.log("Start ap");
+            loggerInfo("Start ap");
             lesstimer = setInterval(()=> {
                 actualTime += pollingTime;
                 if (wpaerr > 0) {
@@ -179,17 +220,18 @@ function startFlow() {
                 }
 
                 if (actualTime > totalSecondsForConnection) {
-                    console.log("Overtime, starting plan B");
+                    loggerInfo("Overtime, starting plan B");
                     if (hotspotFallbackCondition()) {
-                        console.log('STARTING HOTSPOT');
+                        loggerInfo('STARTING HOTSPOT');
                         apstopped = 1;
                         clearTimeout(lesstimer);
                         stopAP(function () {
                             setTimeout(()=> {
                                 startHotspot(function (err) {
                                     if(err) {
-                                        console.log('Could not start Hotspot Fallback: ' + err);
+                                        loggerInfo('Could not start Hotspot Fallback: ' + err);
                                     }
+                                    notifyWirelessReady();
                                 });
                             }, settleTime);
                         });
@@ -200,29 +242,30 @@ function startFlow() {
                     }
                 } else {
                     var SSID = undefined;
-                    console.log("trying...");
+                    loggerInfo("trying...");
                     try {
-                        var SSID = execSync("/usr/bin/sudo /sbin/iwgetid -r", { uid: 1000, gid: 1000, encoding: 'utf8'});
-                        console.log('Connected to: ----'+SSID+'----');
+                        var SSID = execSync("/usr/bin/sudo /sbin/iwgetid -r", { uid: 1000, gid: 1000, encoding: 'utf8'}).replace('\n','');
+                        loggerInfo('Connected to: ----'+SSID+'----');
                     } catch(e) {
-                        //console.log('ERROR: '+e)
+                        //loggerInfo('ERROR: '+e)
                     }
 
 
                     if (SSID != undefined) {
                         ifconfig.status(wlan, function (err, ifstatus) {
-                            console.log("... joined AP, wlan0 IPv4 is " + ifstatus.ipv4_address + ", ipV6 is " + ifstatus.ipv6_address);
+                            loggerInfo("... joined AP, wlan0 IPv4 is " + ifstatus.ipv4_address + ", ipV6 is " + ifstatus.ipv6_address);
                             if (((ifstatus.ipv4_address != undefined) &&
                                 (ifstatus.ipv4_address.length > "0.0.0.0".length))
                                 ||
                                 ((ifstatus.ipv6_address != undefined) &&
                                 (ifstatus.ipv6_address.length > "::".length))) {
                                 if (apstopped == 0) {
-                                    console.log("It's done! AP");
+                                    loggerInfo("It's done! AP");
                                     wstatus("ap");
                                     clearTimeout(lesstimer);
                                     restartAvahi();
                                     saveWirelessConnectionEstablished();
+                                    notifyWirelessReady();
                                 }
                             }
                         });
@@ -241,36 +284,21 @@ function stop(callback) {
 }
 
 if ( ! fs.existsSync("/sys/class/net/" + wlan + "/operstate") ) {
-    console.log("WIRELESS: No wireless interface, exiting");
+    loggerInfo("No wireless interface, exiting");
     process.exit(0);
 }
 
-
-if (process.argv.length < 2) {
-    console.log("Use: start|stop");
-} else {
-    var args = process.argv[2];
-    logger('WIRELESS DAEMON: ' + args);
-
-    switch (args) {
-        case "start":
-            console.log("Cleaning previous...");
-            stopHotspot(function () {
-                stopAP(function() {
-                    console.log("Stopped aP");
-                    // Here we set the regdomain if not set
-                    detectAndApplyRegdomain(function() {
-                        startFlow();
-                    });
-                })});
-            break;
-        case "stop":
-            stopAP(function() {});
-            break;
-        case "test":
-            wstatus("test");
-            break;
-    }
+function initializeWirelessFlow() {
+    loggerInfo("Wireless.js initializing wireless flow");
+    loggerInfo("Cleaning previous...");
+    stopHotspot(function () {
+        stopAP(function() {
+            loggerInfo("Stopped aP");
+            // Here we set the regdomain if not set
+            detectAndApplyRegdomain(function() {
+                startFlow();
+            });
+        })});
 }
 
 function wstatus(nstatus) {
@@ -281,19 +309,23 @@ function restartAvahi() {
     //thus.exec("/bin/systemctl restart avahi-daemon");
 }
 
-function logger(msg) {
+function loggerDebug(msg) {
     if (debug) {
-        console.log(msg)
+        console.log('WIRELESS.JS Debug: ' + msg)
     }
+}
+
+function loggerInfo(msg) {
+    console.log('WIRELESS.JS: ' + msg)
 }
 
 function getWirelessConfiguration() {
     try {
         var conf = fs.readJsonSync('/data/configuration/system_controller/network/config.json');
-        logger('WIRELESS: Loaded configuration');
-        logger('WIRELESS CONF: ' + JSON.stringify(conf));
+        loggerDebug('Loaded configuration');
+        loggerDebug('CONF: ' + JSON.stringify(conf));
     } catch (e) {
-        logger('WIRELESS: First boot');
+        loggerDebug('First boot');
         var conf = fs.readJsonSync('/volumio/app/plugins/system_controller/network/config.json');
     }
     return conf
@@ -333,7 +365,7 @@ function saveWirelessConnectionEstablished() {
     try {
         fs.ensureFileSync(wirelessEstablishedOnceFlagFile)
     } catch (e) {
-        logger('Could not save Wireless Connection Established: ' + e);
+        loggerDebug('Could not save Wireless Connection Established: ' + e);
     }
 }
 
@@ -371,27 +403,27 @@ function detectAndApplyRegdomain(callback) {
         var currentRegDomain = execSync("/usr/bin/sudo /sbin/ifconfig wlan0 up && /usr/bin/sudo /sbin/iw reg get | grep country | cut -f1 -d':'", { uid: 1000, gid: 1000, encoding: 'utf8'}).replace(/country /g, '').replace('\n','');
         var countryCodesInScan = execSync("/usr/bin/sudo /sbin/ifconfig wlan0 up && /usr/bin/sudo /sbin/iw wlan0 scan | grep Country: | cut -f 2", { uid: 1000, gid: 1000, encoding: 'utf8'}).replace(/Country: /g, '').split('\n');
         var appropriateRegDomain = determineMostAppropriateRegdomain(countryCodesInScan);
-        logger('CURRENT REG DOMAIN: ' + currentRegDomain)
-        logger('APPROPRIATE REG DOMAIN: ' + appropriateRegDomain)
+        loggerDebug('CURRENT REG DOMAIN: ' + currentRegDomain)
+        loggerDebug('APPROPRIATE REG DOMAIN: ' + appropriateRegDomain)
         if (isValidRegDomain(appropriateRegDomain) && appropriateRegDomain !== currentRegDomain) {
             applyNewRegDomain(appropriateRegDomain);
         }
     } catch(e) {
-        console.log('Failed to determine most appropriate reg domain: ' + e);
+        loggerInfo('Failed to determine most appropriate reg domain: ' + e);
     }
     callback();
 }
 
 function applyNewRegDomain(newRegDom) {
-    console.log('SETTING APPROPRIATE REG DOMAIN: ' + newRegDom);
+    loggerInfo('SETTING APPROPRIATE REG DOMAIN: ' + newRegDom);
 
     try {
         execSync("/usr/bin/sudo /sbin/ifconfig wlan0 up && /usr/bin/sudo /sbin/iw reg set " + newRegDom, { uid: 1000, gid: 1000, encoding: 'utf8'});
         //execSync("/usr/bin/sudo /bin/echo 'REGDOMAIN=" + newRegDom + "' > /etc/default/crda", { uid: 1000, gid: 1000, encoding: 'utf8'});
         fs.writeFileSync("/etc/default/crda", "REGDOMAIN=" + newRegDom);
-        console.log('SUCCESSFULLY SET NEW REGDOMAIN: ' + newRegDom)
+        loggerInfo('SUCCESSFULLY SET NEW REGDOMAIN: ' + newRegDom)
     } catch(e) {
-        console.log('Failed to set new reg domain: ' + e);
+        loggerInfo('Failed to set new reg domain: ' + e);
     }
 
 }
@@ -423,4 +455,57 @@ function determineMostAppropriateRegdomain(arr) {
             return acc;
         }, {})
        return mostFreq;
+}
+
+function startWiredNetworkingMonitor() {
+    try {
+        fs.accessSync(ethernetStatusFile);
+    } catch (error) {
+        fs.writeFileSync(ethernetStatusFile, 'disconnected', 'utf8');
+    }
+    checkWiredNetworkStatus(true);
+    fs.watch(ethernetStatusFile, () => {
+        checkWiredNetworkStatus();
+    });
+}
+
+function checkWiredNetworkStatus(isFirstStart) {
+    try {
+        var ethstatus = fs.readFileSync(ethernetStatusFile, 'utf8').replace('\n','');
+        if (ethstatus !== currentEthStatus) {
+            currentEthStatus = ethstatus
+            loggerInfo('Wired network status changed to: ---' + ethstatus + '---');
+            if (ethstatus === 'connected') {
+                isWiredNetworkActive = true;
+            } else {
+                isWiredNetworkActive = false;
+            }
+            if (!isFirstStart && singleNetworkMode) {
+                initializeWirelessFlow();
+            }
+        }
+    } catch (e) {}
+}
+
+function retrieveEnvParameters() {
+    // Facility function to read env parameters, without the need for external modules
+    try {
+        var envParameters = fs.readFileSync('/volumio/.env', { encoding: 'utf8'});
+        if (envParameters.includes('SINGLE_NETWORK_MODE=true')) {
+            singleNetworkMode = true;
+            loggerInfo('Single Network Mode enabled, only one network device can be active at a time between ethernet and wireless');
+        }
+    } catch(e) {
+        loggerDebug('Could not read /volumio/.env file: ' + e);
+    }
+}
+
+function notifyWirelessReady() {
+    exec('systemd-notify --ready', { stdio: 'inherit', shell: '/bin/bash', uid: process.getgid(), gid: process.geteuid(), encoding: 'utf8'}, function(error) {
+        if (error) {
+            loggerInfo('Could not notify systemd about wireless ready: ' + error);
+        } else {
+            loggerInfo('Notified systemd about wireless ready');
+        }
+    });
 }

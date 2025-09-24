@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# ifplugd script to monitor eth0 cable status
+# This script is called by ifplugd when cable status changes
+# Arguments: $1 = interface name, $2 = status (up/down)
+
+INTERFACE="$1"
+STATUS="$2"
+STATUS_FILE="/data/eth0status"
+
+# Write status to file based on cable connection
+case "$STATUS" in
+    "up")
+        echo "connected" > "$STATUS_FILE"
+        ;;
+    "down")
+        echo "disconnected" > "$STATUS_FILE"
+        ;;
+    *)
+        # Fallback - shouldn't normally happen
+        echo "unknown" > "$STATUS_FILE"
+        ;;
+esac
+
+# Set proper permissions
+chmod 644 "$STATUS_FILE"
+
+exit 0
