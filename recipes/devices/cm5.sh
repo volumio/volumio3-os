@@ -409,6 +409,7 @@ device_chroot_tweaks_pre() {
 		hdmi_force_hotplug=1
 		display_auto_detect=1
 		disable_splash=1
+		disable_overscan=1
 		max_usb_current=1
 		usb_max_current_enable=1
 		force_eeprom_read=0
