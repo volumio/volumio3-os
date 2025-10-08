@@ -573,7 +573,7 @@ function startWiredNetworkingMonitor() {
 function checkWiredNetworkStatus(isFirstStart) {
     try {
         var ethstatus = fs.readFileSync(ethernetStatusFile, 'utf8').replace('\n','');
-        if (ethstatus !== currentEthStatus) {
+        if (ethstatus && ethstatus !== currentEthStatus) {
             currentEthStatus = ethstatus
             loggerInfo('Wired network status changed to: ---' + ethstatus + '---');
             if (ethstatus === 'connected') {
