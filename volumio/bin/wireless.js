@@ -333,7 +333,7 @@ function startFlow() {
                 var SSID = undefined;
                 loggerInfo("trying...");
                 try {
-                    SSID = execSync("/usr/bin/sudo /sbin/iwgetid -r", { uid: 1000, gid: 1000, encoding: 'utf8' });
+                    SSID = execSync("/usr/bin/sudo /sbin/iwgetid -r", { uid: 1000, gid: 1000, encoding: 'utf8' }).replace('\n','');
                     loggerInfo('Connected to: ----' + SSID + '----');
                 } catch (e) {}
 
@@ -501,10 +501,19 @@ function loggerDebug(msg) {
     if (debug) {
         console.log('WIRELESS.JS Debug: ' + msg)
     }
+    writeToLogFile('DEBUG', msg);
 }
 
 function loggerInfo(msg) {
-    console.log('WIRELESS.JS: ' + msg)
+    console.log('WIRELESS.JS: ' + msg);
+    writeToLogFile('INFO', msg);
+}
+
+function writeToLogFile(level, msg) {
+    try {
+        const timestamp = new Date().toISOString();
+        fs.appendFileSync('/tmp/wireless.log', `[${timestamp}] ${level}: ${msg}\n`);
+    } catch (e) {}
 }
 
 function refreshNetworkStatusFile() {
