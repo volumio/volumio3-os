@@ -313,10 +313,19 @@ function loggerDebug(msg) {
     if (debug) {
         console.log('WIRELESS.JS Debug: ' + msg)
     }
+    writeToLogFile('DEBUG', msg);
 }
 
 function loggerInfo(msg) {
-    console.log('WIRELESS.JS: ' + msg)
+    console.log('WIRELESS.JS: ' + msg);
+    writeToLogFile('INFO', msg);
+}
+
+function writeToLogFile(level, msg) {
+    try {
+        const timestamp = new Date().toISOString();
+        fs.appendFileSync('/tmp/wireless.log', `[${timestamp}] ${level}: ${msg}\n`);
+    } catch (e) {}
 }
 
 function getWirelessConfiguration() {
