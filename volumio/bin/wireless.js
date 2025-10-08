@@ -28,6 +28,7 @@ var ethernetStatusFile = '/data/eth0status';
 var singleNetworkMode = false;
 var isWiredNetworkActive = false;
 var currentEthStatus = 'disconnected';
+var apStartInProgress = false;
 
 // Global variables
 var retryCount = 0;
