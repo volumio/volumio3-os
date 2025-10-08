@@ -8,7 +8,6 @@ var debug = false;
 var settleTime = 3000;
 var fs = require('fs-extra')
 var thus = require('child_process');
-var process = require('node:process');
 var wlan = "wlan0";
 var eth = "eth0";
 // var dhcpd = "dhcpd";
