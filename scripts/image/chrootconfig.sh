@@ -234,6 +234,8 @@ else
 fi
 
 log "Checking NodeJS Major version to see if correct"
+# Must be same as recipes/configurations/config.sh:53
+NODE_VERSION_MAJOR=14
 [ "$(node --version | cut -d. -f1)" = "v${NODE_VERSION_MAJOR}" ] || { echo "ERROR: Wrong Node.js major version. Required: v${NODE_VERSION_MAJOR}, Found: $(node --version)"; exit 10; }
 
 

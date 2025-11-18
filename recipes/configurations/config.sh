@@ -50,6 +50,7 @@ VOL_BE_REPO_BRANCH="master"
 ## NodeJS Controls
 # Semver is only used w.t.r modules fetched from repo,
 # actual node version installs only respects the current major versions (Major.x)
+# Make sure to reflect the major in  scripts/image/chrootconfig.sh:236
 NODE_VERSION_MAJOR=14
 NODE_VERSION=14.15.4
 # Used to pull the right version of modules
