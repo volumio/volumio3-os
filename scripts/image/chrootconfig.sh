@@ -233,6 +233,10 @@ else
   rm -rf "${PATCH}" /patch
 fi
 
+log "Checking NodeJS Major version to see if correct"
+[ "$(node --version | cut -d. -f1)" = "v${NODE_VERSION_MAJOR}" ] || { echo "ERROR: Wrong Node.js major version. Required: v${NODE_VERSION_MAJOR}, Found: $(node --version)"; exit 10; }
+
+
 # #mke2fsfull is used since busybox mke2fs does not include ext4 support
 cp -rp /sbin/mke2fs /sbin/mke2fsfull
 
