@@ -6,7 +6,7 @@ declare -A SecureApt=(
   [nodesource.gpg]="https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
   [lesbonscomptes.gpg]="https://www.lesbonscomptes.com/pages/lesbonscomptes.gpg"
   #TODO Not needed for arm64 and x86
-  [raspbian.gpg]="https://archive.raspbian.org/raspbian.public.key"
+  [raspbian.gpg]="http://apt2.volumio.org/raspbian/raspbian.public.key"
   [raspberrypi.gpg]="http://archive2.volumio.org/debian/raspberrypi.gpg.key"
 )
 

@@ -128,7 +128,7 @@ device_image_tweaks() {
 		wpa_passphrase=volumio2
 	EOF
 
-	log "Adding archive.raspberrypi debian repo" "info"
+	log "Adding archive2.volumio debian repo" "info"
 	cat <<-EOF >"${ROOTFSMNT}/etc/apt/sources.list.d/raspi.list"
 		deb http://archive2.volumio.org/debian/ buster main ui
 		# Uncomment line below then 'apt-get update' to enable 'apt-get source'
