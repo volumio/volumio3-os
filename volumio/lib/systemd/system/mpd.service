@@ -1,0 +1,37 @@
+[Unit]
+Description=Music Player Daemon
+Documentation=man:mpd(1) man:mpd.conf(5)
+After=network.target sound.target
+Wants=mpd.socket
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/mpd --no-daemon
+ExecStartPre=-/usr/bin/sudo /bin/chown mpd:audio /var/log/mpd.log
+StartLimitBurst=15
+
+# Enable this setting to ask systemd to watch over MPD.
+WatchdogSec=20
+
+# allow MPD to use real-time priority 40
+LimitRTPRIO=40
+LimitRTTIME=infinity
+
+# for io_uring
+LimitMEMLOCK=64M
+
+# disallow writing to /usr, /bin, /sbin, ...
+ProtectSystem=yes
+
+# more paranoid security settings
+NoNewPrivileges=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+# AF_NETLINK is required by libsmbclient, or it will exit() .. *sigh*
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+RestrictNamespaces=yes
+
+[Install]
+WantedBy=multi-user.target
+Also=mpd.socket

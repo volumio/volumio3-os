@@ -82,10 +82,6 @@ cp -rp "${SRC}"/volumio/usr/* "${ROOTFS}/usr/"
 cp "${SRC}/volumio/bin/volumio_cpu_tweak" "${ROOTFS}/bin/volumio_cpu_tweak"
 chmod a+x "${ROOTFS}/bin/volumio_cpu_tweak"
 
-#MPD Monitor
-cp "${SRC}/volumio/bin/mpd_monitor.sh" "${ROOTFS}/bin/mpd_monitor.sh"
-chmod a+x "${ROOTFS}/bin/mpd_monitor.sh"
-
 #Time Update Service
 cp "${SRC}/volumio/bin/volumio-time-update" "${ROOTFS}/bin/volumio-time-update"
 chmod a+x "${ROOTFS}/bin/volumio-time-update"
