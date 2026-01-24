@@ -237,14 +237,19 @@ source /etc/os-release
 log "Setting up nameserver for apt resolution" "dbg"
 echo "nameserver 208.67.220.220" >/etc/resolv.conf
 
-log "Installing custom packages for ${VOLUMIO_ARCH} and ${DISTRO_VER}" "info"
-log "Prepare external source lists"
+log "  ${VOLUMIO_ARCH} and ${DISTRO_VER}" "info"
 log "Attempting to install Node version: ${NODE_VERSION}"
-IFS=\. read -ra NODE_SEMVER <<<"${NODE_VERSION}"
-NODE_APT=node_${NODE_SEMVER[0]}.x
 
-apt-get update
-apt-get -y install ${packages}
+NODE_PACKAGE_NAME=nodejs_14.21.3-1nodesource1_${VOLUMIO_ARCH}.deb
+NODE_PACKAGE_BASE_URL=https://github.com/volumio/volumio3-os-static-assets/raw/refs/heads/master/custom-packages/nodejs/
+
+if [[ ${VOLUMIO_ARCH} = "arm" ]]; then
+  NODE_PACKAGE_NAME=nodejs_14.15.4-1unofficial_armv6l.deb
+fi
+
+wget "${NODE_PACKAGE_BASE_URL}${NODE_PACKAGE_NAME}"
+sudo dpkg -i "${NODE_PACKAGE_NAME}"
+rm "${NODE_PACKAGE_NAME}"
 
 log "Node $(node --version) arm_version: $(node <<<'console.log(process.config.variables.arm_version)')" "info"
 log "nodejs installed at $(command -v node)" "info"

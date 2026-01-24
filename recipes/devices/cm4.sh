@@ -311,40 +311,6 @@ device_chroot_tweaks_pre() {
 
 	NODE_VERSION=$(node --version)
 	log "Node version installed:" "dbg" "${NODE_VERSION}"
-	# drop the leading v
-	NODE_VERSION=${NODE_VERSION:1}
-	if [[ ${USE_NODE_ARMV6:-yes} == yes && ${NODE_VERSION%%.*} -ge 8 ]]; then
-		log "Using a compatible nodejs version for all pi images" "info"
-		# We don't know in advance what version is in the repo, so we have to hard code it.
-		# This is temporary fix - make this smarter!
-		declare -A NodeVersion=(
-			[14]="https://repo.volumio.org/Volumio2/nodejs_14.15.4-1unofficial_armv6l.deb"
-			[8]="https://repo.volumio.org/Volumio2/nodejs_8.17.0-1unofficial_armv6l.deb"
-		)
-		# TODO: Warn and proceed or exit the build?
-		local arch=armv6l
-		wget -nv "${NodeVersion[${NODE_VERSION%%.*}]}" -P /volumio/customNode || log "Failed fetching Nodejs for armv6!!" "wrn"
-		# Proceed only if there is a deb to install
-		if compgen -G "/volumio/customNode/nodejs_*-1unofficial_${arch}.deb" >/dev/null; then
-			# Get rid of armv7 nodejs and pick up the armv6l version
-			if dpkg -s nodejs &>/dev/null; then
-				log "Removing previous nodejs installation from $(command -v node)" "info"
-				log "Removing Node $(node --version) arm_version: $(node <<<'console.log(process.config.variables.arm_version)')" "info"
-				apt-get -y purge nodejs
-			fi
-			log "Installing Node for ${arch}" "info"
-			dpkg -i /volumio/customNode/nodejs_*-1unofficial_${arch}.deb
-			log "Installed Node $(node --version) arm_version: $(node <<<'console.log(process.config.variables.arm_version)')" "info"
-			rm -rf /volumio/customNode
-		fi
-		# Block upgrade of nodejs from raspi repos
-		log "Blocking nodejs upgrades for ${NODE_VERSION}" "info"
-		cat <<-EOF >"${ROOTFSMNT}/etc/apt/preferences.d/nodejs"
-			Package: nodejs
-			Pin: release *
-			Pin-Priority: -1
-		EOF
-	fi
 
 	log "Adding gpio & spi group and permissions" "info"
 	groupadd -f --system gpio
