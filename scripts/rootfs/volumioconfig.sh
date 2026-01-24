@@ -242,11 +242,6 @@ log "Prepare external source lists"
 log "Attempting to install Node version: ${NODE_VERSION}"
 IFS=\. read -ra NODE_SEMVER <<<"${NODE_VERSION}"
 NODE_APT=node_${NODE_SEMVER[0]}.x
-log "Adding NodeJs lists - ${NODE_APT}"
-cat <<-EOF >/etc/apt/sources.list.d/nodesource.list
-deb https://deb.nodesource.com/${NODE_APT} ${DISTRO_NAME} main
-deb-src https://deb.nodesource.com/${NODE_APT} ${DISTRO_NAME} main
-EOF
 
 apt-get update
 apt-get -y install ${packages}
