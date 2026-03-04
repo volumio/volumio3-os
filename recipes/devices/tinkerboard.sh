@@ -11,10 +11,6 @@ ARCH="armhf"
 BUILD="armv7"
 UINITRD_ARCH="arm"
 
-PLYMOUTH_THEME="volumio-player"
-# Debug image
-DEBUG_IMAGE=no
-
 ### Device information
 DEVICENAME="Asus Tinkerboard"
 # This is useful for multiple devices sharing the same/similar kernel
@@ -31,6 +27,11 @@ VOLINITUPDATER=yes
 KIOSKMODE=yes
 KIOSKBROWSER=vivaldi
 
+# Plymouth theme
+PLYMOUTH_THEME="volumio-player"
+# Debug image
+DEBUG_IMAGE=no
+
 ## Partition info
 BOOT_START=1
 BOOT_END=64
@@ -39,9 +40,9 @@ BOOT_USE_UUID=yes        # Add UUID to fstab
 INIT_TYPE="initv3" 
 
 # Modules that will be added to intramsfs
-MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437")
+MODULES=("overlay" "overlayfs" "squashfs" "nls_cp437" "fuse")
 # Packages that will be installed
-PACKAGES=("")
+PACKAGES=("bluez-firmware")
 
 ### Device customisation
 # Copy the device specific files (Image/DTS/etc..)
