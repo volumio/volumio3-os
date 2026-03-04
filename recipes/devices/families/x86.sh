@@ -55,7 +55,7 @@ MODULES=("overlay" "squashfs"
   "sata_qstor" "sata_sil24" "sata_sil" "sata_sis" "sata_svw" "sata_sx4" "ata_uli" "sata_via" "sata_vsc"
 )
 # Packages that will be installed
-PACKAGES=()
+PACKAGES=("bluez-firmware")
 
 # Kernel selection
 # This will be expanded as a glob, you can be as specific or vague as required
