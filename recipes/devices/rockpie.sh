@@ -46,6 +46,15 @@ write_device_files() {
   cp -dR "${PLTDIR}/${DEVICE}/boot" "${ROOTFSMNT}"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/modules" "${ROOTFSMNT}/lib"
   cp -pdR "${PLTDIR}/${DEVICE}/lib/firmware" "${ROOTFSMNT}/lib"
+
+  log "Create OTA 'user_overlay' resilience by reading it from 'userEnv.txt'"
+  sed -i '/env import -t ${load_addr} ${filesize}/i \
+        env import -t ${load_addr} ${filesize}\
+fi\
+\
+if test -e ${devtype} ${devnum} ${prefix}userEnv.txt; then\
+	load ${devtype} ${devnum} ${load_addr} ${prefix}userEnv.txt'" \ 
+  "${ROOTFSMNT}"/boot/boot.cmd
 }
 
 write_device_bootloader() {
