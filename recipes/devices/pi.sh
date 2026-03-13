@@ -210,7 +210,7 @@ device_chroot_tweaks_pre() {
 		[6.12.74]="7a35bddc777d8992bdfe42f8e3d043582df2f5f8|master|1948"
 	)
 	# Version we want
-	KERNEL_VERSION="6.6.62"
+	KERNEL_VERSION="6.12.74"
 
 	MAJOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 1)
 	MINOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 2)
@@ -247,7 +247,7 @@ device_chroot_tweaks_pre() {
 		[Bassowl]="https://raw.githubusercontent.com/Darmur/bassowl-hat/master/driver/archives/modules-rpi-${KERNEL_VERSION}-bassowl.tar.gz"
 		[wm8960]="https://raw.githubusercontent.com/hftsai256/wm8960-rpi-modules/main/wm8960-modules-rpi-${KERNEL_VERSION}.tar.gz"
 		[brcmfmac43430b0]="https://raw.githubusercontent.com/volumio/volumio3-os-static-assets/master/firmwares/brcmfmac43430b0/brcmfmac43430b0.tar.gz"
-		[PiCustom]="https://raw.githubusercontent.com/Darmur/volumio-rpi-custom/main/output/modules-rpi-${KERNEL_VERSION}-custom.tar.gz"
+		[PiCustom]="https://raw.githubusercontent.com/volumio/volumio-rpi-custom/main/output/modules-rpi-${KERNEL_VERSION}-custom.tar.gz"
 		[RPiUserlandTools]="https://github.com/volumio/volumio3-os-static-assets/raw/master/tools/rpi-softfp-vc.tar.gz"
 	)
 

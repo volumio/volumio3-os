@@ -168,7 +168,7 @@ device_chroot_tweaks_pre() {
 		[6.12.74]="7a35bddc777d8992bdfe42f8e3d043582df2f5f8|master|1948"
 	)
 	# Version we want
-	KERNEL_VERSION="6.6.62"
+	KERNEL_VERSION="6.12.74"
 
 	MAJOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 1)
 	MINOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 2)
@@ -178,7 +178,7 @@ device_chroot_tweaks_pre() {
 	# github archives that can be extracted directly
 	declare -A CustomFirmware=(
 		[brcmfmac43430b0]="https://raw.githubusercontent.com/volumio/volumio3-os-static-assets/master/firmwares/brcmfmac43430b0/brcmfmac43430b0.tar.gz"
-		[PiCustom]="https://raw.githubusercontent.com/Darmur/volumio-rpi-custom/main/output/modules-rpi-${KERNEL_VERSION}-custom.tar.gz"
+		[PiCustom]="https://raw.githubusercontent.com/volumio/volumio-rpi-custom/main/output/modules-rpi-${KERNEL_VERSION}-custom.tar.gz"
 		[RPiUserlandTools]="https://github.com/volumio/volumio3-os-static-assets/raw/master/tools/rpi-softfp-vc.tar.gz"
 	)
 
