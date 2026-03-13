@@ -173,27 +173,12 @@ device_chroot_tweaks_pre() {
 	## Define parameters
 	declare -A PI_KERNELS=(
 		#[KERNEL_VERSION]="SHA|Branch|Rev"
-		[5.10.90]="9a09c1dcd4fae55422085ab6a87cc650e68c4181|master|1512"
-		[5.10.92]="ea9e10e531a301b3df568dccb3c931d52a469106|stable|1514"
-		[5.10.95]="770ca2c26e9cf341db93786d3f03c89964b1f76f|master|1521"
-		[5.15.84]="a99e144e939bf93bbd03e8066601a8d3eae640f7|stable|1613"
-		[5.15.92]="f5c4fc199c8d8423cb427e509563737d1ac21f3c|master|1627"
-		[6.1.19]="fa51258e0239eaf68d9dff9c156cec3a622fbacc|stable|1637"
-		[6.1.21]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1642"
-		[6.1.47]="f87ad1a3cb8c81e32dc3d541259291605ddaada0|stable|1674"
-		[6.1.57]="12833d1bee03c4ac58dc4addf411944a189f1dfd|master|1688" # Support for Pi5
-		[6.1.58]="7b859959a6642aff44acdfd957d6d66f6756021e|master|1690"
-		[6.1.61]="d1ba55dafdbd33cfb938bca7ec325aafc1190596|master|1696"
-		[6.1.64]="01145f0eb166cbc68dd2fe63740fac04d682133e|master|1702"
-		[6.1.69]="ec8e8136d773de83e313aaf983e664079cce2815|master|1710"
-		[6.1.70]="fc9319fda550a86dc6c23c12adda54a0f8163f22|master|1712"
-		[6.1.77]="5fc4f643d2e9c5aa972828705a902d184527ae3f|master|1730"
-		[6.6.30]="3b768c3f4d2b9a275fafdb53978f126d7ad72a1a|master|1763"
 		[6.6.62]="9a9bda382acec723c901e5ae7c7f415d9afbf635|master|1816"
+		[6.12.47]="6d1da66a7b1358c9cd324286239f37203b7ce25c|master|1904"
 		[6.12.74]="7a35bddc777d8992bdfe42f8e3d043582df2f5f8|master|1948"
 	)
 	# Version we want
-	KERNEL_VERSION="6.6.62"
+	KERNEL_VERSION="6.12.74"
 
 	MAJOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 1)
 	MINOR_VERSION=$(echo "$KERNEL_VERSION" | cut -d '.' -f 2)
@@ -203,7 +188,7 @@ device_chroot_tweaks_pre() {
 	# github archives that can be extracted directly
 	declare -A CustomFirmware=(
 		[PiCustom]="https://raw.githubusercontent.com/Darmur/volumio-rpi-custom/main/output/modules-rpi-${KERNEL_VERSION}-custom.tar.gz"
-		[MotivoCustom]="https://github.com/volumio/motivo-drivers/raw/main/output/modules-rpi-${KERNEL_VERSION}-motivo.tar.gz"
+		[MotivoCustom]="https://github.com/Darmur/motivo-drivers-evo/raw/main/output/modules-rpi-${KERNEL_VERSION}-motivo.tar.gz"
 		[RPiUserlandTools]="https://github.com/volumio/volumio3-os-static-assets/raw/master/tools/rpi-softfp-vc.tar.gz"
 	)
 
