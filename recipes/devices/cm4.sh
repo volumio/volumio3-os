@@ -176,6 +176,7 @@ device_chroot_tweaks_pre() {
 		[6.6.62]="9a9bda382acec723c901e5ae7c7f415d9afbf635|master|1816"
 		[6.12.47]="6d1da66a7b1358c9cd324286239f37203b7ce25c|master|1904"
 		[6.12.74]="7a35bddc777d8992bdfe42f8e3d043582df2f5f8|master|1948"
+		[6.12.75]="98655d3ccedba33aeadd0e550229f1496c5bf6f9|master|1949"
 	)
 	# Version we want
 	KERNEL_VERSION="6.12.74"
