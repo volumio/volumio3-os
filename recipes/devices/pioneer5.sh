@@ -16,7 +16,7 @@ DEVICENAME="pioneer5 SigmaStar Board"
 # This is useful for multiple devices sharing the same/similar kernel
 DEVICEFAMILY="sstar"
 # tarball from DEVICEFAMILY repo to use
-#DEVICEBASE=${DEVICE} # Defaults to ${DEVICE} if unset
+DEVICEREPO="https://github.com/volumio/platform-${DEVICEFAMILY}.git"
 DEVICEREPO="git@github.com:volumio/platform-{DEVICEFAMILY}.git"
 DEVICEREPO_BRANCH="master"
 
